@@ -1,0 +1,26 @@
+[
+  {
+    "id": 4,
+    "topicCode": "english-cafe",
+    "languageCode": "EN",
+    "levelCode": "INTERMEDIATE",
+    "title": "Gọi cà phê tại quán Specialty Coffee",
+    "description": "Gọi đồ uống theo sở thích riêng, hỏi về mức rang hạt và thanh toán chạm.",
+    "userRole": "Khách hàng (Customer)",
+    "aiRole": "Nhân viên pha chế (Barista)",
+    "initialGreeting": "Hey there! Welcome to Craft Coffee. What can I craft for you today?",
+    "culturalContext": "Phong cách đàm thoại thân thiện, dùng cấu trúc nhã nhặn như 'Could I please get...'."
+  },
+  {
+    "id": 5,
+    "topicCode": "english-interview",
+    "languageCode": "EN",
+    "levelCode": "INTERMEDIATE",
+    "title": "Phỏng vấn xin việc Lập trình viên",
+    "description": "Giới thiệu bản thân, chia sẻ kinh nghiệm dự án và trả lời câu hỏi ứng xử kỹ thuật.",
+    "userRole": "Ứng viên (Candidate)",
+    "aiRole": "Trưởng nhóm kỹ thuật (Tech Lead)",
+    "initialGreeting": "Good morning! Thanks for joining today. Could you tell me a bit about yourself?",
+    "culturalContext": "Áp dụng mô hình STAR (Situation, Task, Action, Result) để trả lời mạch lạc."
+  }
+]

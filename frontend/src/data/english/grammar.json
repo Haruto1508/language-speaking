@@ -1,0 +1,28 @@
+[
+  {
+    "id": 4,
+    "languageCode": "EN",
+    "levelCode": "INTERMEDIATE",
+    "grammarPoint": "Could I please get + [Noun]? (Yêu cầu gọi món nhã nhặn)",
+    "pattern": "Could I please get + [Noun]?",
+    "meaning": "Cho tôi xin / Lấy giúp tôi [Danh từ] được không ạ?",
+    "explanation": "Mẫu câu gọi đồ lịch sự chuẩn bản xứ tại các nước nói tiếng Anh (Mỹ, Anh, Úc), thay vì dùng câu mệnh lệnh cộc lốc 'Give me...' hoặc 'I want...'.",
+    "formula": "Could I please get + [Drink/Food Item] + (with [Customization])?",
+    "exampleSentence": "Could I please get an iced Americano with light ice?",
+    "translation": "Làm ơn cho tôi một ly Americano đá ít đá được không ạ?",
+    "pitfalls": "Tránh dùng 'I want a coffee' vì người bản ngữ cảm thấy thiếu nhã nhặn trong ngữ cảnh dịch vụ khách hàng."
+  },
+  {
+    "id": 5,
+    "languageCode": "EN",
+    "levelCode": "INTERMEDIATE",
+    "grammarPoint": "Would you mind if I + [Past Verb]...? (Xin phép trang trọng)",
+    "pattern": "Would you mind if I + [Past Verb]...?",
+    "meaning": "Bạn có phiền nếu tôi làm [Hành động] không?",
+    "explanation": "Cấu trúc đề nghị xin phép cực kỳ lịch sự trong môi trường công sở hoặc phỏng vấn xin việc.",
+    "formula": "Would you mind if I + [Subject] + [Past Simple Verb]...?",
+    "exampleSentence": "Would you mind if I took a moment to organize my thoughts?",
+    "translation": "Bạn có phiền nếu tôi xin một chút thời gian để sắp xếp lại ý nghĩ không ạ?",
+    "pitfalls": "Lưu ý câu trả lời: Nếu đồng ý cho phép thì trả lời 'No, not at all' (Không phiền đâu) hoặc 'Sure, go ahead'."
+  }
+]

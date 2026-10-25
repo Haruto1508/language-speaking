@@ -1,0 +1,51 @@
+[
+  {
+    "id": 2,
+    "languageCode": "EN",
+    "topicCode": "english-cafe",
+    "title": "Lesson 1: Ordering Coffee like a Native",
+    "levelCode": "INTERMEDIATE",
+    "steps": [
+      {
+        "type": "word-builder",
+        "title": "Dịch câu này sang tiếng Việt",
+        "instruction": "Chạm vào các thẻ từ để ghép thành câu hoàn chỉnh:",
+        "prompt": "Could I please get an iced oat latte?",
+        "audioText": "Could I please get an iced oat latte?",
+        "tiles": ["Cho tôi", "ly latte", "sữa yến mạch đá", "với", "nóng", "trà xanh", "được không"],
+        "correctTiles": ["Cho tôi", "ly latte", "sữa yến mạch đá", "được không"]
+      },
+      {
+        "type": "listen-choose",
+        "title": "Nghe và chọn nghĩa tiếng Việt đúng",
+        "instruction": "Lắng nghe nhân viên pha chế hỏi về đơn hàng của bạn:",
+        "prompt": "Will that be for here or to go?",
+        "audioText": "Will that be for here or to go?",
+        "options": [
+          { "id": "1", "text": "Bạn dùng ở đây hay mang đi ạ?", "correct": true },
+          { "id": "2", "text": "Bạn muốn thanh toán bằng thẻ hay tiền mặt?", "correct": false },
+          { "id": "3", "text": "Quán hôm nay hết cà phê rồi.", "correct": false }
+        ]
+      },
+      {
+        "type": "speak",
+        "title": "Luyện phát âm câu nói tự nhiên",
+        "instruction": "Nhấn nút micro và nói to rõ ràng:",
+        "prompt": "Make that to-go, please!",
+        "audioText": "Make that to-go, please!"
+      },
+      {
+        "type": "matching",
+        "title": "Ghép cặp từ đồng nghĩa & đối nghĩa",
+        "instruction": "Chạm vào 2 thẻ tương ứng để hoàn thành bài tập:",
+        "prompt": "Ghép các cặp cụm từ gọi món:",
+        "audioText": "For here. To go. Decaf.",
+        "pairs": [
+          { "id": "1", "left": "For here", "right": "Dùng tại quán" },
+          { "id": "2", "left": "To-go", "right": "Mang đi" },
+          { "id": "3", "left": "Decaf", "right": "Cà phê không caffeine" }
+        ]
+      }
+    ]
+  }
+]

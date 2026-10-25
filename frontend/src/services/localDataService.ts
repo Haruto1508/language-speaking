@@ -1,8 +1,17 @@
-import topicsData from '../data/topics.json';
-import vocabularyData from '../data/vocabulary.json';
-import grammarData from '../data/grammar.json';
-import scenariosData from '../data/scenarios.json';
-import lessonsData from '../data/lessons.json';
+// Korean Data
+import koTopics from '../data/korean/topics.json';
+import koVocab from '../data/korean/vocabulary.json';
+import koGrammar from '../data/korean/grammar.json';
+import koScenarios from '../data/korean/scenarios.json';
+import koLessons from '../data/korean/lessons.json';
+
+// English Data
+import enTopics from '../data/english/topics.json';
+import enVocab from '../data/english/vocabulary.json';
+import enGrammar from '../data/english/grammar.json';
+import enScenarios from '../data/english/scenarios.json';
+import enLessons from '../data/english/lessons.json';
+
 import {
   Topic,
   Vocabulary,
@@ -41,26 +50,22 @@ const saveVocabProgress = (vocabId: number, status: string) => {
 };
 
 export const localDataService = {
-  // Topics
+  // Topics (separated by Korean and English)
   getTopics: (language: LanguageCode, level?: ProficiencyLevelCode): Topic[] => {
-    return (topicsData as unknown as Topic[]).filter((t) => {
-      const matchLang = t.languageCode === language;
-      const matchLevel = level ? t.levelCode === level : true;
-      return matchLang && matchLevel;
-    });
+    const source = language === 'KO' ? koTopics : enTopics;
+    return (source as unknown as Topic[]).filter((t) => (level ? t.levelCode === level : true));
   },
 
   getTopicByCode: (code: string): Topic | undefined => {
-    return (topicsData as unknown as Topic[]).find((t) => t.code === code);
+    const all = [...(koTopics as unknown as Topic[]), ...(enTopics as unknown as Topic[])];
+    return all.find((t) => t.code === code);
   },
 
-  // Vocabulary
+  // Vocabulary (separated by Korean and English)
   getVocabulary: (language: LanguageCode, search?: string): Vocabulary[] => {
     const storedProgress = getStoredVocabProgress();
-    let list = (vocabularyData as unknown as Vocabulary[]).filter((v) => v.languageCode === language);
-
-    // Merge saved progress
-    list = list.map((v) => ({
+    const source = language === 'KO' ? koVocab : enVocab;
+    let list = (source as unknown as Vocabulary[]).map((v) => ({
       ...v,
       userStatus: (storedProgress[v.id] || v.userStatus || 'NEW') as Vocabulary['userStatus'],
     }));
@@ -82,12 +87,13 @@ export const localDataService = {
     saveVocabProgress(id, status);
   },
 
-  // Grammar
+  // Grammar (separated by Korean and English)
   getGrammar: (language: LanguageCode): Grammar[] => {
-    return (grammarData as unknown as Grammar[]).filter((g) => g.languageCode === language);
+    const source = language === 'KO' ? koGrammar : enGrammar;
+    return source as unknown as Grammar[];
   },
 
-  // Scenarios
+  // Scenarios (separated by Korean and English)
   getScenarios: (language: LanguageCode): ConversationScenario[] => {
     let custom: ConversationScenario[] = [];
     try {
@@ -97,14 +103,19 @@ export const localDataService = {
       // ignore
     }
 
-    const defaultItems = (scenariosData as ConversationScenario[]).filter((s) => s.languageCode === language);
+    const defaultItems = (language === 'KO' ? koScenarios : enScenarios) as unknown as ConversationScenario[];
     const matchingCustom = custom.filter((s) => s.languageCode === language);
     return [...matchingCustom, ...defaultItems];
   },
 
-  // Lessons
+  // Lessons (separated by Korean and English)
   getLessonById: (id: number) => {
-    return lessonsData.find((l) => l.id === id) || lessonsData[0];
+    const all = [...koLessons, ...enLessons];
+    return all.find((l) => l.id === id) || koLessons[0];
+  },
+
+  getLessonsByLanguage: (language: LanguageCode) => {
+    return language === 'KO' ? koLessons : enLessons;
   },
 
   // Reviews

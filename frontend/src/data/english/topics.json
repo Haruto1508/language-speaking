@@ -1,0 +1,35 @@
+[
+  {
+    "id": 5,
+    "languageCode": "EN",
+    "levelCode": "INTERMEDIATE",
+    "code": "english-cafe",
+    "name": "Specialty Coffee & Quán Cà phê",
+    "description": "Gọi đồ uống phức tạp, tùy chỉnh mức sữa hạt, hỏi loại hạt rang và thanh toán thẻ không tiếp xúc.",
+    "icon": "Coffee",
+    "estimatedMinutes": 20,
+    "orderIndex": 1
+  },
+  {
+    "id": 6,
+    "languageCode": "EN",
+    "levelCode": "INTERMEDIATE",
+    "code": "english-interview",
+    "name": "Phỏng vấn xin việc Kỹ sư phần mềm",
+    "description": "Giới thiệu bản thân chuyên nghiệp, chia sẻ kinh nghiệm kỹ thuật và áp dụng mô hình STAR để trả lời mạch lạc.",
+    "icon": "Briefcase",
+    "estimatedMinutes": 30,
+    "orderIndex": 2
+  },
+  {
+    "id": 7,
+    "languageCode": "EN",
+    "levelCode": "BEGINNER",
+    "code": "english-airport",
+    "name": "Sân bay & Nhập cảnh quốc tế",
+    "description": "Làm thủ tục check-in, qua cửa an ninh, khai báo hải quan và tìm cổng lên máy bay.",
+    "icon": "Plane",
+    "estimatedMinutes": 25,
+    "orderIndex": 3
+  }
+]

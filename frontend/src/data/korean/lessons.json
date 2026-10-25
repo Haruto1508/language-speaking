@@ -1,0 +1,55 @@
+[
+  {
+    "id": 1,
+    "languageCode": "KO",
+    "topicCode": "korean-restaurant",
+    "title": "Bài học 1: Gọi món tại quán ăn Hàn Quốc",
+    "levelCode": "BEGINNER",
+    "steps": [
+      {
+        "type": "word-builder",
+        "title": "Dịch câu này sang tiếng Việt",
+        "instruction": "Bấm vào các thẻ từ để ghép thành câu hoàn chỉnh:",
+        "prompt": "김치찌개 하나 주세요",
+        "romanization": "Gimchijjigae hana juseyo",
+        "audioText": "김치찌개 하나 주세요",
+        "tiles": ["cho tôi", "cơm trắng", "một phần", "canh kim chi", "nước lọc", "xin vui lòng", "hai phần"],
+        "correctTiles": ["cho tôi", "một phần", "canh kim chi"]
+      },
+      {
+        "type": "listen-choose",
+        "title": "Nghe và chọn câu trả lời đúng",
+        "instruction": "Lắng nghe nhân viên nhà hàng chào đón bạn:",
+        "prompt": "어서오세요! 몇 분이세요?",
+        "romanization": "Eoseo-oseyo! Myeot bun-iseyo?",
+        "audioText": "어서오세요! 몇 분이세요?",
+        "options": [
+          { "id": "1", "text": "Chào mừng quý khách! Đi mấy người ạ?", "correct": true },
+          { "id": "2", "text": "Xin hãy thanh toán bằng thẻ.", "correct": false },
+          { "id": "3", "text": "Món này rất cay.", "correct": false },
+          { "id": "4", "text": "Quán đã hết bàn rồi.", "correct": false }
+        ]
+      },
+      {
+        "type": "speak",
+        "title": "Luyện nói phát âm",
+        "instruction": "Bấm vào biểu tượng mic và nói to rõ ràng:",
+        "prompt": "안녕하세요! 두 명이에요.",
+        "romanization": "Annyeonghaseyo! Du myeong-ieyo.",
+        "audioText": "안녕하세요! 두 명이에요."
+      },
+      {
+        "type": "matching",
+        "title": "Nối các cặp từ tương ứng",
+        "instruction": "Chạm vào từ tiếng Hàn và nghĩa tương ứng:",
+        "prompt": "Ghép đúng 3 cặp từ:",
+        "audioText": "저기요. 주세요. 계산하다.",
+        "pairs": [
+          { "id": "1", "left": "저기요", "right": "Xin lỗi / Em ơi!" },
+          { "id": "2", "left": "주세요", "right": "Làm ơn cho tôi" },
+          { "id": "3", "left": "계산하다", "right": "Tính tiền / Thanh toán" }
+        ]
+      }
+    ]
+  }
+]

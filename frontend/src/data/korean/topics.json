@@ -1,0 +1,46 @@
+[
+  {
+    "id": 1,
+    "languageCode": "KO",
+    "levelCode": "BEGINNER",
+    "code": "korean-restaurant",
+    "name": "Nhà hàng & Ẩm thực Hàn Quốc",
+    "description": "Gọi món truyền thống, xin thêm món phụ (반찬), gọi tính tiền và giao tiếp tự nhiên với nhân viên phục vụ.",
+    "icon": "Utensils",
+    "estimatedMinutes": 20,
+    "orderIndex": 1
+  },
+  {
+    "id": 2,
+    "languageCode": "KO",
+    "levelCode": "BEGINNER",
+    "code": "korean-greetings",
+    "name": "Chào hỏi & Tự giới thiệu",
+    "description": "Nắm vững các câu kính ngữ chào hỏi, giới thiệu họ tên, quốc tịch và tạo ấn tượng đầu ấm áp.",
+    "icon": "Hand",
+    "estimatedMinutes": 15,
+    "orderIndex": 2
+  },
+  {
+    "id": 3,
+    "languageCode": "KO",
+    "levelCode": "BEGINNER",
+    "code": "korean-cafe",
+    "name": "Văn hóa Cà phê Seoul",
+    "description": "Gọi đồ uống theo phong cách Hàn Quốc: uống nóng hay đá (아아), bánh ngọt, uống tại quán hay mang đi.",
+    "icon": "Coffee",
+    "estimatedMinutes": 20,
+    "orderIndex": 3
+  },
+  {
+    "id": 4,
+    "languageCode": "KO",
+    "levelCode": "ELEMENTARY",
+    "code": "korean-travel",
+    "name": "Hỏi đường & Tàu điện ngầm",
+    "description": "Hỏi lối ra ga tàu điện ngầm Gangnam/Hongdae, bắt taxi và hỏi khoảng cách đi bộ.",
+    "icon": "Compass",
+    "estimatedMinutes": 25,
+    "orderIndex": 4
+  }
+]

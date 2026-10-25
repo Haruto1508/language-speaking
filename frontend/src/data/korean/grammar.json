@@ -1,0 +1,41 @@
+[
+  {
+    "id": 1,
+    "languageCode": "KO",
+    "levelCode": "BEGINNER",
+    "grammarPoint": "N + 주세요 (Làm ơn cho tôi N / Cho tôi xin N)",
+    "pattern": "N + 주세요",
+    "meaning": "Làm ơn cho tôi [Danh từ] / Cho tôi xin [Danh từ]",
+    "explanation": "Mẫu câu cơ bản và quan trọng nhất khi vào nhà hàng, quán cà phê, siêu thị tại Hàn Quốc. Thêm từ '하나' (1 cái), '두 개' (2 cái) hoặc '1인분' (1 suất) sau danh từ để nói rõ số lượng.",
+    "formula": "Danh từ (Món ăn/Đồ uống) + (Lượng từ) + 주세요",
+    "exampleSentence": "김치찌개 2인분하고 콜라 하나 주세요.",
+    "translation": "Cho tôi 2 phần canh kim chi và 1 lon coca nhé.",
+    "pitfalls": "Không dùng đuôi câu cộc lốc '김치찌개 줘' với người lạ hoặc nhân viên lớn tuổi hơn; luôn dùng đuôi kính ngữ '주세요'."
+  },
+  {
+    "id": 2,
+    "languageCode": "KO",
+    "levelCode": "BEGINNER",
+    "grammarPoint": "V + (으)ㄹ 수 있다 / 없다 (Có thể / Không thể làm gì)",
+    "pattern": "V + (으)ㄹ 수 있다 / 없다",
+    "meaning": "Có thể / Không thể làm [Hành động]",
+    "explanation": "Dùng để diễn tả khả năng, năng lực hoặc xin phép làm điều gì đó một cách lịch sự.",
+    "formula": "Gốc động từ có patchim + 을 수 있다/없다; không có patchim + ㄹ 수 있다/없다",
+    "exampleSentence": "물 좀 더 주실 수 있나요?",
+    "translation": "Em có thể cho anh xin thêm chút nước được không?",
+    "pitfalls": "Khi hỏi xin phép người khác, nên chia thành dạng kính ngữ '주실 수 있나요?' thay vì '줄 수 있어요?'."
+  },
+  {
+    "id": 3,
+    "languageCode": "KO",
+    "levelCode": "BEGINNER",
+    "grammarPoint": "N + (으)로 결제하다 / 계산하다 (Thanh toán bằng phương thức...)",
+    "pattern": "N + (으)로 결제하다 / 계산하다",
+    "meaning": "Thanh toán bằng [Phương thức]",
+    "explanation": "Trợ từ '(으)로' chỉ phương tiện, phương thức thanh toán như thẻ, tiền mặt hoặc ví điện tử.",
+    "formula": "Danh từ phương thức (카드 / 현금 / 계좌이체) + (으)로 + 결제하다/계산하다",
+    "exampleSentence": "카드로 결제할게요. 영수증은 버려주세요.",
+    "translation": "Tôi thanh toán bằng thẻ nhé. Hóa đơn bỏ đi giúp tôi.",
+    "pitfalls": "Nếu danh từ kết thúc bằng nguyên âm hoặc patchim 'ㄹ' thì đi với '로' (ví dụ: 카드로); kết thúc bằng phụ âm khác thì đi với '으로' (ví dụ: 현금으로)."
+  }
+]
