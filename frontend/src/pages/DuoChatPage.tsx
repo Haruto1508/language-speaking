@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Tag, Avatar, Modal, Typography, Space, Tooltip, message } from 'antd';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Tag, Avatar, Modal, Typography, Space, Tooltip, message, Progress } from 'antd';
 import {
   Mic,
   Send,
@@ -17,18 +17,37 @@ import {
   Lightbulb,
   Sun,
   Moon,
+  MessageSquare,
+  Compass,
+  Utensils,
+  UserCheck,
+  Languages,
+  ChevronRight,
+  Play,
+  RotateCw,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import axios from 'axios';
 import { useAppStore } from '../stores/useAppStore';
 import { api } from '../services/api';
-import { ConversationScenario, ConversationMessage, ConversationFeedback, formatLevelVietnamese } from '../types';
+import {
+  ConversationScenario,
+  ConversationMessage,
+  ConversationFeedback,
+  formatLevelVietnamese,
+} from '../types';
 import { speakText, recordSpeech } from '../utils/speech';
 import { translateToVietnamese } from '../services/translator';
+import {
+  COMPREHENSIVE_SCENARIOS,
+  EnhancedScenario,
+} from '../data/conversationScenarios';
 
-const { Text, Paragraph } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
 export const DuoChatPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     targetLanguage,
     targetLevel,
@@ -38,84 +57,48 @@ export const DuoChatPage: React.FC = () => {
     customScenarios,
     themeMode,
     toggleTheme,
+    user,
   } = useAppStore();
 
   const isKo = targetLanguage === 'KO';
 
-  // Base scenarios + custom scenarios
-  const defaultScenarios: ConversationScenario[] = isKo
-    ? [
-        {
-          id: 1,
-          topicCode: 'korean-restaurant',
-          languageCode: 'KO',
-          levelCode: 'BEGINNER',
-          title: 'Gọi món tại quán ăn Hàn Quốc (식당에서 주문하기)',
-          description: 'Gọi món canh kim chi, xin thêm nước và gọi thanh toán hóa đơn.',
-          userRole: 'Khách hàng (손님)',
-          aiRole: 'Nhân viên phục vụ (직원)',
-          initialGreeting: '어서오세요! 몇 분이세요? 편하신 자리로 앉으세요.',
-          culturalContext: 'Dùng đuôi câu lịch sự -요 để giao tiếp tự nhiên.',
-        },
-        {
-          id: 2,
-          topicCode: 'korean-cafe',
-          languageCode: 'KO',
-          levelCode: 'BEGINNER',
-          title: 'Gọi cà phê tại quán cafe Seoul (아이스 아메리카노)',
-          description: 'Gọi đồ uống, chọn uống tại chỗ hay mang đi và xin hóa đơn.',
-          userRole: 'Khách hàng (손님)',
-          aiRole: 'Barista (바리스타)',
-          initialGreeting: '안녕하세요! 주문 도와드리겠습니다. 드시고 가시나요?',
-          culturalContext: 'Người Hàn hay gọi tắt Ice Americano là "아아".',
-        },
-        {
-          id: 3,
-          topicCode: 'korean-travel',
-          languageCode: 'KO',
-          levelCode: 'ELEMENTARY',
-          title: 'Hỏi đường tại ga tàu điện ngầm Gangnam',
-          description: 'Hỏi đường đến lối ra số 11 và thời gian đi bộ.',
-          userRole: 'Khách du lịch (여행자)',
-          aiRole: 'Người qua đường (행인)',
-          initialGreeting: '네, 안녕하세요! 길 찾으시나요?',
-          culturalContext: 'Mở đầu bằng "저기요, 실례지만..." khi hỏi đường.',
-        },
-      ]
-    : [
-        {
-          id: 4,
-          topicCode: 'english-cafe',
-          languageCode: 'EN',
-          levelCode: 'INTERMEDIATE',
-          title: 'Gọi cà phê tại quán Specialty Coffee',
-          description: 'Gọi đồ uống theo sở thích riêng, hỏi về mức rang hạt và thanh toán chạm.',
-          userRole: 'Khách hàng (Customer)',
-          aiRole: 'Nhân viên pha chế (Barista)',
-          initialGreeting: 'Hey there! Welcome to Craft Coffee. What can I craft for you today?',
-          culturalContext: 'Phong cách đàm thoại thân thiện, dùng cấu trúc nhã nhặn như "Could I please get...".',
-        },
-        {
-          id: 5,
-          topicCode: 'english-interview',
-          languageCode: 'EN',
-          levelCode: 'INTERMEDIATE',
-          title: 'Phỏng vấn xin việc Lập trình viên',
-          description: 'Giới thiệu bản thân, chia sẻ kinh nghiệm dự án và trả lời câu hỏi ứng xử kỹ thuật.',
-          userRole: 'Ứng viên (Candidate)',
-          aiRole: 'Trưởng nhóm kỹ thuật (Tech Lead)',
-          initialGreeting: 'Good morning! Thanks for joining today. Could you tell me a bit about yourself?',
-          culturalContext: 'Áp dụng mô hình STAR (Situation, Task, Action, Result) để trả lời mạch lạc.',
-        },
-      ];
+  // Merge default enhanced scenarios with user's custom scenarios
+  const allEnhancedScenarios: EnhancedScenario[] = [
+    ...COMPREHENSIVE_SCENARIOS.filter((s) => s.languageCode === targetLanguage),
+    ...customScenarios
+      .filter((s) => s.languageCode === targetLanguage)
+      .map((cs) => ({
+        ...cs,
+        category: 'FREE_CHAT' as const,
+        categoryLabel: 'Tự tạo',
+        categoryIcon: '✨',
+        quickReplies: [
+          isKo ? '안녕하세요!' : 'Hello!',
+          isKo ? '감사합니다.' : 'Thank you!',
+          isKo ? '다시 한번 말씀해 주세요.' : 'Could you say that again?',
+        ],
+      })),
+  ];
 
-  const allScenarios = [...customScenarios.filter((s) => s.languageCode === targetLanguage), ...defaultScenarios];
+  // View state: 'LIST' (Catalog of topics & conversations) vs 'CHAT' (Interactive chat room)
+  const initialScenarioId = searchParams.get('scenarioId');
+  const initialScenario = initialScenarioId
+    ? allEnhancedScenarios.find((s) => s.id === Number(initialScenarioId))
+    : null;
 
-  const [selectedScenario, setSelectedScenario] = useState<ConversationScenario>(allScenarios[0]);
+  const [viewMode, setViewMode] = useState<'LIST' | 'CHAT'>(initialScenario ? 'CHAT' : 'LIST');
+  const [selectedCategory, setSelectedCategory] = useState<'ALL' | 'DIRECTIONS' | 'SELF_INTRO' | 'FOOD_ORDER' | 'FREE_CHAT'>('ALL');
+  const [selectedScenario, setSelectedScenario] = useState<EnhancedScenario>(
+    initialScenario || allEnhancedScenarios[0]
+  );
+
+  // Chat State
   const [messages, setMessages] = useState<ConversationMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [sending, setSending] = useState(false);
+
+  // Translations
   const [showTranslations, setShowTranslations] = useState<Record<string | number, boolean>>({});
   const [translations, setTranslations] = useState<Record<string | number, string>>({});
   const [translatingIds, setTranslatingIds] = useState<Record<string | number, boolean>>({});
@@ -152,15 +135,30 @@ export const DuoChatPage: React.FC = () => {
 
   // Automatically switch selected scenario when targetLanguage changes
   useEffect(() => {
-    const matching = allScenarios.filter((s) => s.languageCode === targetLanguage);
+    const matching = allEnhancedScenarios.filter((s) => s.languageCode === targetLanguage);
     if (matching.length > 0) {
       setSelectedScenario(matching[0]);
     }
   }, [targetLanguage]);
 
-  // Initialize conversation when scenario changes
+  // When selectedScenario changes, reset messages and greeting
+  const startChatWithScenario = (scenario: EnhancedScenario) => {
+    setSelectedScenario(scenario);
+    setViewMode('CHAT');
+    setSearchParams({ scenarioId: String(scenario.id) });
+
+    const initial: ConversationMessage = {
+      id: 1,
+      senderRole: 'AI',
+      content: scenario.initialGreeting,
+      timestamp: new Date().toISOString(),
+    };
+    setMessages([initial]);
+    speakText(scenario.initialGreeting, scenario.languageCode, 0.95);
+  };
+
   useEffect(() => {
-    if (selectedScenario) {
+    if (viewMode === 'CHAT' && messages.length === 0 && selectedScenario) {
       const initial: ConversationMessage = {
         id: 1,
         senderRole: 'AI',
@@ -170,11 +168,13 @@ export const DuoChatPage: React.FC = () => {
       setMessages([initial]);
       speakText(selectedScenario.initialGreeting, selectedScenario.languageCode, 0.95);
     }
-  }, [selectedScenario]);
+  }, [viewMode, selectedScenario]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (viewMode === 'CHAT') {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, viewMode]);
 
   // Send message
   const handleSendMessage = async (textToSend?: string) => {
@@ -191,64 +191,164 @@ export const DuoChatPage: React.FC = () => {
     };
     setMessages((prev) => [...prev, userMsg]);
 
-    try {
-      // Backend reply
-      const res = await api.conversations.reply(1, content);
-      if (res?.messages) {
-        setMessages(res.messages);
-        const lastAi = res.messages.filter((m) => m.senderRole === 'AI').slice(-1)[0];
-        if (lastAi) {
-          speakText(lastAi.content, selectedScenario.languageCode, 0.95);
-        }
-      }
-    } catch (e) {
-      // Fallback local educational engine
-      setTimeout(() => {
-        let aiReply = '';
-        let coachTip = '';
-        let suggestion = '';
+    const isFreeChat = selectedScenario.category === 'FREE_CHAT';
 
-        if (isKo) {
-          if (content.includes('김치찌개') || content.includes('주문') || content.includes('주세요')) {
-            aiReply = '네, 김치찌개 하나 준비해 드리겠습니다! 밥과 기본 반찬은 셀프바에서 이용하시면 됩니다. 음료는 필요 없으신가요?';
-            coachTip = 'Câu đặt món rất tự nhiên! Dùng "수량 + 주세요" là quy tắc chuẩn xác.';
-            suggestion = '네, 시원한 물 한 병만 주세요.';
+    // 1. If user provided Gemini API Key, generate real-time AI reply
+    if (apiKey) {
+      try {
+        const systemInstruction = isFreeChat
+          ? `You are a supportive, friendly ${isKo ? 'Korean' : 'English'} language tutor chatting naturally with a learner.
+Respond warmly in ${isKo ? 'Korean' : 'English'} (1-2 sentences).
+Respond ONLY with a JSON object:
+{
+  "reply": "natural response in target language",
+  "coachTip": "concise encouragement or grammar tip in Vietnamese",
+  "suggestedAlternative": "optional more native phrase in target language"
+}`
+          : `You are roleplaying as "${selectedScenario.aiRole}" in scenario: "${selectedScenario.title}". The learner is "${selectedScenario.userRole}".
+Context: ${selectedScenario.description}.
+Respond in character in ${isKo ? 'Korean' : 'English'} (1-2 natural sentences).
+Respond ONLY with a JSON object:
+{
+  "reply": "in-character response in target language",
+  "coachTip": "concise feedback in Vietnamese on learner tone or grammar",
+  "suggestedAlternative": "optional more native phrasing in target language"
+}`;
+
+        const res = await axios.post(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+          {
+            contents: [
+              {
+                parts: [
+                  { text: systemInstruction },
+                  { text: `Learner says: "${content}"` },
+                ],
+              },
+            ],
+            generationConfig: { responseMimeType: 'application/json' },
+          },
+          { timeout: 12000 }
+        );
+
+        const textOut = res.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (textOut) {
+          const parsed = JSON.parse(textOut);
+          const aiMsg: ConversationMessage = {
+            id: Date.now() + 1,
+            senderRole: 'AI',
+            content: parsed.reply || (isKo ? '네, 잘 들었습니다!' : 'Got it! Sounds good.'),
+            grammarFeedback: parsed.coachTip || 'Diễn đạt rất tự nhiên!',
+            suggestedAlternative: parsed.suggestedAlternative,
+            timestamp: new Date().toISOString(),
+          };
+          setMessages((prev) => [...prev, aiMsg]);
+          speakText(aiMsg.content, selectedScenario.languageCode, 0.95);
+          return;
+        }
+      } catch (geminiErr) {
+        console.warn('Gemini chat reply failed, using educational offline engine', geminiErr);
+      }
+    }
+
+    // 2. Fallback smart educational engine
+    setTimeout(() => {
+      let aiReply = '';
+      let coachTip = '';
+      let suggestion = '';
+
+      if (isKo) {
+        if (selectedScenario.category === 'DIRECTIONS') {
+          if (content.includes('출구') || content.includes('어디') || content.includes('어떻게')) {
+            aiReply = '네! 이쪽으로 쭉 직진하시다가 첫 번째 사거리에서 우회전하시면 바로 보입니다.';
+            coachTip = 'Câu hỏi đường rất chuẩn mực! Mở đầu với "저기요, 실례지만..." là phép lịch sự.';
+            suggestion = '여기서 걸어서 얼마나 걸려요?';
+          } else if (content.includes('얼마나') || content.includes('시간') || content.includes('걸려')) {
+            aiReply = '걸어서 5분 정도밖에 안 걸려요. 금방 가실 수 있습니다!';
+            coachTip = 'Dùng "얼마나 걸려요?" để hỏi thời gian đi lại rất tự nhiên.';
+            suggestion = '친절하게 알려주셔서 정말 감사합니다!';
+          } else {
+            aiReply = '네, 맞습니다! 혹시 다른 곳도 더 찾으시는 곳 있으신가요?';
+            coachTip = 'Giữ ngữ điệu nhã nhặn với đuôi -요.';
+            suggestion = '감사합니다, 좋은 하루 보내세요!';
+          }
+        } else if (selectedScenario.category === 'SELF_INTRO') {
+          if (content.includes('안녕') || content.includes('이름') || content.includes('베트남')) {
+            aiReply = '만나서 정말 반가워요! 베트남에서 오셨군요. 한국 생활은 좀 어떠신가요?';
+            coachTip = 'Giới thiệu quê quán rất rõ ràng. Nói "만나서 반갑습니다" là chuẩn mực.';
+            suggestion = '한국어 공부하는 게 아주 재미있어요.';
+          } else if (content.includes('취미') || content.includes('좋아') || content.includes('음악')) {
+            aiReply = '와, 저랑 취미가 정말 비슷하시네요! 주말에 시간 되실 때 같이 활동해요.';
+            coachTip = 'Chia sẻ sở thích giúp kéo gần khoảng cách rất nhanh.';
+            suggestion = '네, 좋아요! 연락처 교환해요.';
+          } else {
+            aiReply = '말씀 들으니 정말 흥미롭네요! 앞으로 서로 도움 주고받으며 잘 지내봐요.';
+            coachTip = 'Ngữ điệu tự tin và thân thiện.';
+            suggestion = '앞으로 잘 부탁드립니다!';
+          }
+        } else if (selectedScenario.category === 'FOOD_ORDER') {
+          if (content.includes('주문') || content.includes('주세요') || content.includes('찌개') || content.includes('삼겹살') || content.includes('커피')) {
+            aiReply = '네, 손님! 주문하신 메뉴 바로 준비해 드리겠습니다. 더 필요하신 건 없으신가요?';
+            coachTip = 'Cấu trúc "Tên món + 수량 + 주세요" là công thức chuẩn xác số 1 khi gọi món.';
+            suggestion = '네, 시원한 물 한 병만 더 주세요.';
           } else if (content.includes('계산') || content.includes('얼마') || content.includes('카드')) {
-            aiReply = '네, 총 9,000원입니다. 앞쪽에 카드 꽂아주시면 결제 도와드리겠습니다!';
-            coachTip = 'Khi thanh toán, nói "카드로 할게요" hoặc "계산해 주세요" rất chuẩn.';
+            aiReply = '네, 총 결제 도와드리겠습니다. 앞쪽 단말기에 카드 꽂아주시면 됩니다!';
+            coachTip = 'Khi thanh toán, nói "카드로 할게요" rất ngắn gọn và tự nhiên.';
             suggestion = '영수증은 버려주셔도 돼요.';
           } else {
-            aiReply = '네, 손님! 말씀하신 내용 확인했습니다. 더 필요하신 부분 있으시면 언제든 저기요 하고 불러주세요.';
-            coachTip = 'Giữ ngữ điệu thân thiện và lịch sự với đuôi -요.';
-            suggestion = '감사합니다, 맛있게 먹겠습니다!';
+            aiReply = '네, 손님! 말씀하신 부분 확인했습니다. 잠시만 기다려 주시면 바로 챙겨드리겠습니다.';
+            coachTip = 'Giao tiếp gọi phục vụ rất lưu loát!';
+            suggestion = '맛있게 잘 먹겠습니다!';
           }
         } else {
-          if (content.includes('latte') || content.includes('coffee') || content.includes('get')) {
-            aiReply = 'Perfect! An iced oat latte coming right up. That will be $6.50 on card. Will that be for here or to go?';
-            coachTip = 'Great use of polite modal "Could I get...".';
-            suggestion = 'Make that to go, please.';
-          } else {
-            aiReply = 'Sounds wonderful! Let me know if you need any extra syrup or sugar on the side.';
-            coachTip = 'Fluent and natural flow.';
-            suggestion = 'Thank you, I appreciate it!';
-          }
+          // Free Chat
+          aiReply = '정말 좋은 생각이네요! 당신과 한국어로 이야기 나누는 것이 참 즐겁습니다. 계속해서 편하게 말씀해 주세요!';
+          coachTip = 'Phản xạ tiếng Hàn rất tự tin và trôi chảy!';
+          suggestion = '다음에는 어떤 이야기를 나눌까요?';
         }
+      } else {
+        // English
+        if (selectedScenario.category === 'DIRECTIONS') {
+          if (content.includes('where') || content.includes('how') || content.includes('find')) {
+            aiReply = 'Sure thing! Just head straight down this avenue and take a right at the traffic lights. You cannot miss it!';
+            coachTip = 'Great use of polite inquiry modal "Could you tell me...".';
+            suggestion = 'Is it within walking distance from here?';
+          } else {
+            aiReply = 'It takes only about five minutes on foot. Very easy to find!';
+            coachTip = 'Clear pronunciation and natural conversational flow.';
+            suggestion = 'Thank you so much, have a wonderful day!';
+          }
+        } else if (selectedScenario.category === 'FOOD_ORDER') {
+          if (content.includes('latte') || content.includes('order') || content.includes('steak') || content.includes('burger') || content.includes('please')) {
+            aiReply = 'Excellent choice! Coming right up for you. Would you like anything else to drink or a side with that?';
+            coachTip = 'Polite modal request "Could I please get..." sounds very respectful.';
+            suggestion = 'Could we get the check whenever you have a moment?';
+          } else {
+            aiReply = 'Certainly! That will be on card. Please tap right on the terminal screen.';
+            coachTip = 'Smooth transaction phrasing.';
+            suggestion = 'Keep the change, thank you!';
+          }
+        } else {
+          aiReply = "That sounds wonderful! I completely agree with your point. What else would you like to explore today?";
+          coachTip = 'Fluent and natural sentence structure.';
+          suggestion = 'What do you recommend for practicing speaking?';
+        }
+      }
 
-        const aiMsg: ConversationMessage = {
-          id: Date.now() + 1,
-          senderRole: 'AI',
-          content: aiReply,
-          grammarFeedback: coachTip,
-          suggestedAlternative: suggestion,
-          timestamp: new Date().toISOString(),
-        };
+      const aiMsg: ConversationMessage = {
+        id: Date.now() + 1,
+        senderRole: 'AI',
+        content: aiReply,
+        grammarFeedback: coachTip,
+        suggestedAlternative: suggestion,
+        timestamp: new Date().toISOString(),
+      };
 
-        setMessages((prev) => [...prev, aiMsg]);
-        speakText(aiReply, selectedScenario.languageCode, 0.95);
-      }, 700);
-    } finally {
-      setSending(false);
-    }
+      setMessages((prev) => [...prev, aiMsg]);
+      speakText(aiReply, selectedScenario.languageCode, 0.95);
+    }, 700);
+
+    setSending(false);
   };
 
   // Voice recording
@@ -275,93 +375,333 @@ export const DuoChatPage: React.FC = () => {
       grammarScore: 94,
       vocabularyScore: 89,
       feedbackSummary: isKo
-        ? 'Buổi giao tiếp xuất sắc! Bạn đã sử dụng chính xác các đuôi câu kính ngữ 존댓말, gọi món rõ ràng và thể hiện sự tự tin cao.'
-        : 'Outstanding conversation practice! You applied natural modal hedging and polite service request phrasing.',
+        ? 'Bạn phản xạ câu hỏi và trả lời tự nhiên, vận dụng tốt đuôi câu lịch sự và từ vựng chuyên ngành trong tình huống!'
+        : 'Outstanding roleplay! You applied natural modal hedging, courteous intonation, and native phrasing.',
       grammarMistakes: isKo
-        ? ['Lưu ý khi gọi món: nên thêm lượng từ "하나" hoặc "1인분" sau tên món ăn.']
-        : ['Remember prepositions: "order from the menu" instead of "order in the menu".'],
-      vocabularyMistakes: isKo
-        ? ['Nên dùng từ thuần Hàn "계산서" hoặc "영수증" thay vì mượn từ bill.']
-        : ['Prefer "Could I please get" over blunt imperatives like "Give me".'],
+        ? ['Chú ý sử dụng kính ngữ phù hợp với người lớn tuổi/nhân viên phục vụ.']
+        : ['Remember to check modal verb alignment in formal inquiries.'],
+      vocabularyMistakes: [],
       moreNaturalExpressions: isKo
-        ? [
-            'Khi xin thêm nước: "물 좀 더 주실 수 있나요?"',
-            'Khi thanh toán xong: "잘 먹었습니다! 수고하세요~"',
-          ]
-        : [
-            '"Could you make that extra hot, please?"',
-            '"We are ready to order whenever you are."',
-          ],
+        ? ['"~해 주시겠어요?" thay vì "~해줘" để câu nói mềm mại và lịch thiệp hơn.']
+        : ['"Could you please tell me..." sounds more natural than direct questions.'],
       usefulVocabulary: isKo
-        ? ['1인분 (Một phần ăn)', '반찬 리필 (Xin thêm món phụ)', '포장 (Mang về / Takeout)', '영수증 (Hóa đơn)']
-        : ['Single-origin', 'Dairy-free', 'Complimentary', 'To-go'],
-      suggestedAlternativeSentences: isKo
-        ? ['창가 자리로 부탁드려도 될까요? (Cho tôi xin bàn cạnh cửa sổ được không ạ?)']
-        : ['Could we have the check whenever you get a chance?'],
+        ? ['직진하다 (đi thẳng)', '주문하다 (gọi món)', '반갑습니다 (rất vui được gặp)']
+        : ['recommendation', 'crossroad', 'pleased to meet you'],
+      suggestedAlternativeSentences: [],
     };
-
     setFeedback(mockFeedback);
     setIsFeedbackOpen(true);
     confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
   };
 
-  // Quick reply chips
-  const quickReplies = isKo
-    ? ['네, 김치찌개 하나 주세요.', '물 좀 더 주세요.', '계산해 주세요!', '창가 자리 있나요?']
-    : ['Could I get an iced latte, please?', 'Make that to go, please.', 'Could I have the check?', 'What do you recommend?'];
+  // Filter scenarios for catalog view
+  const filteredCatalog = allEnhancedScenarios.filter((sc) => {
+    if (selectedCategory === 'ALL') return true;
+    return sc.category === selectedCategory;
+  });
 
+  const categoryCounts = {
+    ALL: allEnhancedScenarios.length,
+    DIRECTIONS: allEnhancedScenarios.filter((s) => s.category === 'DIRECTIONS').length,
+    SELF_INTRO: allEnhancedScenarios.filter((s) => s.category === 'SELF_INTRO').length,
+    FOOD_ORDER: allEnhancedScenarios.filter((s) => s.category === 'FOOD_ORDER').length,
+    FREE_CHAT: allEnhancedScenarios.filter((s) => s.category === 'FREE_CHAT').length,
+  };
+
+  const isFreeChat = selectedScenario.category === 'FREE_CHAT';
+
+  // =========================================================================
+  // VIEW MODE 1: LIST / CATALOG OF CONVERSATION SCENARIOS
+  // =========================================================================
+  if (viewMode === 'LIST') {
+    return (
+      <div style={{ maxWidth: 1100, margin: '0 auto', paddingBottom: 60 }}>
+        {/* Top Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24 }}>
+          <div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '4px 12px', borderRadius: 20, background: 'rgba(28, 176, 246, 0.12)', border: '1.5px solid rgba(28, 176, 246, 0.3)', marginBottom: 10 }}>
+              <Sparkles size={14} color="#1CB0F6" />
+              <span style={{ fontSize: 12, fontWeight: 800, color: '#1CB0F6' }}>
+                Trung tâm Luyện nói & Phản xạ Giao tiếp AI 3D 🚀
+              </span>
+            </div>
+            <Title level={2} style={{ color: 'var(--duo-text-primary)', margin: 0, fontWeight: 900 }}>
+              {isKo ? 'Hội thoại Giao tiếp Thực chiến Tiếng Hàn 🇰🇷' : 'Hội thoại Giao tiếp Thực chiến Tiếng Anh 🇺🇸'}
+            </Title>
+            <Text style={{ color: 'var(--duo-text-secondary)', fontSize: 15 }}>
+              Chọn tình huống bên dưới để nhập vai cùng AI (Hỏi đường, Giới thiệu bản thân, Order món ăn) hoặc Chat tự do mọi chủ đề!
+            </Text>
+          </div>
+
+          {/* Quick Action Buttons */}
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <button
+              className="duo-btn-outline"
+              onClick={openApiKeyModal}
+              style={{ padding: '8px 14px', borderColor: apiKey ? '#58CC02' : '#FFC800' }}
+            >
+              <Key size={15} color={apiKey ? '#58CC02' : '#FFC800'} />
+              <span style={{ color: apiKey ? '#58CC02' : '#FFC800' }}>
+                {apiKey ? 'AI Key (Đã bật)' : 'Điền AI Key'}
+              </span>
+            </button>
+
+            <button
+              className="duo-btn-outline"
+              onClick={openImportModal}
+              style={{ padding: '8px 14px' }}
+            >
+              <Upload size={15} color="#1CB0F6" />
+              <span>Nạp JSON</span>
+            </button>
+
+            <button
+              className="duo-btn-outline"
+              onClick={toggleTheme}
+              style={{ padding: '8px 12px' }}
+              title={themeMode === 'dark' ? 'Giao diện Sáng ☀️' : 'Giao diện Tối 🌙'}
+            >
+              {themeMode === 'dark' ? <Sun size={15} color="#FFC800" /> : <Moon size={15} color="#6366F1" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Category Filter Tabs */}
+        <div
+          style={{
+            display: 'flex',
+            gap: 10,
+            overflowX: 'auto',
+            paddingBottom: 14,
+            marginBottom: 26,
+          }}
+        >
+          {[
+            { key: 'ALL', label: 'Tất cả chủ đề', icon: '🌟', count: categoryCounts.ALL },
+            { key: 'DIRECTIONS', label: 'Hỏi đường & Đi lại', icon: '🗺️', count: categoryCounts.DIRECTIONS },
+            { key: 'SELF_INTRO', label: 'Giới thiệu bản thân & Kết bạn', icon: '🙋', count: categoryCounts.SELF_INTRO },
+            { key: 'FOOD_ORDER', label: 'Order món ăn & Cafe', icon: '🍜', count: categoryCounts.FOOD_ORDER },
+            { key: 'FREE_CHAT', label: 'Chat tự do cùng AI', icon: '✨', count: categoryCounts.FREE_CHAT },
+          ].map((cat) => {
+            const isSelected = selectedCategory === cat.key;
+            return (
+              <button
+                key={cat.key}
+                onClick={() => setSelectedCategory(cat.key as any)}
+                style={{
+                  background: isSelected ? 'var(--duo-card-bg)' : 'transparent',
+                  color: isSelected ? 'var(--duo-text-primary)' : 'var(--duo-text-secondary)',
+                  border: isSelected ? '2px solid #58CC02' : '1.5px solid var(--duo-border)',
+                  borderBottom: isSelected ? '4px solid #46A302' : '3px solid var(--duo-border)',
+                  borderRadius: 14,
+                  padding: '10px 18px',
+                  fontSize: 14,
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  transition: 'all 0.15s ease',
+                }}
+                className="duo-card-interactive"
+              >
+                <span>{cat.icon}</span>
+                <span>{cat.label}</span>
+                <Tag
+                  color={isSelected ? 'green' : 'default'}
+                  style={{ borderRadius: 6, fontWeight: 800, margin: 0, fontSize: 11 }}
+                >
+                  {cat.count}
+                </Tag>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Scenario Directory Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
+          {filteredCatalog.map((sc) => {
+            const isFree = sc.category === 'FREE_CHAT';
+
+            return (
+              <div
+                key={sc.id}
+                onClick={() => startChatWithScenario(sc)}
+                className="duo-card duo-card-interactive"
+                style={{
+                  padding: 22,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: 14,
+                  cursor: 'pointer',
+                  position: 'relative',
+                  border: isFree ? '2px solid rgba(28, 176, 246, 0.5)' : undefined,
+                }}
+              >
+                <div>
+                  {/* Top Badges */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 24 }}>{sc.categoryIcon}</span>
+                      <Tag color="cyan" style={{ borderRadius: 6, fontWeight: 800, margin: 0 }}>
+                        {sc.categoryLabel}
+                      </Tag>
+                    </div>
+
+                    <Tag color="blue" style={{ borderRadius: 6, fontWeight: 800, margin: 0 }}>
+                      {formatLevelVietnamese(sc.levelCode)}
+                    </Tag>
+                  </div>
+
+                  {/* Title & Description */}
+                  <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 8, lineHeight: 1.35 }}>
+                    {sc.title}
+                  </h3>
+                  <p style={{ fontSize: 13, color: 'var(--duo-text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
+                    {sc.description}
+                  </p>
+
+                  {/* Role Assignment */}
+                  <div
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 12,
+                      background: 'var(--duo-bg)',
+                      border: '1px solid var(--duo-border)',
+                      fontSize: 12,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 4,
+                      marginBottom: 12,
+                    }}
+                  >
+                    <div>
+                      🧑‍🎓 <strong>Bạn đóng vai:</strong>{' '}
+                      <span style={{ color: '#58CC02', fontWeight: 700 }}>{sc.userRole}</span>
+                    </div>
+                    <div>
+                      🤖 <strong>AI đóng vai:</strong>{' '}
+                      <span style={{ color: '#1CB0F6', fontWeight: 700 }}>{sc.aiRole}</span>
+                    </div>
+                  </div>
+
+                  {/* Initial Greeting Quote */}
+                  <div
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: 10,
+                      background: 'rgba(28, 176, 246, 0.08)',
+                      borderLeft: '3px solid #1CB0F6',
+                      fontSize: 13,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 8,
+                    }}
+                  >
+                    <span className={isKo ? 'lang-ko' : ''} style={{ fontStyle: 'italic', color: 'var(--duo-text-primary)', fontWeight: 600 }}>
+                      "{sc.initialGreeting}"
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        speakText(sc.initialGreeting, sc.languageCode, 0.95);
+                      }}
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#1CB0F6', padding: 2 }}
+                      title="Nghe câu mở đầu"
+                    >
+                      <Volume2 size={16} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Bottom CTA Button */}
+                <button
+                  className={isFree ? 'duo-btn-blue' : 'duo-btn-green'}
+                  style={{ width: '100%', padding: '10px 16px', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                >
+                  <MessageSquare size={16} />
+                  <span>{isFree ? 'Bắt đầu chat tự do ➔' : 'Vào luyện nói hội thoại ➔'}</span>
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // VIEW MODE 2: ACTIVE CHAT ROOM
+  // =========================================================================
   return (
     <div
       style={{
-        minHeight: '100vh',
-        background: 'var(--duo-bg)',
-        color: 'var(--duo-text-primary)',
         display: 'flex',
         flexDirection: 'column',
-        transition: 'background-color 0.2s ease, color 0.2s ease',
+        height: 'calc(100vh - 64px)',
+        background: 'var(--duo-bg)',
       }}
     >
-      {/* Top Header Navigation (Duolingo Style) */}
+      {/* Top Header in Chat Room */}
       <div
         style={{
-          padding: '14px 24px',
-          borderBottom: '2px solid var(--duo-border)',
+          padding: '12px 24px',
           background: 'var(--duo-header-bg)',
-          backdropFilter: 'blur(12px)',
+          backdropFilter: 'blur(16px)',
+          borderBottom: '2px solid var(--duo-border)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: 12,
-          transition: 'background-color 0.2s ease, border-color 0.2s ease',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* Back button to scenario list */}
           <button
             className="duo-btn-outline"
-            onClick={() => navigate('/topics')}
-            style={{ padding: '8px 14px' }}
+            onClick={() => setViewMode('LIST')}
+            style={{
+              padding: '6px 14px',
+              fontSize: 13,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              fontWeight: 800,
+            }}
+            title="Quay lại danh sách chọn tình huống khác"
           >
             <ArrowLeft size={16} />
-            <span>Thoát</span>
+            <span>Danh sách hội thoại</span>
           </button>
 
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 18, fontWeight: 900, color: 'var(--duo-text-primary)' }}>
+              <span style={{ fontSize: 18 }}>{selectedScenario.categoryIcon}</span>
+              <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--duo-text-primary)' }}>
                 {selectedScenario.title}
               </span>
-              <Tag color="green">{formatLevelVietnamese(selectedScenario.levelCode)}</Tag>
+              <Tag color="blue" style={{ borderRadius: 6, fontWeight: 800, margin: 0 }}>
+                {formatLevelVietnamese(selectedScenario.levelCode)}
+              </Tag>
             </div>
-            <div style={{ fontSize: 12, color: 'var(--duo-text-secondary)' }}>
-              Bạn là: <strong style={{ color: '#58CC02' }}>{selectedScenario.userRole}</strong> | AI đóng vai: <strong style={{ color: '#1CB0F6' }}>{selectedScenario.aiRole}</strong>
+            <div style={{ fontSize: 12, color: 'var(--duo-text-secondary)', marginTop: 2 }}>
+              {isFreeChat ? (
+                <span>Trò chuyện tự do cùng Trợ lý AI • Không giới hạn chủ đề</span>
+              ) : (
+                <span>
+                  Bạn: <strong style={{ color: '#58CC02' }}>{selectedScenario.userRole}</strong> | AI: <strong style={{ color: '#1CB0F6' }}>{selectedScenario.aiRole}</strong>
+                </span>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Action Controls */}
+        {/* Header Right Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {/* API Key Modal Button */}
           <button
             className="duo-btn-outline"
             onClick={openApiKeyModal}
@@ -369,34 +709,19 @@ export const DuoChatPage: React.FC = () => {
           >
             <Key size={15} color={apiKey ? '#58CC02' : '#FFC800'} />
             <span style={{ color: apiKey ? '#58CC02' : '#FFC800' }}>
-              {apiKey ? 'API Key (Đã kích hoạt)' : 'Điền API Key'}
+              {apiKey ? 'AI Key (Bật)' : 'Điền Key'}
             </span>
           </button>
 
-          {/* Import JSON Modal Button */}
-          <button
-            className="duo-btn-outline"
-            onClick={openImportModal}
-            style={{ padding: '8px 14px' }}
-          >
-            <Upload size={15} color="#1CB0F6" />
-            <span>Nạp JSON</span>
-          </button>
-
-          {/* Theme Toggle Button */}
           <button
             className="duo-btn-outline"
             onClick={toggleTheme}
-            style={{
-              padding: '8px 12px',
-              color: themeMode === 'dark' ? '#FFC800' : '#6366F1',
-            }}
-            title={themeMode === 'dark' ? 'Chuyển sang giao diện Sáng ☀️' : 'Chuyển sang giao diện Tối 🌙'}
+            style={{ padding: '8px 12px' }}
+            title={themeMode === 'dark' ? 'Giao diện Sáng ☀️' : 'Giao diện Tối 🌙'}
           >
-            {themeMode === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+            {themeMode === 'dark' ? <Sun size={15} color="#FFC800" /> : <Moon size={15} color="#6366F1" />}
           </button>
 
-          {/* Finish Button */}
           <button
             className="duo-btn-green"
             onClick={handleFinish}
@@ -408,53 +733,11 @@ export const DuoChatPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Scenario Bar Selector */}
-      <div
-        style={{
-          padding: '10px 24px',
-          background: 'var(--duo-card-bg)',
-          borderBottom: '2px solid var(--duo-border)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          overflowX: 'auto',
-          transition: 'background-color 0.2s ease, border-color 0.2s ease',
-        }}
-      >
-        <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--duo-text-secondary)', whiteSpace: 'nowrap' }}>
-          Đổi tình huống:
-        </span>
-        {allScenarios.map((sc) => {
-          const isSel = selectedScenario.id === sc.id;
-          return (
-            <button
-              key={sc.id}
-              onClick={() => setSelectedScenario(sc)}
-              style={{
-                background: isSel ? '#58CC02' : 'var(--duo-bg)',
-                color: isSel ? '#FFFFFF' : 'var(--duo-text-secondary)',
-                border: isSel ? 'none' : '2px solid var(--duo-border)',
-                borderBottom: isSel ? '3px solid #46A302' : '3px solid var(--duo-border)',
-                borderRadius: 12,
-                padding: '6px 14px',
-                fontSize: 13,
-                fontWeight: 800,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                transition: 'all 0.1s ease',
-              }}
-            >
-              {sc.title}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Main Chat Messenger Area */}
+      {/* Messages Scroll Area */}
       <div
         style={{
           flex: 1,
-          maxWidth: 800,
+          maxWidth: 820,
           width: '100%',
           margin: '0 auto',
           padding: '24px 20px',
@@ -487,7 +770,11 @@ export const DuoChatPage: React.FC = () => {
                   width: 44,
                   height: 44,
                   borderRadius: '50%',
-                  background: isAi ? 'linear-gradient(135deg, #1CB0F6, #58CC02)' : 'linear-gradient(135deg, #FFC800, #FF9600)',
+                  background: isAi
+                    ? isFreeChat
+                      ? 'linear-gradient(135deg, #8B5CF6, #06B6D4)'
+                      : 'linear-gradient(135deg, #1CB0F6, #58CC02)'
+                    : 'linear-gradient(135deg, #FFC800, #FF9600)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -497,7 +784,7 @@ export const DuoChatPage: React.FC = () => {
                   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
                 }}
               >
-                {isAi ? '🤖' : '🧑‍🎓'}
+                {isAi ? (isFreeChat ? '🧙‍♂️' : '🤖') : '🧑‍🎓'}
               </div>
 
               <div style={{ maxWidth: '78%' }}>
@@ -505,7 +792,7 @@ export const DuoChatPage: React.FC = () => {
                 <div className={isAi ? 'duo-speech-bubble' : 'duo-speech-bubble-user'}>
                   <div
                     className={isKo ? 'lang-ko' : ''}
-                    style={{ fontSize: 17, fontWeight: 700, lineHeight: 1.5 }}
+                    style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.55 }}
                   >
                     {msg.content}
                   </div>
@@ -545,7 +832,7 @@ export const DuoChatPage: React.FC = () => {
                           cursor: 'pointer',
                           fontSize: 12,
                         }}
-                        title="Nghe chậm"
+                        title="Nghe phát âm chậm"
                       >
                         🐢
                       </button>
@@ -559,7 +846,7 @@ export const DuoChatPage: React.FC = () => {
                           color: isTranslated ? '#1CB0F6' : 'var(--duo-text-secondary)',
                           cursor: 'pointer',
                           fontSize: 12,
-                          fontWeight: isTranslated ? 700 : 500,
+                          fontWeight: isTranslated ? 800 : 600,
                           textDecoration: 'underline',
                         }}
                       >
@@ -568,7 +855,7 @@ export const DuoChatPage: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Audio Speaker & Translation Controls for User message */}
+                  {/* Controls for User message */}
                   {!isAi && (
                     <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8 }}>
                       <button
@@ -596,7 +883,7 @@ export const DuoChatPage: React.FC = () => {
                           color: isTranslated ? '#58CC02' : 'var(--duo-text-secondary)',
                           cursor: 'pointer',
                           fontSize: 11,
-                          fontWeight: isTranslated ? 700 : 500,
+                          fontWeight: isTranslated ? 800 : 600,
                           textDecoration: 'underline',
                         }}
                       >
@@ -605,7 +892,7 @@ export const DuoChatPage: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Dynamic Translation Text Reveal */}
+                  {/* Dynamic Translation Box */}
                   {isTranslated && (
                     <div
                       style={{
@@ -621,7 +908,7 @@ export const DuoChatPage: React.FC = () => {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
                         <span style={{ fontSize: 13 }}>💡</span>
                         <span style={{ fontSize: 11, fontWeight: 700, color: isAi ? '#A5B4FC' : '#86EFAC', textTransform: 'uppercase' }}>
-                          Bản dịch nghĩa:
+                          Bản dịch nghĩa tiếng Việt:
                         </span>
                       </div>
                       <div style={{ paddingLeft: 18 }}>
@@ -639,7 +926,7 @@ export const DuoChatPage: React.FC = () => {
                   )}
                 </div>
 
-                {/* Coach Note On Grammar */}
+                {/* Educational Coach Feedback */}
                 {msg.grammarFeedback && (
                   <div
                     style={{
@@ -668,207 +955,236 @@ export const DuoChatPage: React.FC = () => {
       </div>
 
       {/* Quick Replies Chips */}
-      <div style={{ maxWidth: 800, width: '100%', margin: '0 auto', padding: '0 20px 10px' }}>
-        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 6 }}>
-          <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--duo-text-muted)', display: 'flex', alignItems: 'center' }}>
-            Gợi ý:
-          </span>
-          {quickReplies.map((reply, i) => (
-            <button
-              key={i}
-              onClick={() => handleSendMessage(reply)}
-              className="duo-btn-outline"
-              style={{
-                padding: '6px 12px',
-                fontSize: 12,
-                borderRadius: 20,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {reply}
-            </button>
-          ))}
+      {selectedScenario.quickReplies && selectedScenario.quickReplies.length > 0 && (
+        <div style={{ maxWidth: 820, width: '100%', margin: '0 auto', padding: '0 20px 8px' }}>
+          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 6 }}>
+            <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--duo-text-muted)', display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+              💡 Gợi ý câu:
+            </span>
+            {selectedScenario.quickReplies.map((reply, i) => (
+              <button
+                key={i}
+                onClick={() => handleSendMessage(reply)}
+                className="duo-btn-outline"
+                style={{
+                  fontSize: 12,
+                  padding: '5px 12px',
+                  borderRadius: 20,
+                  whiteSpace: 'nowrap',
+                  fontWeight: 700,
+                }}
+              >
+                {reply}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Bottom Input Action Bar */}
+      {/* Chat Input Bar */}
       <div
         style={{
-          borderTop: '2px solid var(--duo-border)',
           background: 'var(--duo-card-bg)',
+          borderTop: '2px solid var(--duo-border)',
           padding: '16px 24px',
-          transition: 'background-color 0.2s ease, border-color 0.2s ease',
         }}
       >
         <div
           style={{
-            maxWidth: 800,
+            maxWidth: 820,
             margin: '0 auto',
             display: 'flex',
             alignItems: 'center',
             gap: 12,
           }}
         >
-          {/* Big Voice Mic Recording Button */}
-          <Tooltip title={isRecording ? 'Đang lắng nghe... bấm để dừng' : 'Bấm để ghi âm và nói trực tiếp'}>
-            <button
-              onClick={handleVoiceRecord}
-              className={isRecording ? 'duo-mic-active' : ''}
-              style={{
-                width: 52,
-                height: 52,
-                borderRadius: '50%',
-                background: isRecording ? '#FF4B4B' : '#1CB0F6',
-                border: 'none',
-                borderBottom: isRecording ? '4px solid #EA2B2B' : '4px solid #1899D6',
-                color: '#FFFFFF',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <Mic size={24} />
-            </button>
-          </Tooltip>
-
-          {/* Text Input Field */}
-          <input
-            type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && !sending && handleSendMessage()}
-            placeholder={
-              isKo
-                ? 'Nhập bằng tiếng Hàn hoặc bấm mic để nói (ví dụ: 네, 김치찌개 하나 주세요)...'
-                : 'Nhập bằng tiếng Anh hoặc bấm mic để nói (ví dụ: Could I get an iced latte, please?)...'
-            }
+          {/* Mic Button */}
+          <button
+            onClick={handleVoiceRecord}
+            className={isRecording ? 'pulse-fast' : ''}
             style={{
-              flex: 1,
-              background: 'var(--duo-bg)',
-              border: '2px solid var(--duo-border)',
-              borderRadius: 16,
-              padding: '14px 18px',
-              color: 'var(--duo-text-primary)',
-              fontSize: 15,
-              outline: 'none',
-              fontFamily: 'inherit',
-              transition: 'background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease',
+              width: 50,
+              height: 50,
+              borderRadius: '50%',
+              background: isRecording ? '#FF4B4B' : 'linear-gradient(135deg, #1CB0F6, #1899D6)',
+              border: 'none',
+              borderBottom: isRecording ? '4px solid #EA2B2B' : '4px solid #1480B4',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              flexShrink: 0,
+              boxShadow: isRecording ? '0 0 16px rgba(255, 75, 75, 0.6)' : '0 4px 12px rgba(28, 176, 246, 0.3)',
+              transition: 'all 0.15s ease',
             }}
-          />
+            title={isRecording ? 'Đang lắng nghe bạn nói...' : 'Nhấn để nói tiếng Hàn/Anh qua micro'}
+          >
+            <Mic size={22} />
+          </button>
+
+          {/* Text Input */}
+          <div style={{ flex: 1, position: 'relative' }}>
+            <input
+              type="text"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSendMessage();
+              }}
+              placeholder={
+                isFreeChat
+                  ? isKo
+                    ? 'Nhập tin nhắn hoặc nói bất kỳ điều gì bằng tiếng Hàn...'
+                    : 'Type a message or speak anything in English...'
+                  : isKo
+                  ? `Nhập câu nói của bạn (${selectedScenario.userRole})...`
+                  : `Type your message (${selectedScenario.userRole})...`
+              }
+              className={isKo ? 'lang-ko' : ''}
+              style={{
+                width: '100%',
+                padding: '14px 18px',
+                borderRadius: 16,
+                background: 'var(--duo-bg)',
+                border: '2px solid var(--duo-border)',
+                color: 'var(--duo-text-primary)',
+                fontSize: 15,
+                fontWeight: 600,
+                outline: 'none',
+                boxSizing: 'border-box',
+                transition: 'border-color 0.2s ease',
+              }}
+            />
+          </div>
 
           {/* Send Button */}
           <button
-            className="duo-btn-green"
             onClick={() => handleSendMessage()}
-            disabled={sending || !inputText.trim()}
-            style={{ padding: '14px 22px', borderRadius: 16 }}
+            disabled={!inputText.trim() || sending}
+            className="duo-btn-green"
+            style={{
+              height: 50,
+              padding: '0 22px',
+              fontSize: 15,
+              opacity: !inputText.trim() ? 0.5 : 1,
+              cursor: !inputText.trim() ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
           >
             <Send size={18} />
+            <span>Gửi</span>
           </button>
         </div>
       </div>
 
-      {/* Post-Conversation Performance Feedback Modal */}
-      {isFeedbackOpen && feedback && (
-        <Modal
-          title={
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Award size={26} color="#FFC800" />
-              <span style={{ fontSize: 20, fontWeight: 900 }}>Kết quả Đánh giá Giao tiếp 🎉</span>
-            </div>
-          }
-          open={isFeedbackOpen}
-          onCancel={() => setIsFeedbackOpen(false)}
-          footer={null}
-          width={720}
-          centered
-        >
-          <div style={{ padding: '10px 0' }}>
-            {/* Score Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 20 }}>
-              <div className="duo-card" style={{ textAlign: 'center', borderColor: '#FFC800' }}>
-                <div style={{ fontSize: 28, fontWeight: 900, color: '#FFC800' }}>{feedback.overallScore}</div>
-                <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--duo-text-muted)' }}>TỔNG ĐIỂM</div>
-              </div>
-              <div className="duo-card" style={{ textAlign: 'center', borderColor: '#58CC02' }}>
-                <div style={{ fontSize: 28, fontWeight: 900, color: '#58CC02' }}>{feedback.fluencyScore}</div>
-                <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--duo-text-muted)' }}>LƯU LOÁT</div>
-              </div>
-              <div className="duo-card" style={{ textAlign: 'center', borderColor: '#1CB0F6' }}>
-                <div style={{ fontSize: 28, fontWeight: 900, color: '#1CB0F6' }}>{feedback.grammarScore}</div>
-                <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--duo-text-muted)' }}>NGỮ PHÁP</div>
-              </div>
-              <div className="duo-card" style={{ textAlign: 'center', borderColor: '#CE82FF' }}>
-                <div style={{ fontSize: 28, fontWeight: 900, color: '#CE82FF' }}>{feedback.vocabularyScore}</div>
-                <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--duo-text-muted)' }}>TỪ VỰNG</div>
-              </div>
-            </div>
-
-            {/* General Feedback Summary */}
-            <div className="duo-card" style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 15, color: 'var(--duo-text-primary)', lineHeight: 1.6 }}>
-                {feedback.feedbackSummary}
-              </div>
-            </div>
-
-            {/* Natural Native Expressions */}
-            {feedback.moreNaturalExpressions && feedback.moreNaturalExpressions.length > 0 && (
-              <div style={{ marginBottom: 18 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#58CC02', fontWeight: 800, fontSize: 14, marginBottom: 8 }}>
-                  <Sparkles size={16} />
-                  <span>Cách người bản xứ diễn đạt tự nhiên hơn:</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {feedback.moreNaturalExpressions.map((exp, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        padding: '10px 14px',
-                        borderRadius: 10,
-                        background: 'rgba(88, 204, 2, 0.12)',
-                        border: '1px solid rgba(88, 204, 2, 0.3)',
-                        fontSize: 14,
-                        color: 'var(--duo-text-primary)',
-                        fontWeight: 600,
-                      }}
-                    >
-                      ✨ {exp}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Vocabulary to Remember */}
-            {feedback.usefulVocabulary && feedback.usefulVocabulary.length > 0 && (
-              <div style={{ marginBottom: 24 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#1CB0F6', fontWeight: 800, fontSize: 14, marginBottom: 8 }}>
-                  <BookOpen size={16} />
-                  <span>Từ vựng hữu ích cho tình huống này:</span>
-                </div>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {feedback.usefulVocabulary.map((word, i) => (
-                    <Tag key={i} color="blue" style={{ fontSize: 13, padding: '6px 12px', borderRadius: 8, fontWeight: 700 }}>
-                      {word}
-                    </Tag>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <button
-              className="duo-btn-green"
-              onClick={() => setIsFeedbackOpen(false)}
-              style={{ width: '100%', padding: '14px' }}
-            >
-              <span>Tiếp tục luyện tập</span>
-            </button>
+      {/* Completion & Feedback Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Award size={26} color="#FFC800" />
+            <span style={{ fontSize: 20, fontWeight: 900 }}>Kết quả Luyện nói & Đánh giá AI</span>
           </div>
-        </Modal>
-      )}
+        }
+        open={isFeedbackOpen}
+        onCancel={() => setIsFeedbackOpen(false)}
+        footer={null}
+        width={560}
+        centered
+      >
+        {feedback && (
+          <div style={{ marginTop: 16 }}>
+            {/* Overall Score Circle Card */}
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '24px 20px',
+                borderRadius: 18,
+                background: 'linear-gradient(135deg, rgba(88, 204, 2, 0.15), rgba(28, 176, 246, 0.15))',
+                border: '2px solid var(--duo-border)',
+                marginBottom: 20,
+              }}
+            >
+              <div style={{ fontSize: 48, fontWeight: 900, color: '#58CC02', lineHeight: 1 }}>
+                {feedback.overallScore}
+                <span style={{ fontSize: 22, color: 'var(--duo-text-muted)' }}>/100</span>
+              </div>
+              <div style={{ fontSize: 16, fontWeight: 800, marginTop: 8, color: 'var(--duo-text-primary)' }}>
+                Xuất sắc! Phản xạ hội thoại rất chuẩn mực 🌟
+              </div>
+            </div>
+
+            {/* Sub-scores */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 700, marginBottom: 4 }}>
+                  <span>Độ trôi chảy & Tự nhiên (Fluency)</span>
+                  <span style={{ color: '#1CB0F6' }}>{feedback.fluencyScore}%</span>
+                </div>
+                <Progress percent={feedback.fluencyScore} strokeColor="#1CB0F6" showInfo={false} />
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 700, marginBottom: 4 }}>
+                  <span>Độ chính xác ngữ pháp (Grammar)</span>
+                  <span style={{ color: '#58CC02' }}>{feedback.grammarScore}%</span>
+                </div>
+                <Progress percent={feedback.grammarScore} strokeColor="#58CC02" showInfo={false} />
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 700, marginBottom: 4 }}>
+                  <span>Vốn từ vựng tình huống (Vocabulary)</span>
+                  <span style={{ color: '#FF9600' }}>{feedback.vocabularyScore}%</span>
+                </div>
+                <Progress percent={feedback.vocabularyScore} strokeColor="#FF9600" showInfo={false} />
+              </div>
+            </div>
+
+            {/* AI Summary Comment */}
+            <div
+              style={{
+                padding: '14px 18px',
+                borderRadius: 14,
+                background: 'var(--duo-card-bg)',
+                border: '1.5px solid var(--duo-border)',
+                fontSize: 14,
+                lineHeight: 1.6,
+                color: 'var(--duo-text-secondary)',
+                marginBottom: 24,
+              }}
+            >
+              💡 <strong>Nhận xét từ AI:</strong> {feedback.feedbackSummary}
+            </div>
+
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button
+                className="duo-btn-outline"
+                onClick={() => {
+                  setIsFeedbackOpen(false);
+                  setViewMode('LIST');
+                }}
+                style={{ flex: 1, padding: '12px' }}
+              >
+                <span>Đổi kịch bản khác</span>
+              </button>
+              <button
+                className="duo-btn-green"
+                onClick={() => {
+                  setIsFeedbackOpen(false);
+                  startChatWithScenario(selectedScenario);
+                }}
+                style={{ flex: 1, padding: '12px' }}
+              >
+                <RotateCcw size={16} />
+                <span>Luyện lại bài này</span>
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };
