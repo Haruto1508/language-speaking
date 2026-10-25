@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Tag, Button, Typography, Spin, Card, Row, Col } from 'antd';
-import { Sparkles, AlertCircle, Volume2, BookOpen, Layers } from 'lucide-react';
+import { Tag, Typography, Spin, Input } from 'antd';
+import { Sparkles, AlertCircle, Volume2, Search, Turtle } from 'lucide-react';
 import { api } from '../services/api';
 import { useAppStore } from '../stores/useAppStore';
 import { Grammar } from '../types';
-import { speakText } from '../utils/speech';
-
+import { speakText, speakSlow } from '../utils/speech';
 import { localDataService } from '../services/localDataService';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
 export const GrammarPage: React.FC = () => {
   const { targetLanguage } = useAppStore();
   const [grammarList, setGrammarList] = useState<Grammar[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchGrammar();
@@ -37,24 +37,69 @@ export const GrammarPage: React.FC = () => {
 
   const isKo = targetLanguage === 'KO';
 
+  const filteredGrammar = grammarList.filter((gram) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    return (
+      gram.grammarPoint?.toLowerCase().includes(q) ||
+      gram.pattern?.toLowerCase().includes(q) ||
+      gram.explanation?.toLowerCase().includes(q) ||
+      gram.exampleSentence?.toLowerCase().includes(q) ||
+      gram.translation?.toLowerCase().includes(q) ||
+      gram.structureFormula?.toLowerCase().includes(q) ||
+      gram.formula?.toLowerCase().includes(q) ||
+      gram.usageGuide?.toLowerCase().includes(q) ||
+      (gram.exampleConversationsJson && gram.exampleConversationsJson.toLowerCase().includes(q))
+    );
+  });
+
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', paddingBottom: 60 }}>
-      <div style={{ marginBottom: 28 }}>
-        <Title level={2} style={{ color: 'var(--duo-text-primary)', margin: 0, fontWeight: 900 }}>
-          {isKo ? 'Mẫu câu & Ngữ pháp tiếng Hàn 🇰🇷' : 'Mẫu câu & Ngữ pháp tiếng Anh 🇺🇸'}
-        </Title>
-        <Text style={{ color: 'var(--duo-text-secondary)', fontSize: 14 }}>
-          Nắm vững các công thức câu giao tiếp, cấp độ kính ngữ (존댓말 vs 반말) và các lỗi sai thường gặp.
-        </Text>
+      <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
+        <div>
+          <Title level={2} style={{ color: 'var(--duo-text-primary)', margin: 0, fontWeight: 900 }}>
+            {isKo ? 'Mẫu câu & Ngữ pháp tiếng Hàn 🇰🇷' : 'Mẫu câu & Ngữ pháp tiếng Anh 🇺🇸'}
+          </Title>
+          <Text style={{ color: 'var(--duo-text-secondary)', fontSize: 14 }}>
+            {isKo
+              ? 'Nắm vững các công thức câu giao tiếp, cấp độ kính ngữ (존댓말 vs 반말) và các lỗi sai thường gặp.'
+              : 'Nắm vững 50+ mẫu câu giao tiếp nhà hàng, công thức đàm thoại chuẩn mực và phản xạ tự nhiên.'}
+          </Text>
+        </div>
+
+        {/* Search Bar */}
+        <div style={{ width: 320, maxWidth: '100%' }}>
+          <Input
+            prefix={<Search size={16} color="var(--duo-text-muted)" />}
+            placeholder="Tìm kiếm mẫu câu, từ khóa..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            allowClear
+            style={{
+              height: 44,
+              borderRadius: 14,
+              fontSize: 14,
+              background: 'var(--duo-card-bg)',
+              borderColor: 'var(--duo-border)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            }}
+          />
+        </div>
       </div>
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px 0' }}>
           <Spin size="large" />
         </div>
+      ) : filteredGrammar.length === 0 ? (
+        <div className="duo-card" style={{ padding: 40, textAlign: 'center' }}>
+          <p style={{ fontSize: 16, color: 'var(--duo-text-secondary)', margin: 0 }}>
+            Không tìm thấy mẫu câu nào phù hợp với từ khóa "{searchQuery}".
+          </p>
+        </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {grammarList.map((gram) => {
+          {filteredGrammar.map((gram) => {
             let convExamples: any[] = [];
             if (gram.exampleConversationsJson) {
               try {
@@ -62,10 +107,12 @@ export const GrammarPage: React.FC = () => {
               } catch (e) {}
             }
 
+            const formulaText = gram.structureFormula || gram.formula;
+
             return (
               <div key={gram.id} className="duo-card duo-card-interactive" style={{ padding: 26 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
-                  <h3 style={{ fontSize: 22, fontWeight: 900, color: 'var(--duo-text-primary)' }}>
+                  <h3 style={{ fontSize: 20, fontWeight: 900, color: 'var(--duo-text-primary)', margin: 0 }}>
                     {gram.grammarPoint}
                   </h3>
                   {gram.formalityLevel && (
@@ -74,21 +121,21 @@ export const GrammarPage: React.FC = () => {
                 </div>
 
                 {/* Structure Formula */}
-                {gram.structureFormula && (
+                {formulaText && (
                   <div
                     style={{
-                      padding: '14px 18px',
+                      padding: '12px 18px',
                       borderRadius: 12,
-                      background: 'rgba(28, 176, 246, 0.1)',
+                      background: 'rgba(28, 176, 246, 0.08)',
                       border: '1.5px solid rgba(28, 176, 246, 0.3)',
                       marginBottom: 16,
                     }}
                   >
-                    <div style={{ fontSize: 12, fontWeight: 800, color: '#1CB0F6', textTransform: 'uppercase', marginBottom: 4 }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: '#1CB0F6', textTransform: 'uppercase', marginBottom: 4 }}>
                       Công thức cấu trúc:
                     </div>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
-                      {gram.structureFormula}
+                    <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
+                      {formulaText}
                     </div>
                   </div>
                 )}
@@ -97,11 +144,57 @@ export const GrammarPage: React.FC = () => {
                   {gram.explanation}
                 </p>
 
+                {/* Example sentence if available */}
+                {gram.exampleSentence && (
+                  <div
+                    style={{
+                      padding: '14px 18px',
+                      borderRadius: 12,
+                      background: 'rgba(88, 204, 2, 0.08)',
+                      border: '1.5px solid rgba(88, 204, 2, 0.3)',
+                      marginBottom: 16,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: '#58CC02', textTransform: 'uppercase', marginBottom: 4 }}>
+                        Ví dụ câu tiêu biểu:
+                      </div>
+                      <div className={isKo ? 'lang-ko' : ''} style={{ fontSize: 16, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
+                        "{gram.exampleSentence}"
+                      </div>
+                      {gram.translation && (
+                        <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)', marginTop: 4 }}>
+                          {gram.translation}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, marginLeft: 12 }}>
+                      <button
+                        onClick={() => speakText(gram.exampleSentence!, isKo ? 'KO' : 'EN')}
+                        title="Nghe tốc độ chuẩn (1.0x)"
+                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#58CC02', padding: 6, display: 'flex' }}
+                      >
+                        <Volume2 size={20} />
+                      </button>
+                      <button
+                        onClick={() => speakSlow(gram.exampleSentence!, isKo ? 'KO' : 'EN')}
+                        title="Nghe phát âm chậm (0.6x 🐢)"
+                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#1CB0F6', padding: 6, display: 'flex' }}
+                      >
+                        <Turtle size={20} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Usage Guide */}
                 {gram.usageGuide && (
                   <div style={{ marginBottom: 16 }}>
                     <h4 style={{ fontSize: 14, fontWeight: 800, color: 'var(--duo-text-primary)', marginBottom: 6 }}>
-                      Hướng dẫn sử dụng:
+                      Hướng dẫn sử dụng & Mẫu câu ngữ cảnh:
                     </h4>
                     <pre
                       style={{
@@ -111,9 +204,9 @@ export const GrammarPage: React.FC = () => {
                         whiteSpace: 'pre-wrap',
                         background: 'var(--duo-bg)',
                         border: '1px solid var(--duo-border)',
-                        padding: 12,
+                        padding: 14,
                         borderRadius: 10,
-                        lineHeight: 1.5,
+                        lineHeight: 1.6,
                       }}
                     >
                       {gram.usageGuide}
@@ -125,9 +218,9 @@ export const GrammarPage: React.FC = () => {
                 {convExamples.length > 0 && (
                   <div style={{ marginBottom: 16 }}>
                     <h4 style={{ fontSize: 14, fontWeight: 800, color: 'var(--duo-text-primary)', marginBottom: 8 }}>
-                      Hội thoại mẫu thực tế:
+                      Hội thoại mẫu thực tế ({convExamples.length} câu đối đáp):
                     </h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 380, overflowY: 'auto', paddingRight: 4 }}>
                       {convExamples.map((c, i) => (
                         <div
                           key={i}
@@ -141,30 +234,40 @@ export const GrammarPage: React.FC = () => {
                             border: '1px solid var(--duo-border)',
                           }}
                         >
-                          <div>
-                            <div className={isKo ? 'lang-ko' : ''} style={{ fontSize: 15, fontWeight: 700, color: 'var(--duo-text-primary)' }}>
-                              <strong style={{ color: '#1CB0F6' }}>{c.speaker || 'A'}:</strong> "{c.text}"
+                          <div style={{ flex: 1, paddingRight: 10 }}>
+                            <div className={isKo ? 'lang-ko' : ''} style={{ fontSize: 14, fontWeight: 700, color: 'var(--duo-text-primary)' }}>
+                              <strong style={{ color: '#1CB0F6' }}>{c.speaker || 'Person'}:</strong> "{c.text}"
                             </div>
                             {c.translation && (
-                              <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)', marginTop: 4 }}>
+                              <div style={{ fontSize: 12, color: 'var(--duo-text-secondary)', marginTop: 4 }}>
                                 {c.translation}
                               </div>
                             )}
                           </div>
-                          <button
-                            onClick={() => speakText(c.text, isKo ? 'KO' : 'EN')}
-                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#1CB0F6', padding: 4 }}
-                          >
-                            <Volume2 size={18} />
-                          </button>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                            <button
+                              onClick={() => speakText(c.text, isKo ? 'KO' : 'EN')}
+                              title="Nghe chuẩn (1.0x)"
+                              style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#1CB0F6', padding: 4, display: 'flex' }}
+                            >
+                              <Volume2 size={18} />
+                            </button>
+                            <button
+                              onClick={() => speakSlow(c.text, isKo ? 'KO' : 'EN')}
+                              title="Nghe chậm (0.6x 🐢)"
+                              style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#58CC02', padding: 4, display: 'flex' }}
+                            >
+                              <Turtle size={18} />
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Common Mistakes */}
-                {gram.commonMistakes && (
+                {/* Common Mistakes / Pitfalls */}
+                {(gram.commonMistakes || gram.pitfalls) && (
                   <div
                     style={{
                       padding: 14,
@@ -175,10 +278,10 @@ export const GrammarPage: React.FC = () => {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#FF4B4B', fontWeight: 800, fontSize: 13, marginBottom: 4 }}>
                       <AlertCircle size={16} />
-                      <span>Lỗi sai phổ biến cần lưu ý:</span>
+                      <span>Lỗi sai phổ biến & Lưu ý quan trọng:</span>
                     </div>
                     <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)' }}>
-                      {gram.commonMistakes}
+                      {gram.commonMistakes || gram.pitfalls}
                     </div>
                   </div>
                 )}

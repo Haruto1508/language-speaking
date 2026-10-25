@@ -5,6 +5,7 @@ import confetti from 'canvas-confetti';
 import { useAppStore } from '../stores/useAppStore';
 import { api } from '../services/api';
 import { speakText, speakSlow, startRecordingSession, ActiveRecordingSession } from '../utils/speech';
+import { localDataService } from '../services/localDataService';
 
 interface ExerciseStep {
   type: 'word-builder' | 'listen-choose' | 'matching' | 'speak';
@@ -24,10 +25,19 @@ export const DuoLessonPage: React.FC = () => {
   const navigate = useNavigate();
   const { targetLanguage, user, themeMode, toggleTheme } = useAppStore();
 
-  const isKo = id === '2' ? false : id === '1' ? true : targetLanguage === 'KO';
+  const matchedLesson = id ? localDataService.getLessonById(Number(id)) : undefined;
+  const isKo = matchedLesson
+    ? matchedLesson.languageCode === 'KO'
+    : id === '2'
+    ? false
+    : id === '1'
+    ? true
+    : targetLanguage === 'KO';
 
   // Lesson steps
-  const steps: ExerciseStep[] = isKo
+  const steps: ExerciseStep[] = (matchedLesson && matchedLesson.steps && matchedLesson.steps.length > 0)
+    ? (matchedLesson.steps as ExerciseStep[])
+    : isKo
     ? [
         {
           type: 'word-builder',

@@ -186,14 +186,16 @@ export const MainLayout: React.FC = () => {
         collapsedWidth={80}
         className="duo-sider"
       >
-        {/* Brand Header */}
+        {/* Brand Header (aligned with Content Header: height 64px, border-bottom 2px) */}
         <div
           style={{
-            padding: collapsed ? '14px 8px 12px' : '16px 14px 14px',
+            height: 64,
+            boxSizing: 'border-box',
+            padding: collapsed ? '0 8px' : '0 16px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: collapsed ? 'center' : 'space-between',
-            borderBottom: '1px solid var(--duo-border)',
+            justifyContent: collapsed ? 'center' : 'flex-start',
+            borderBottom: '2px solid var(--duo-border)',
             userSelect: 'none',
           }}
         >
@@ -205,6 +207,8 @@ export const MainLayout: React.FC = () => {
               alignItems: 'center',
               gap: 10,
               cursor: 'pointer',
+              width: collapsed ? 'auto' : '100%',
+              justifyContent: collapsed ? 'center' : 'flex-start',
             }}
           >
             <div
@@ -226,7 +230,7 @@ export const MainLayout: React.FC = () => {
               🦉
             </div>
             {!collapsed && (
-              <div>
+              <div style={{ overflow: 'hidden' }}>
                 <div style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--duo-text-primary)', lineHeight: 1.1 }}>
                   Lingua<span style={{ color: '#58CC02' }}>Talk</span>
                 </div>
@@ -244,6 +248,7 @@ export const MainLayout: React.FC = () => {
                     alignItems: 'center',
                     gap: 4,
                     cursor: 'pointer',
+                    whiteSpace: 'nowrap',
                   }}
                   title="Nhấn để đổi Ngôn ngữ hoặc Trình độ học"
                 >
@@ -254,62 +259,7 @@ export const MainLayout: React.FC = () => {
               </div>
             )}
           </div>
-
-          {/* Collapse toggle button (expanded mode) */}
-          {!collapsed && (
-            <Tooltip title="Thu gọn thanh bên" placement="right">
-              <button
-                onClick={() => setCollapsed(true)}
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 10,
-                  background: 'var(--duo-card-bg)',
-                  border: '1.5px solid var(--duo-border)',
-                  borderBottom: '2.5px solid var(--duo-border)',
-                  color: 'var(--duo-text-secondary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'none',
-                  flexShrink: 0,
-                }}
-                className="duo-card-interactive"
-              >
-                <PanelLeftClose size={17} />
-              </button>
-            </Tooltip>
-          )}
         </div>
-
-        {/* When collapsed, a clean expand button below the logo */}
-        {collapsed && (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 4px' }}>
-            <Tooltip title="Mở rộng thanh bên" placement="right">
-              <button
-                onClick={() => setCollapsed(false)}
-                style={{
-                  width: 36,
-                  height: 28,
-                  borderRadius: 10,
-                  background: 'var(--duo-card-bg)',
-                  border: '1.5px solid var(--duo-border)',
-                  borderBottom: '2.5px solid var(--duo-border)',
-                  color: 'var(--duo-text-secondary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'none',
-                }}
-                className="duo-card-interactive"
-              >
-                <PanelLeftOpen size={16} />
-              </button>
-            </Tooltip>
-          </div>
-        )}
 
         {/* Custom Duolingo Navigation Groups */}
         <div
@@ -545,7 +495,7 @@ export const MainLayout: React.FC = () => {
       </Sider>
 
       <Layout style={{ background: 'transparent' }}>
-        {/* Top Header */}
+        {/* Top Header (height 64px, border-bottom 2px matching sidebar header) */}
         <Header
           style={{
             background: 'var(--duo-header-bg)',
@@ -554,6 +504,7 @@ export const MainLayout: React.FC = () => {
             borderBottom: '2px solid var(--duo-border)',
             padding: '0 24px',
             height: 64,
+            boxSizing: 'border-box',
             lineHeight: 'normal',
             display: 'flex',
             alignItems: 'center',
@@ -564,31 +515,8 @@ export const MainLayout: React.FC = () => {
             transition: 'background 0.25s ease, border-color 0.25s ease',
           }}
         >
-          {/* Header Left Title & Quick Sidebar Toggle */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flexShrink: 1, marginRight: 12 }}>
-            <Tooltip title={collapsed ? 'Mở rộng thanh bên' : 'Thu gọn thanh bên'}>
-              <button
-                onClick={() => setCollapsed(!collapsed)}
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 10,
-                  background: 'var(--duo-card-bg)',
-                  border: '1.5px solid var(--duo-border)',
-                  borderBottom: '2.5px solid var(--duo-border)',
-                  color: 'var(--duo-text-secondary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                }}
-                className="duo-card-interactive"
-              >
-                {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
-              </button>
-            </Tooltip>
-
+          {/* Header Left Title */}
+          <div style={{ display: 'flex', alignItems: 'center', minWidth: 0, flexShrink: 1, marginRight: 12 }}>
             <span style={{ fontSize: 14, color: 'var(--duo-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               Luyện nói <strong style={{ color: 'var(--duo-text-primary)' }}>{langName}</strong> thực chiến theo chuẩn <strong style={{ color: '#58CC02' }}>Duolingo 3D</strong>
             </span>

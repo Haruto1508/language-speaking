@@ -47,5 +47,55 @@
         ]
       }
     ]
+  },
+  {
+    "id": 5,
+    "languageCode": "EN",
+    "topicCode": "english-restaurant",
+    "title": "Lesson: Restaurant Dining & Ordering Expressions",
+    "levelCode": "BEGINNER",
+    "steps": [
+      {
+        "type": "word-builder",
+        "title": "Ghép câu đặt bàn nhà hàng lịch sự",
+        "instruction": "Chạm vào các thẻ từ để tạo câu hoàn chỉnh:",
+        "prompt": "I would like a table for 4, please",
+        "audioText": "I would like a table for four, please",
+        "tiles": ["Cho tôi", "một bàn", "cho 4 người", "làm ơn", "thực đơn chay", "tính tiền nhé"],
+        "correctTiles": ["Cho tôi", "một bàn", "cho 4 người", "làm ơn"]
+      },
+      {
+        "type": "listen-choose",
+        "title": "Nghe câu hỏi gọi món của nhân viên phục vụ",
+        "instruction": "Lắng nghe nhân viên hỏi về món bít tết và salad:",
+        "prompt": "How would you like your steak, and would you like a salad with it?",
+        "audioText": "How would you like your steak, and would you like a salad with it?",
+        "options": [
+          { "id": "1", "text": "Quý khách muốn bít tết chế biến thế nào, và có muốn dùng kèm salad không?", "correct": true },
+          { "id": "2", "text": "Hôm nay chúng tôi đã hết sạch món tôm sú rồi ạ.", "correct": false },
+          { "id": "3", "text": "Hóa đơn của quý khách đây ạ, thanh toán bằng tiền mặt nhé.", "correct": false }
+        ]
+      },
+      {
+        "type": "speak",
+        "title": "Luyện nói câu thanh toán và giữ tiền thừa",
+        "instruction": "Nhấn nút micro và nói to câu tiếng Anh sau:",
+        "prompt": "May I have the bill, please? Keep the change!",
+        "audioText": "May I have the bill, please? Keep the change!"
+      },
+      {
+        "type": "matching",
+        "title": "Nối mẫu câu giao tiếp nhà hàng thông dụng",
+        "instruction": "Ghép các cặp câu tiếng Anh và dịch nghĩa tiếng Việt tương ứng:",
+        "prompt": "Ghép mẫu câu nhà hàng:",
+        "audioText": "May I take your order? This way, please. Keep the change. Could I see the menu, please?",
+        "pairs": [
+          { "id": "1", "left": "May I take your order?", "right": "Quý khách gọi món chưa ạ?" },
+          { "id": "2", "left": "This way, please.", "right": "Vui lòng đi lối này ạ." },
+          { "id": "3", "left": "Keep the change.", "right": "Hãy giữ lại tiền thừa nhé." },
+          { "id": "4", "left": "Could I see the menu, please?", "right": "Cho tôi xem thực đơn được không?" }
+        ]
+      }
+    ]
   }
 ]

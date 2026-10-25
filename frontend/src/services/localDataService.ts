@@ -137,12 +137,39 @@ const saveVocabProgress = (vocabId: number, status: string) => {
 export const localDataService = {
   // Topics (separated by Language and Level)
   getTopics: (language: LanguageCode, level?: ProficiencyLevelCode): Topic[] => {
+    let rawTopics: Topic[];
     if (level && dataset[language]?.[level]) {
-      return dataset[language][level]!.topics;
+      rawTopics = dataset[language][level]!.topics;
+    } else {
+      const levels = getLanguageLevels(language);
+      const all = levels.flatMap((l) => l.topics);
+      rawTopics = level ? all.filter((t) => t.levelCode === level) : all;
     }
-    const levels = getLanguageLevels(language);
-    const all = levels.flatMap((l) => l.topics);
-    return level ? all.filter((t) => t.levelCode === level) : all;
+
+    const allLessons = getLanguageLevels(language).flatMap((l) => l.lessons);
+    return rawTopics.map((t) => {
+      const topicLessons = allLessons
+        .filter((les) => les.topicCode === t.code)
+        .map((les) => ({
+          id: les.id,
+          topicId: t.id,
+          topicName: t.name,
+          title: les.title,
+          scenario: '',
+          description: '',
+          difficulty: (t.levelCode || 'BEGINNER') as ProficiencyLevelCode,
+          status: 'PUBLISHED' as const,
+          orderIndex: les.id,
+          vocabularyCount: 0,
+          grammarCount: 0,
+          exercisesCount: les.steps?.length || 0,
+        }));
+      return {
+        ...t,
+        lessons: topicLessons.length > 0 ? topicLessons : t.lessons,
+        totalLessons: topicLessons.length || t.totalLessons || 0,
+      };
+    });
   },
 
   getTopicByCode: (code: string): Topic | undefined => {

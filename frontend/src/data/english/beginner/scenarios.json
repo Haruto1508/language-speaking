@@ -22,5 +22,29 @@
     "aiRole": "Bạn đồng hành (Networking Partner)",
     "initialGreeting": "Hi there! Mind if I join you at this table? I'm David from Canada.",
     "culturalContext": "Văn hóa phương Tây cởi mở khi bắt chuyện (small talk) về thời tiết, đồ uống hoặc sự kiện trước khi đi sâu vào chi tiết cá nhân."
+  },
+  {
+    "id": 9,
+    "topicCode": "english-restaurant",
+    "languageCode": "EN",
+    "levelCode": "BEGINNER",
+    "title": "Đón tiếp & Gọi món tại nhà hàng Âu (Dining & Ordering at a Restaurant)",
+    "description": "Hỏi bàn trống, xem thực đơn, gọi món bít tết nướng (steak), chọn độ chín, gọi salad kèm theo và thưởng thức rượu vang.",
+    "userRole": "Thực khách (Diner)",
+    "aiRole": "Nhân viên phục vụ bàn (Waitstaff / Server)",
+    "initialGreeting": "Good evening, welcome to The Grand Bistro! Do you have a reservation, or would you like a table for tonight?",
+    "culturalContext": "Khi gọi món steak, nhân viên sẽ hỏi 'How would you like your steak?'. Bạn có thể trả lời 'Medium rare, please' hoặc 'Well-done, please'. Luôn dùng 'Could I have...' hoặc 'I would like...' để thể hiện sự lịch thiệp."
+  },
+  {
+    "id": 10,
+    "topicCode": "english-restaurant",
+    "languageCode": "EN",
+    "levelCode": "BEGINNER",
+    "title": "Yêu cầu thêm món, phản hồi dịch vụ & Thanh toán (Special Requests & Billing)",
+    "description": "Yêu cầu thêm cơm/gia vị, phản hồi món ăn bị nguội hoặc mặn, nhận đổi món mới, xin hóa đơn thanh toán và boa tiền thừa (Keep the change).",
+    "userRole": "Thực khách (Diner)",
+    "aiRole": "Quản lý phục vụ nhà hàng (Restaurant Floor Captain)",
+    "initialGreeting": "Excuse me, sir/madam. How is everything tasting? Is there anything else I can bring for you?",
+    "culturalContext": "Khi có vấn đề về món ăn, hãy nói nhẹ nhàng 'Excuse me, my meal is so cold' hoặc 'This is too salty'. Nhân viên sẽ đổi món mới ngay lập tức. Khi thanh toán tiền mặt và muốn tip, hãy nói 'Keep the change!'."
   }
 ]
