@@ -23,6 +23,7 @@ import { useAppStore } from '../stores/useAppStore';
 import { api } from '../services/api';
 import { ConversationScenario, ConversationMessage, ConversationFeedback, formatLevelVietnamese } from '../types';
 import { speakText, recordSpeech } from '../utils/speech';
+import { translateToVietnamese } from '../services/translator';
 
 const { Text, Paragraph } = Typography;
 
@@ -115,7 +116,33 @@ export const DuoChatPage: React.FC = () => {
   const [inputText, setInputText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [sending, setSending] = useState(false);
-  const [showTranslations, setShowTranslations] = useState<Record<number, boolean>>({});
+  const [showTranslations, setShowTranslations] = useState<Record<string | number, boolean>>({});
+  const [translations, setTranslations] = useState<Record<string | number, string>>({});
+  const [translatingIds, setTranslatingIds] = useState<Record<string | number, boolean>>({});
+
+  // Dynamic real-time translation handler
+  const handleToggleTranslate = async (msgKey: string | number, text: string) => {
+    const isCurrentlyOpen = !!showTranslations[msgKey];
+    if (isCurrentlyOpen) {
+      setShowTranslations((prev) => ({ ...prev, [msgKey]: false }));
+      return;
+    }
+
+    setShowTranslations((prev) => ({ ...prev, [msgKey]: true }));
+
+    if (translations[msgKey]) return;
+
+    setTranslatingIds((prev) => ({ ...prev, [msgKey]: true }));
+    try {
+      const res = await translateToVietnamese(text, selectedScenario.languageCode, apiKey);
+      setTranslations((prev) => ({ ...prev, [msgKey]: res }));
+    } catch (err) {
+      console.error('Translation error:', err);
+      setTranslations((prev) => ({ ...prev, [msgKey]: 'Không thể dịch nội dung này.' }));
+    } finally {
+      setTranslatingIds((prev) => ({ ...prev, [msgKey]: false }));
+    }
+  };
 
   // Feedback modal
   const [feedback, setFeedback] = useState<ConversationFeedback | null>(null);
@@ -439,7 +466,10 @@ export const DuoChatPage: React.FC = () => {
       >
         {messages.map((msg, idx) => {
           const isAi = msg.senderRole === 'AI';
-          const isTranslated = showTranslations[msg.id || idx];
+          const msgKey = msg.id ?? idx;
+          const isTranslated = !!showTranslations[msgKey];
+          const isTranslating = !!translatingIds[msgKey];
+          const translatedText = translations[msgKey];
 
           return (
             <div
@@ -480,9 +510,9 @@ export const DuoChatPage: React.FC = () => {
                     {msg.content}
                   </div>
 
-                  {/* Audio Speaker Controls for AI message */}
+                  {/* Audio Speaker & Translation Controls for AI message */}
                   {isAi && (
-                    <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                       <button
                         onClick={() => speakText(msg.content, selectedScenario.languageCode, 0.95)}
                         style={{
@@ -522,18 +552,14 @@ export const DuoChatPage: React.FC = () => {
 
                       {/* Translation reveal button */}
                       <button
-                        onClick={() =>
-                          setShowTranslations((prev) => ({
-                            ...prev,
-                            [msg.id || idx]: !isTranslated,
-                          }))
-                        }
+                        onClick={() => handleToggleTranslate(msgKey, msg.content)}
                         style={{
                           background: 'transparent',
                           border: 'none',
-                          color: 'var(--duo-text-secondary)',
+                          color: isTranslated ? '#1CB0F6' : 'var(--duo-text-secondary)',
                           cursor: 'pointer',
                           fontSize: 12,
+                          fontWeight: isTranslated ? 700 : 500,
                           textDecoration: 'underline',
                         }}
                       >
@@ -542,19 +568,73 @@ export const DuoChatPage: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Translation Text Reveal */}
+                  {/* Audio Speaker & Translation Controls for User message */}
+                  {!isAi && (
+                    <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8 }}>
+                      <button
+                        onClick={() => speakText(msg.content, selectedScenario.languageCode, 0.95)}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'var(--duo-text-secondary)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          fontSize: 11,
+                        }}
+                        title="Nghe lại câu vừa nói"
+                      >
+                        <Volume2 size={13} />
+                        <span>Nghe</span>
+                      </button>
+                      <button
+                        onClick={() => handleToggleTranslate(msgKey, msg.content)}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: isTranslated ? '#58CC02' : 'var(--duo-text-secondary)',
+                          cursor: 'pointer',
+                          fontSize: 11,
+                          fontWeight: isTranslated ? 700 : 500,
+                          textDecoration: 'underline',
+                        }}
+                      >
+                        {isTranslated ? 'Ẩn dịch' : 'Dịch câu này'}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Dynamic Translation Text Reveal */}
                   {isTranslated && (
                     <div
                       style={{
-                        marginTop: 8,
-                        paddingTop: 8,
-                        borderTop: '1px dashed var(--duo-border)',
+                        marginTop: 10,
+                        padding: '8px 12px',
+                        borderRadius: 10,
+                        background: isAi ? 'rgba(99, 102, 241, 0.12)' : 'rgba(88, 204, 2, 0.12)',
+                        border: isAi ? '1px dashed #6366F1' : '1px dashed #58CC02',
                         fontSize: 13,
-                        color: '#A5B4FC',
+                        lineHeight: 1.5,
                       }}
                     >
-                      💡 <em>Bản dịch tham khảo:</em>{' '}
-                      {isKo ? 'Chào mừng quý khách! Đi mấy người ạ? Xin mời ngồi vào vị trí thoải mái.' : 'Xin chào! Bạn dùng gì hôm nay?'}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
+                        <span style={{ fontSize: 13 }}>💡</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: isAi ? '#A5B4FC' : '#86EFAC', textTransform: 'uppercase' }}>
+                          Bản dịch nghĩa:
+                        </span>
+                      </div>
+                      <div style={{ paddingLeft: 18 }}>
+                        {isTranslating ? (
+                          <span style={{ color: '#FFC800', fontStyle: 'italic' }}>
+                            Đang dịch nghĩa... ⏳
+                          </span>
+                        ) : (
+                          <span style={{ color: 'var(--duo-text-primary)', fontWeight: 600 }}>
+                            {translatedText || 'Chưa thể tải bản dịch.'}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

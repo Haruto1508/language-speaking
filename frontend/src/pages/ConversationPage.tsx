@@ -22,11 +22,12 @@ import {
   ConversationFeedback,
 } from '../types';
 import { speakText, recordSpeech } from '../utils/speech';
+import { translateToVietnamese } from '../services/translator';
 
 const { Title, Text, Paragraph } = Typography;
 
 export const ConversationPage: React.FC = () => {
-  const { targetLanguage, targetLevel } = useAppStore();
+  const { targetLanguage, targetLevel, apiKey } = useAppStore();
 
   const [scenarios, setScenarios] = useState<ConversationScenario[]>([]);
   const [selectedScenario, setSelectedScenario] = useState<ConversationScenario | null>(null);
@@ -37,6 +38,35 @@ export const ConversationPage: React.FC = () => {
   const [inputText, setInputText] = useState('');
   const [sending, setSending] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+
+  // Translations
+  const [showTranslations, setShowTranslations] = useState<Record<string | number, boolean>>({});
+  const [translations, setTranslations] = useState<Record<string | number, string>>({});
+  const [translatingIds, setTranslatingIds] = useState<Record<string | number, boolean>>({});
+
+  const handleToggleTranslate = async (msgKey: string | number, text: string) => {
+    const isCurrentlyOpen = !!showTranslations[msgKey];
+    if (isCurrentlyOpen) {
+      setShowTranslations((prev) => ({ ...prev, [msgKey]: false }));
+      return;
+    }
+
+    setShowTranslations((prev) => ({ ...prev, [msgKey]: true }));
+
+    if (translations[msgKey]) return;
+
+    setTranslatingIds((prev) => ({ ...prev, [msgKey]: true }));
+    try {
+      const lang = session?.scenario?.languageCode || selectedScenario?.languageCode || targetLanguage;
+      const res = await translateToVietnamese(text, lang, apiKey);
+      setTranslations((prev) => ({ ...prev, [msgKey]: res }));
+    } catch (err) {
+      console.error('Translation error:', err);
+      setTranslations((prev) => ({ ...prev, [msgKey]: 'Không thể dịch nội dung này.' }));
+    } finally {
+      setTranslatingIds((prev) => ({ ...prev, [msgKey]: false }));
+    }
+  };
 
   // Post-conversation feedback modal
   const [feedback, setFeedback] = useState<ConversationFeedback | null>(null);
@@ -410,6 +440,11 @@ export const ConversationPage: React.FC = () => {
           <div style={{ flex: 1, overflowY: 'auto', padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
             {session.messages.map((msg, idx) => {
               const isAi = msg.senderRole === 'AI';
+              const msgKey = msg.id ?? idx;
+              const isTranslated = !!showTranslations[msgKey];
+              const isTranslating = !!translatingIds[msgKey];
+              const translatedText = translations[msgKey];
+
               return (
                 <div
                   key={idx}
@@ -444,26 +479,70 @@ export const ConversationPage: React.FC = () => {
                     >
                       <div>{msg.content}</div>
 
-                      {/* Play Audio Button for AI message */}
-                      {isAi && (
-                        <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <button
-                            onClick={() => speakText(msg.content, session.scenario.languageCode, 0.95)}
-                            style={{
-                              background: 'transparent',
-                              border: 'none',
-                              cursor: 'pointer',
-                              color: '#06B6D4',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 4,
-                              fontSize: 12,
-                              fontWeight: 600,
-                            }}
-                          >
-                            <Volume2 size={15} />
-                            <span>Listen</span>
-                          </button>
+                      {/* Controls bar */}
+                      <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <button
+                          onClick={() => speakText(msg.content, session.scenario.languageCode, 0.95)}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: isAi ? '#38BDF8' : '#34D399',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            fontSize: 12,
+                            fontWeight: 600,
+                          }}
+                        >
+                          <Volume2 size={15} />
+                          <span>Nghe</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleToggleTranslate(msgKey, msg.content)}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: isTranslated ? '#F59E0B' : 'var(--text-muted)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            textDecoration: 'underline',
+                          }}
+                        >
+                          {isTranslated ? 'Ẩn dịch' : 'Dịch nghĩa'}
+                        </button>
+                      </div>
+
+                      {/* Dynamic Translation Reveal */}
+                      {isTranslated && (
+                        <div
+                          style={{
+                            marginTop: 10,
+                            padding: '8px 12px',
+                            borderRadius: 8,
+                            background: isAi ? 'rgba(99, 102, 241, 0.12)' : 'rgba(16, 185, 129, 0.12)',
+                            border: isAi ? '1px dashed #6366F1' : '1px dashed #10B981',
+                            fontSize: 13,
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          <div style={{ fontSize: 11, fontWeight: 700, color: isAi ? '#A5B4FC' : '#6EE7B7', marginBottom: 2 }}>
+                            💡 BẢN DỊCH TIẾNG VIỆT:
+                          </div>
+                          <div>
+                            {isTranslating ? (
+                              <span style={{ color: '#F59E0B', fontStyle: 'italic' }}>Đang dịch nghĩa... ⏳</span>
+                            ) : (
+                              <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+                                {translatedText || 'Chưa thể tải bản dịch.'}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>
