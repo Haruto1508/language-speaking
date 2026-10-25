@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { X, Flame, Volume2, Mic, CheckCircle2, XCircle, ArrowRight, RotateCcw, Award, Sparkles, Sun, Moon } from 'lucide-react';
+import { X, Flame, Volume2, Mic, CheckCircle2, XCircle, ArrowRight, RotateCcw, Award, Sparkles, Sun, Moon, Square, Play, Turtle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAppStore } from '../stores/useAppStore';
 import { api } from '../services/api';
-import { speakText, recordSpeech } from '../utils/speech';
+import { speakText, speakSlow, startRecordingSession, ActiveRecordingSession } from '../utils/speech';
 
 interface ExerciseStep {
   type: 'word-builder' | 'listen-choose' | 'matching' | 'speak';
@@ -117,8 +117,11 @@ export const DuoLessonPage: React.FC = () => {
 
   // Speaking state
   const [isRecording, setIsRecording] = useState(false);
+  const [recordingSession, setRecordingSession] = useState<ActiveRecordingSession | null>(null);
   const [spokenText, setSpokenText] = useState<string | null>(null);
   const [speakScore, setSpeakScore] = useState<number | null>(null);
+  const [userAudioUrl, setUserAudioUrl] = useState<string | null>(null);
+  const [isPlayingUserAudio, setIsPlayingUserAudio] = useState(false);
 
   // Matching state
   const [matchedPairs, setMatchedPairs] = useState<string[]>([]);
@@ -137,6 +140,13 @@ export const DuoLessonPage: React.FC = () => {
       setSelectedOptionId(null);
       setSpokenText(null);
       setSpeakScore(null);
+      setUserAudioUrl(null);
+      setIsPlayingUserAudio(false);
+      if (recordingSession) {
+        recordingSession.cancel();
+        setRecordingSession(null);
+      }
+      setIsRecording(false);
       setMatchedPairs([]);
       setSelectedLeft(null);
       setSelectedRight(null);
@@ -198,18 +208,48 @@ export const DuoLessonPage: React.FC = () => {
     }
   };
 
-  // Speech Recording
-  const handleRecord = async () => {
-    setIsRecording(true);
-    try {
-      const res = await recordSpeech(isKo ? 'KO' : 'EN', currentStep.prompt);
-      setSpokenText(res.transcript);
-      setSpeakScore(res.accuracy);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsRecording(false);
+  // Speech Recording toggle (Start or Stop & Compare Accuracy)
+  const handleToggleRecord = async () => {
+    if (isRecording && recordingSession) {
+      // User pressed STOP: evaluate speech and get recorded voice audio
+      try {
+        setIsRecording(false);
+        const res = await recordingSession.stop();
+        setSpokenText(res.transcript || currentStep.prompt);
+        setSpeakScore(res.accuracy);
+        if (res.audioUrl) {
+          setUserAudioUrl(res.audioUrl);
+        }
+      } catch (err) {
+        console.error('Error stopping speech recording:', err);
+      } finally {
+        setRecordingSession(null);
+        setIsRecording(false);
+      }
+    } else {
+      // User pressed START: start MediaRecorder and SpeechRecognition
+      try {
+        setIsRecording(true);
+        setSpokenText(null);
+        setSpeakScore(null);
+        setUserAudioUrl(null);
+        const session = await startRecordingSession(isKo ? 'KO' : 'EN', currentStep.prompt);
+        setRecordingSession(session);
+      } catch (err) {
+        console.error('Failed to start speech recording:', err);
+        setIsRecording(false);
+      }
     }
+  };
+
+  // Playback user's own recorded voice
+  const handlePlayUserVoice = () => {
+    if (!userAudioUrl) return;
+    const audio = new Audio(userAudioUrl);
+    setIsPlayingUserAudio(true);
+    audio.onended = () => setIsPlayingUserAudio(false);
+    audio.onerror = () => setIsPlayingUserAudio(false);
+    audio.play();
   };
 
   // Determine if user has answered the question
@@ -535,49 +575,150 @@ export const DuoLessonPage: React.FC = () => {
 
           {/* 3. SPEAKING TYPE */}
           {currentStep.type === 'speak' && (
-            <div style={{ textAlign: 'center', padding: '20px 0' }}>
-              <div style={{ marginBottom: 20 }}>
+            <div style={{ textAlign: 'center', padding: '16px 0' }}>
+              <div style={{ marginBottom: 22 }}>
                 <button
-                  onClick={handleRecord}
-                  disabled={isRecording}
+                  onClick={handleToggleRecord}
                   className={isRecording ? 'duo-mic-active' : ''}
                   style={{
-                    width: 84,
-                    height: 84,
+                    width: 88,
+                    height: 88,
                     borderRadius: '50%',
-                    background: '#1CB0F6',
+                    background: isRecording ? '#FF4B4B' : '#1CB0F6',
                     border: 'none',
-                    borderBottom: '5px solid #1899D6',
+                    borderBottom: isRecording ? '5px solid #EA2B2B' : '5px solid #1899D6',
                     color: '#FFFFFF',
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     transition: 'all 0.15s ease',
+                    boxShadow: isRecording
+                      ? '0 0 24px rgba(255, 75, 75, 0.6)'
+                      : '0 8px 20px rgba(28, 176, 246, 0.35)',
+                  }}
+                  title={isRecording ? 'Nhấn để dừng và chấm điểm' : 'Nhấn để bắt đầu nói'}
+                >
+                  {isRecording ? <Square size={32} fill="#FFFFFF" /> : <Mic size={38} />}
+                </button>
+
+                <div
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 800,
+                    marginTop: 14,
+                    color: isRecording ? '#FF4B4B' : 'var(--duo-text-secondary)',
                   }}
                 >
-                  <Mic size={36} />
-                </button>
-                <div style={{ fontSize: 14, fontWeight: 800, marginTop: 12, color: isRecording ? '#FF4B4B' : 'var(--duo-text-secondary)' }}>
-                  {isRecording ? 'Đang lắng nghe... Nói to rõ ràng!' : 'Chạm vào mic và đọc to'}
+                  {isRecording ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      <span className="flame-bounce" style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#FF4B4B' }} />
+                      Đang thu âm... Hãy nói xong rồi <b>nhấn vào nút để DỪNG & CHẤM ĐIỂM</b>!
+                    </span>
+                  ) : speakScore !== null ? (
+                    'Chạm vào mic để nói lại nếu muốn'
+                  ) : (
+                    'Chạm vào mic để nói, sau đó nhấn dừng để so sánh'
+                  )}
                 </div>
               </div>
 
-              {spokenText && (
+              {speakScore !== null && (
                 <div
                   className="duo-card"
                   style={{
                     display: 'inline-block',
-                    padding: '14px 24px',
-                    borderColor: (speakScore || 0) >= 70 ? '#58CC02' : '#FFC800',
+                    padding: '20px 28px',
+                    borderRadius: 20,
+                    maxWidth: 520,
+                    width: '100%',
+                    border: (speakScore || 0) >= 70 ? '2px solid #58CC02' : '2px solid #FF9600',
+                    background: 'var(--duo-card-bg)',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
                   }}
                 >
-                  <div style={{ fontSize: 13, color: 'var(--duo-text-muted)' }}>Máy nhận diện được:</div>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--duo-text-primary)', margin: '4px 0' }}>
+                  {/* Accuracy Badge */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 10 }}>
+                    <div
+                      style={{
+                        padding: '6px 16px',
+                        borderRadius: 20,
+                        background: (speakScore || 0) >= 70 ? 'rgba(88, 204, 2, 0.15)' : 'rgba(255, 150, 0, 0.15)',
+                        color: (speakScore || 0) >= 70 ? '#58CC02' : '#FF9600',
+                        fontSize: 18,
+                        fontWeight: 900,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                      }}
+                    >
+                      <Sparkles size={18} />
+                      <span>Độ chính xác: {speakScore}%</span>
+                      <span>{(speakScore || 0) >= 85 ? '🌟 Rất xuất sắc!' : (speakScore || 0) >= 70 ? '✓ Đạt chuẩn!' : 'Cần phát âm rõ hơn'}</span>
+                    </div>
+                  </div>
+
+                  <div style={{ fontSize: 13, color: 'var(--duo-text-muted)', marginBottom: 4 }}>
+                    Máy đã nhận diện:
+                  </div>
+                  <div
+                    className={isKo ? 'lang-ko' : ''}
+                    style={{ fontSize: 18, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 16 }}
+                  >
                     "{spokenText}"
                   </div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: (speakScore || 0) >= 70 ? '#58CC02' : '#FFC800' }}>
-                    Điểm chính xác: {speakScore}%
+
+                  {/* Audio Playback Controls (User Voice & Native Voice) */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center' }}>
+                    {userAudioUrl && (
+                      <button
+                        onClick={handlePlayUserVoice}
+                        disabled={isPlayingUserAudio}
+                        className="duo-btn-outline"
+                        style={{
+                          padding: '8px 16px',
+                          borderRadius: 14,
+                          borderColor: '#FF9600',
+                          color: '#FF9600',
+                          fontWeight: 800,
+                          fontSize: 13,
+                        }}
+                      >
+                        <Volume2 size={16} color="#FF9600" />
+                        <span>{isPlayingUserAudio ? 'Đang phát giọng bạn...' : 'Nghe lại giọng của bạn'}</span>
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() => speakText(currentStep.prompt, isKo ? 'KO' : 'EN', 0.95)}
+                      className="duo-btn-outline"
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: 14,
+                        color: '#1CB0F6',
+                        fontWeight: 800,
+                        fontSize: 13,
+                      }}
+                    >
+                      <Volume2 size={16} color="#1CB0F6" />
+                      <span>Nghe giọng mẫu</span>
+                    </button>
+
+                    <button
+                      onClick={() => speakSlow(currentStep.prompt, isKo ? 'KO' : 'EN')}
+                      className="duo-btn-outline"
+                      style={{
+                        padding: '8px 14px',
+                        borderRadius: 14,
+                        color: '#58CC02',
+                        fontWeight: 800,
+                        fontSize: 13,
+                      }}
+                      title="Nghe mẫu phát âm chậm (0.6x)"
+                    >
+                      <Turtle size={16} color="#58CC02" />
+                      <span>Nghe chậm</span>
+                    </button>
                   </div>
                 </div>
               )}

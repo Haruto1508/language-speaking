@@ -12,7 +12,7 @@ export const speakText = (text: string, lang: 'KO' | 'EN' = 'KO', rate: number =
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang === 'KO' ? 'ko-KR' : 'en-US';
-    utterance.rate = rate; // slightly slower for language learners
+    utterance.rate = rate; // configurable speech rate
 
     // Try to find a matching voice if available
     const voices = window.speechSynthesis.getVoices();
@@ -27,6 +27,11 @@ export const speakText = (text: string, lang: 'KO' | 'EN' = 'KO', rate: number =
 
     window.speechSynthesis.speak(utterance);
   });
+};
+
+// Play audio at slow learner speed (Turtle / Snail speed)
+export const speakSlow = (text: string, lang: 'KO' | 'EN' = 'KO'): Promise<void> => {
+  return speakText(text, lang, 0.58);
 };
 
 // Calculate Levenshtein-based similarity percentage (0 - 100)
@@ -60,53 +65,160 @@ export const calculateSimilarity = (s1: string, s2: string): number => {
   return Math.round(((maxLen - distance) / maxLen) * 100);
 };
 
-// Pronunciation recording using Web Speech API Recognition
 export interface SpeechRecognitionResult {
   transcript: string;
   accuracy: number;
+  audioUrl?: string;
+  audioBlob?: Blob;
 }
 
-export const recordSpeech = (
+export interface ActiveRecordingSession {
+  stop: () => Promise<SpeechRecognitionResult>;
+  cancel: () => void;
+}
+
+// Start interactive recording that captures both voice audio (MediaRecorder) and transcript (SpeechRecognition)
+export const startRecordingSession = async (
+  lang: 'KO' | 'EN',
+  targetSentence?: string
+): Promise<ActiveRecordingSession> => {
+  let mediaStream: MediaStream | null = null;
+  let mediaRecorder: MediaRecorder | null = null;
+  const audioChunks: Blob[] = [];
+  let recognition: any = null;
+  let accumulatedTranscript = '';
+
+  // 1. Initialize MediaRecorder for actual voice playback
+  try {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm')
+        ? 'audio/webm'
+        : MediaRecorder.isTypeSupported('audio/mp4')
+        ? 'audio/mp4'
+        : '';
+
+      mediaRecorder = mimeType
+        ? new MediaRecorder(mediaStream, { mimeType })
+        : new MediaRecorder(mediaStream);
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          audioChunks.push(event.data);
+        }
+      };
+      mediaRecorder.start(100);
+    }
+  } catch (err) {
+    console.warn('Microphone stream access warning:', err);
+  }
+
+  // 2. Initialize SpeechRecognition for transcript comparison
+  const SpeechRecognition =
+    (window as unknown as { SpeechRecognition?: any }).SpeechRecognition ||
+    (window as unknown as { webkitSpeechRecognition?: any }).webkitSpeechRecognition;
+
+  if (SpeechRecognition) {
+    try {
+      recognition = new SpeechRecognition();
+      recognition.lang = lang === 'KO' ? 'ko-KR' : 'en-US';
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = (event: any) => {
+        let currentText = '';
+        for (let i = 0; i < event.results.length; i++) {
+          currentText += event.results[i][0].transcript;
+        }
+        if (currentText.trim()) {
+          accumulatedTranscript = currentText.trim();
+        }
+      };
+
+      recognition.onerror = (e: any) => {
+        console.warn('Speech recognition warning:', e);
+      };
+
+      recognition.start();
+    } catch (e) {
+      console.warn('SpeechRecognition failed to start:', e);
+    }
+  }
+
+  const cleanupTracks = () => {
+    if (mediaStream) {
+      mediaStream.getTracks().forEach((t) => t.stop());
+    }
+  };
+
+  return {
+    stop: (): Promise<SpeechRecognitionResult> => {
+      return new Promise((resolve) => {
+        // Stop recognition
+        if (recognition) {
+          try {
+            recognition.stop();
+          } catch {}
+        }
+
+        // Stop media recorder and resolve with audio
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.onstop = () => {
+            cleanupTracks();
+            const blob = new Blob(audioChunks, { type: mediaRecorder?.mimeType || 'audio/webm' });
+            const audioUrl = URL.createObjectURL(blob);
+
+            const finalTranscript = accumulatedTranscript.trim() || targetSentence || '';
+            const accuracy = targetSentence
+              ? calculateSimilarity(finalTranscript, targetSentence)
+              : 90;
+
+            resolve({
+              transcript: finalTranscript,
+              accuracy: Math.max(accuracy, 10),
+              audioUrl,
+              audioBlob: blob,
+            });
+          };
+          mediaRecorder.stop();
+        } else {
+          cleanupTracks();
+          const finalTranscript = accumulatedTranscript.trim() || targetSentence || '';
+          const accuracy = targetSentence ? calculateSimilarity(finalTranscript, targetSentence) : 90;
+          resolve({
+            transcript: finalTranscript,
+            accuracy,
+          });
+        }
+      });
+    },
+    cancel: () => {
+      cleanupTracks();
+      if (recognition) {
+        try {
+          recognition.stop();
+        } catch {}
+      }
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        try {
+          mediaRecorder.stop();
+        } catch {}
+      }
+    },
+  };
+};
+
+// Backward compatible helper
+export const recordSpeech = async (
   lang: 'KO' | 'EN',
   targetSentence?: string
 ): Promise<SpeechRecognitionResult> => {
-  return new Promise((resolve, reject) => {
-    const SpeechRecognition =
-      (window as unknown as { SpeechRecognition?: any }).SpeechRecognition ||
-      (window as unknown as { webkitSpeechRecognition?: any }).webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      // Fallback for browsers without speech recognition support
-      setTimeout(() => {
-        const mockTranscript = targetSentence || (lang === 'KO' ? '안녕하세요' : 'Hello there');
-        resolve({
-          transcript: mockTranscript,
-          accuracy: 94,
-        });
-      }, 1500);
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = lang === 'KO' ? 'ko-KR' : 'en-US';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      const accuracy = targetSentence ? calculateSimilarity(transcript, targetSentence) : 90;
-      resolve({ transcript, accuracy });
-    };
-
-    recognition.onerror = (err: any) => {
-      console.warn('Speech recognition error:', err);
-      // Friendly fallback
-      resolve({
-        transcript: targetSentence || '',
-        accuracy: 85,
-      });
-    };
-
-    recognition.start();
+  const session = await startRecordingSession(lang, targetSentence);
+  return new Promise((resolve) => {
+    setTimeout(async () => {
+      const res = await session.stop();
+      resolve(res);
+    }, 3500);
   });
 };

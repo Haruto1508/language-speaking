@@ -7,11 +7,12 @@ import {
   Sparkles,
   Bookmark,
   CheckCircle,
+  Turtle,
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useAppStore } from '../stores/useAppStore';
 import { Vocabulary, formatStatusVietnamese, formatPartOfSpeechVietnamese } from '../types';
-import { speakText } from '../utils/speech';
+import { speakText, speakSlow } from '../utils/speech';
 
 import { localDataService } from '../services/localDataService';
 
@@ -136,14 +137,27 @@ export const VocabularyPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <button
-                    className="duo-btn-outline"
-                    onClick={() => speakText(vocab.word, isKo ? 'KO' : 'EN')}
-                    style={{ padding: '8px 16px', fontSize: 13 }}
-                  >
-                    <Volume2 size={16} color="#1CB0F6" />
-                    <span>Phát âm</span>
-                  </button>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <button
+                      className="duo-btn-outline"
+                      onClick={() => speakText(vocab.word, isKo ? 'KO' : 'EN', 0.95)}
+                      style={{ padding: '8px 14px', fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                      title="Nghe phát âm bình thường (1.0x)"
+                    >
+                      <Volume2 size={16} color="#1CB0F6" />
+                      <span>Nghe</span>
+                    </button>
+
+                    <button
+                      className="duo-btn-outline"
+                      onClick={() => speakSlow(vocab.word, isKo ? 'KO' : 'EN')}
+                      style={{ padding: '8px 12px', fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 6, color: '#58CC02', borderColor: 'rgba(88, 204, 2, 0.4)' }}
+                      title="Nghe phát âm chậm (chú rùa 🐢 0.6x)"
+                    >
+                      <Turtle size={16} color="#58CC02" />
+                      <span>Chậm</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Korean Morpheme Breakdown */}

@@ -17,12 +17,13 @@ import {
   CheckCheck,
   Eye,
   Filter,
+  Turtle,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { api } from '../services/api';
 import { useAppStore } from '../stores/useAppStore';
 import { Vocabulary, formatStatusVietnamese, formatPartOfSpeechVietnamese } from '../types';
-import { speakText } from '../utils/speech';
+import { speakText, speakSlow } from '../utils/speech';
 import { localDataService } from '../services/localDataService';
 
 const { Title, Text, Paragraph } = Typography;
@@ -372,17 +373,33 @@ export const ReviewPage: React.FC = () => {
                         </div>
                       )}
 
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          speakText(currentItem.word, isKo ? 'KO' : 'EN', 0.9);
-                        }}
-                        className="duo-btn-outline"
-                        style={{ padding: '8px 20px', borderRadius: 20 }}
-                      >
-                        <Volume2 size={18} color="#1CB0F6" />
-                        <span>Nghe phát âm</span>
-                      </button>
+                      <div style={{ display: 'flex', gap: 10, justifyContent: 'center', alignItems: 'center' }}>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            speakText(currentItem.word, isKo ? 'KO' : 'EN', 0.95);
+                          }}
+                          className="duo-btn-outline"
+                          style={{ padding: '8px 18px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                          title="Nghe phát âm bình thường (1.0x)"
+                        >
+                          <Volume2 size={18} color="#1CB0F6" />
+                          <span>Nghe</span>
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            speakSlow(currentItem.word, isKo ? 'KO' : 'EN');
+                          }}
+                          className="duo-btn-outline"
+                          style={{ padding: '8px 16px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 6, color: '#58CC02', borderColor: 'rgba(88, 204, 2, 0.4)' }}
+                          title="Nghe phát âm chậm (chú rùa 🐢 0.6x)"
+                        >
+                          <Turtle size={18} color="#58CC02" />
+                          <span>Chậm</span>
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     // Mặt sau: Ý nghĩa + Ví dụ
@@ -412,15 +429,28 @@ export const ReviewPage: React.FC = () => {
                             <div className={isKo ? 'lang-ko' : ''} style={{ fontSize: 16, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
                               "{currentItem.exampleSentence}"
                             </div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                speakText(currentItem.exampleSentence!, isKo ? 'KO' : 'EN', 0.95);
-                              }}
-                              style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 4 }}
-                            >
-                              <Volume2 size={16} color="#1CB0F6" />
-                            </button>
+                            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  speakText(currentItem.exampleSentence!, isKo ? 'KO' : 'EN', 0.95);
+                                }}
+                                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 4 }}
+                                title="Nghe câu ví dụ tốc độ bình thường"
+                              >
+                                <Volume2 size={16} color="#1CB0F6" />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  speakSlow(currentItem.exampleSentence!, isKo ? 'KO' : 'EN');
+                                }}
+                                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 4 }}
+                                title="Nghe câu ví dụ chậm (chú rùa 🐢)"
+                              >
+                                <Turtle size={16} color="#58CC02" />
+                              </button>
+                            </div>
                           </div>
                           {currentItem.translation && (
                             <div style={{ fontSize: 14, color: 'var(--duo-text-secondary)' }}>
@@ -738,22 +768,43 @@ export const ReviewPage: React.FC = () => {
                         {item.word}
                       </div>
 
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          speakText(item.word, isKo ? 'KO' : 'EN', 0.95);
-                        }}
-                        style={{
-                          background: 'rgba(28, 176, 246, 0.1)',
-                          border: 'none',
-                          borderRadius: 8,
-                          padding: '6px 8px',
-                          cursor: 'pointer',
-                          color: '#1CB0F6',
-                        }}
-                      >
-                        <Volume2 size={16} />
-                      </button>
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            speakText(item.word, isKo ? 'KO' : 'EN', 0.95);
+                          }}
+                          style={{
+                            background: 'rgba(28, 176, 246, 0.1)',
+                            border: 'none',
+                            borderRadius: 8,
+                            padding: '6px 8px',
+                            cursor: 'pointer',
+                            color: '#1CB0F6',
+                          }}
+                          title="Nghe bình thường"
+                        >
+                          <Volume2 size={16} />
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            speakSlow(item.word, isKo ? 'KO' : 'EN');
+                          }}
+                          style={{
+                            background: 'rgba(88, 204, 2, 0.1)',
+                            border: 'none',
+                            borderRadius: 8,
+                            padding: '6px 8px',
+                            cursor: 'pointer',
+                            color: '#58CC02',
+                          }}
+                          title="Nghe chậm (chú rùa 🐢)"
+                        >
+                          <Turtle size={16} />
+                        </button>
+                      </div>
                     </div>
 
                     {item.romanization && (
@@ -833,14 +884,27 @@ export const ReviewPage: React.FC = () => {
                 </div>
               )}
 
-              <button
-                onClick={() => speakText(selectedVocab.word, isKo ? 'KO' : 'EN', 0.9)}
-                className="duo-btn-outline"
-                style={{ padding: '8px 20px', borderRadius: 20 }}
-              >
-                <Volume2 size={18} color="#1CB0F6" />
-                <span>Nghe phát âm chuẩn</span>
-              </button>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginBottom: 12 }}>
+                <button
+                  onClick={() => speakText(selectedVocab.word, isKo ? 'KO' : 'EN', 0.95)}
+                  className="duo-btn-outline"
+                  style={{ padding: '8px 18px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                  title="Nghe phát âm chuẩn tốc độ bình thường (1.0x)"
+                >
+                  <Volume2 size={18} color="#1CB0F6" />
+                  <span>Nghe phát âm chuẩn</span>
+                </button>
+
+                <button
+                  onClick={() => speakSlow(selectedVocab.word, isKo ? 'KO' : 'EN')}
+                  className="duo-btn-outline"
+                  style={{ padding: '8px 16px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 6, color: '#58CC02', borderColor: 'rgba(88, 204, 2, 0.4)' }}
+                  title="Nghe phát âm chậm (chú rùa 🐢 0.6x)"
+                >
+                  <Turtle size={18} color="#58CC02" />
+                  <span>Nghe chậm</span>
+                </button>
+              </div>
             </div>
 
             {/* Meaning */}
@@ -876,12 +940,22 @@ export const ReviewPage: React.FC = () => {
                   <div style={{ fontSize: 13, color: 'var(--duo-text-muted)', fontWeight: 800, textTransform: 'uppercase' }}>
                     Câu ví dụ ngữ cảnh:
                   </div>
-                  <button
-                    onClick={() => speakText(selectedVocab.exampleSentence!, isKo ? 'KO' : 'EN', 0.95)}
-                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 2 }}
-                  >
-                    <Volume2 size={16} color="#1CB0F6" />
-                  </button>
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <button
+                      onClick={() => speakText(selectedVocab.exampleSentence!, isKo ? 'KO' : 'EN', 0.95)}
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 2 }}
+                      title="Nghe ví dụ bình thường"
+                    >
+                      <Volume2 size={16} color="#1CB0F6" />
+                    </button>
+                    <button
+                      onClick={() => speakSlow(selectedVocab.exampleSentence!, isKo ? 'KO' : 'EN')}
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 2 }}
+                      title="Nghe ví dụ chậm (chú rùa 🐢)"
+                    >
+                      <Turtle size={16} color="#58CC02" />
+                    </button>
+                  </div>
                 </div>
                 <div className={isKo ? 'lang-ko' : ''} style={{ fontSize: 16, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
                   "{selectedVocab.exampleSentence}"
