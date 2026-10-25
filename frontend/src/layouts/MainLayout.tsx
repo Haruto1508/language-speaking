@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Layout, Menu, Button, Avatar, Space, Tag, Tooltip } from 'antd';
+import { Layout, Avatar, Tooltip } from 'antd';
 import {
   LayoutDashboard,
   BookOpen,
@@ -10,13 +10,10 @@ import {
   Repeat,
   Settings,
   Flame,
-  Globe,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Volume2,
   Key,
-  Upload,
   GraduationCap,
   Sun,
   Moon,
@@ -38,7 +35,6 @@ export const MainLayout: React.FC = () => {
     openLangModal,
     user,
     openApiKeyModal,
-    openImportModal,
     apiKey,
     themeMode,
     toggleTheme,
@@ -368,113 +364,6 @@ export const MainLayout: React.FC = () => {
           })}
         </div>
 
-        {/* Unified Bottom Deck: Gamification & Utilities */}
-        {!collapsed ? (
-          <div style={{ padding: '8px 12px 10px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {/* Unified Card: Diamond League + Daily Goal + Quick Tools */}
-            <div
-              className="duo-sider-card"
-              style={{
-                background: 'linear-gradient(135deg, rgba(255, 150, 0, 0.06) 0%, rgba(88, 204, 2, 0.04) 100%)',
-                borderColor: 'rgba(255, 150, 0, 0.25)',
-                borderBottomColor: 'rgba(255, 150, 0, 0.4)',
-              }}
-            >
-              {/* Streak Card Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <Flame size={16} color="#FF9600" className="flame-bounce" />
-                  <span style={{ fontSize: 12, fontWeight: 900, color: '#FF9600' }}>
-                    Chuỗi học tập
-                  </span>
-                </div>
-                <Tag color="orange" style={{ margin: 0, fontSize: 10, fontWeight: 900, borderRadius: 6, border: 'none' }}>
-                  {user?.streakCount || 5} NGÀY 🔥
-                </Tag>
-              </div>
-
-              {/* Daily Goal progress */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--duo-text-muted)', marginBottom: 5, fontWeight: 700 }}>
-                <span>Mục tiêu ngày</span>
-                <span style={{ color: '#58CC02' }}>12/15 phút</span>
-              </div>
-              <div className="duo-progress-track" style={{ height: 6, marginBottom: 10 }}>
-                <div className="duo-progress-fill" style={{ width: '80%' }} />
-              </div>
-
-              {/* Quick Action Toolbelt (2-column tactile micro-buttons) */}
-              <div style={{ display: 'flex', gap: 6 }}>
-                <Tooltip title={apiKey ? 'AI Key: Đã kết nối ✓' : 'Cài đặt API Key AI (Gemini / OpenAI)'}>
-                  <button
-                    onClick={openApiKeyModal}
-                    className="duo-micro-btn"
-                    style={{
-                      color: apiKey ? '#58CC02' : '#FF9600',
-                      borderColor: apiKey ? 'rgba(88, 204, 2, 0.3)' : 'rgba(255, 150, 0, 0.3)',
-                    }}
-                  >
-                    <Key size={13} />
-                    <span>AI Key</span>
-                    <span
-                      style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: '50%',
-                        background: apiKey ? '#58CC02' : '#FF9600',
-                        boxShadow: apiKey ? '0 0 6px #58CC02' : 'none',
-                      }}
-                    />
-                  </button>
-                </Tooltip>
-
-                <Tooltip title="Nạp bài học & kịch bản hội thoại từ file JSON">
-                  <button
-                    onClick={openImportModal}
-                    className="duo-micro-btn"
-                    style={{
-                      color: '#1CB0F6',
-                      borderColor: 'rgba(28, 176, 246, 0.3)',
-                    }}
-                  >
-                    <Upload size={13} />
-                    <span>Nạp JSON</span>
-                  </button>
-                </Tooltip>
-              </div>
-            </div>
-          </div>
-        ) : (
-          /* Collapsed Bottom Action Icons */
-          <div style={{ padding: '8px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-            <Tooltip title={`Chuỗi học tập: ${user?.streakCount || 5} ngày liên tục 🔥`} placement="right">
-              <button
-                className="duo-micro-btn"
-                style={{ width: 40, height: 40, padding: 0, borderRadius: 12, color: '#FF9600' }}
-              >
-                <Flame size={18} color="#FF9600" className="flame-bounce" />
-              </button>
-            </Tooltip>
-            <Tooltip title={apiKey ? 'AI Key: Đã kết nối ✓' : 'Cài đặt API Key AI'} placement="right">
-              <button
-                onClick={openApiKeyModal}
-                className="duo-micro-btn"
-                style={{ width: 40, height: 40, padding: 0, borderRadius: 12, color: apiKey ? '#58CC02' : '#FF9600' }}
-              >
-                <Key size={16} />
-              </button>
-            </Tooltip>
-            <Tooltip title="Nạp kịch bản JSON" placement="right">
-              <button
-                onClick={openImportModal}
-                className="duo-micro-btn"
-                style={{ width: 40, height: 40, padding: 0, borderRadius: 12, color: '#1CB0F6' }}
-              >
-                <Upload size={16} />
-              </button>
-            </Tooltip>
-          </div>
-        )}
-
         {/* User Card at Bottom of Sider */}
         {user && (
           <div
@@ -556,6 +445,42 @@ export const MainLayout: React.FC = () => {
                 <Flame size={18} color="#FF9600" className="flame-bounce" />
                 <span>{user?.streakCount || 5}</span>
               </div>
+            </Tooltip>
+
+            {/* AI Key Button */}
+            <Tooltip title={apiKey ? 'AI Key: Đã kết nối ✓' : 'Cài đặt API Key AI (Gemini / OpenAI)'}>
+              <button
+                onClick={openApiKeyModal}
+                style={{
+                  height: 38,
+                  padding: '0 12px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  color: apiKey ? '#58CC02' : '#FF9600',
+                  background: 'var(--duo-card-bg)',
+                  border: '2px solid var(--duo-border)',
+                  borderBottom: '3px solid var(--duo-border)',
+                  borderRadius: 14,
+                  fontWeight: 800,
+                  fontSize: 12,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+                className="duo-card-interactive"
+              >
+                <Key size={15} />
+                <span>AI Key</span>
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    background: apiKey ? '#58CC02' : '#FF9600',
+                    boxShadow: apiKey ? '0 0 6px #58CC02' : 'none',
+                  }}
+                />
+              </button>
             </Tooltip>
 
             {/* Theme Toggle Button (Light / Dark) */}
