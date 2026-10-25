@@ -184,11 +184,11 @@ export const TopicsPage: React.FC = () => {
       {/* Header and Level Filters */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 28 }}>
         <div>
-          <Title level={2} style={{ color: 'var(--text-primary)', margin: 0 }}>
-            {targetLanguage === 'KO' ? 'Korean Communication Scenarios 🇰🇷' : 'English Communication Scenarios 🇺🇸'}
+          <Title level={2} style={{ color: 'var(--duo-text-primary)', margin: 0, fontWeight: 900 }}>
+            {targetLanguage === 'KO' ? 'Chủ đề & Tình huống giao tiếp tiếng Hàn 🇰🇷' : 'Chủ đề & Tình huống giao tiếp tiếng Anh 🇺🇸'}
           </Title>
-          <Text style={{ color: 'var(--text-secondary)', fontSize: 15 }}>
-            Select a scenario to start a multi-step structured lesson: vocabulary, grammar, dialogues, and speaking exercises.
+          <Text style={{ color: 'var(--duo-text-secondary)', fontSize: 15 }}>
+            Chọn tình huống thực tế để học theo lộ trình: Từ vựng cốt lõi ➔ Mẫu câu ngữ pháp ➔ Hội thoại & Luyện phát âm AI.
           </Text>
         </div>
 
@@ -196,24 +196,16 @@ export const TopicsPage: React.FC = () => {
           <button
             className="duo-btn-blue"
             onClick={() => navigate('/chat')}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 16px', fontSize: 13 }}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', fontSize: 14 }}
           >
             <Sparkles size={16} />
-            <span>Trò chuyện AI (Duolingo)</span>
-          </button>
-          <button
-            className="btn-secondary"
-            onClick={() => navigate('/admin')}
-            style={{ display: 'flex', alignItems: 'center', gap: 6 }}
-          >
-            <Sparkles size={16} color="#6366F1" />
-            <span>AI Lesson Generator</span>
+            <span>Phòng Luyện nói AI (Duolingo)</span>
           </button>
         </Space>
       </div>
 
-      {/* Level Filter Tabs */}
-      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 12, marginBottom: 20 }}>
+      {/* Chunky Duolingo Level Filter Pills */}
+      <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 14, marginBottom: 24 }}>
         {levelOptions.map((lvl) => {
           const isSelected = targetLevel === lvl;
           return (
@@ -221,16 +213,18 @@ export const TopicsPage: React.FC = () => {
               key={lvl}
               onClick={() => setTargetLevel(lvl)}
               style={{
-                padding: '8px 16px',
-                borderRadius: 20,
-                background: isSelected ? '#6366F1' : 'rgba(255, 255, 255, 0.04)',
-                color: isSelected ? '#FFFFFF' : 'var(--text-secondary)',
-                border: isSelected ? '1px solid #6366F1' : '1px solid var(--border-subtle)',
-                fontWeight: 600,
-                fontSize: 13,
+                padding: '10px 20px',
+                borderRadius: 16,
+                background: isSelected ? 'var(--duo-green)' : 'var(--duo-card-bg)',
+                color: isSelected ? '#FFFFFF' : 'var(--duo-text-secondary)',
+                border: isSelected ? 'none' : '2px solid var(--duo-border)',
+                borderBottom: isSelected ? '4px solid var(--duo-green-shadow)' : '4px solid var(--duo-border)',
+                fontWeight: 800,
+                fontSize: 14,
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
-                transition: 'all 0.2s',
+                transition: 'all 0.15s ease',
+                userSelect: 'none',
               }}
             >
               {lvl.replace('_', ' ')}
@@ -244,13 +238,13 @@ export const TopicsPage: React.FC = () => {
           <Spin size="large" />
         </div>
       ) : (
-        <Row gutter={[20, 20]}>
+        <Row gutter={[22, 22]}>
           {topics.map((topic) => {
             const hasLessons = topic.lessons && topic.lessons.length > 0;
             return (
               <Col xs={24} md={12} key={topic.id}>
                 <div
-                  className="glass-panel"
+                  className="duo-card"
                   style={{
                     padding: 24,
                     height: '100%',
@@ -260,77 +254,75 @@ export const TopicsPage: React.FC = () => {
                   }}
                 >
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
                       <div
                         style={{
-                          width: 48,
-                          height: 48,
-                          borderRadius: 12,
-                          background: 'rgba(255, 255, 255, 0.05)',
+                          width: 52,
+                          height: 52,
+                          borderRadius: 16,
+                          background: 'linear-gradient(135deg, rgba(88, 204, 2, 0.15), rgba(28, 176, 246, 0.15))',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          border: '1px solid var(--border-subtle)',
+                          border: '2px solid var(--duo-border)',
+                          fontSize: 24,
                         }}
                       >
-                        {ICON_MAP[topic.icon] || <BookOpen size={24} color="#6366F1" />}
+                        {ICON_MAP[topic.icon] || <BookOpen size={26} color="#58CC02" />}
                       </div>
                       <Space>
-                        <Tag color="blue">{topic.levelCode.replace('_', ' ')}</Tag>
-                        <Tag icon={<Clock size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />} color="default">
-                          {topic.estimatedMinutes} min
+                        <Tag color="blue" style={{ borderRadius: 8, fontWeight: 800, padding: '2px 8px' }}>
+                          {topic.levelCode.replace('_', ' ')}
+                        </Tag>
+                        <Tag icon={<Clock size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />} color="default" style={{ borderRadius: 8, fontWeight: 700 }}>
+                          {topic.estimatedMinutes} phút
                         </Tag>
                       </Space>
                     </div>
 
-                    <h3 style={{ fontSize: 19, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
+                    <h3 style={{ fontSize: 20, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 8 }}>
                       {topic.name}
                     </h3>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.5, marginBottom: 16 }}>
+                    <p style={{ color: 'var(--duo-text-secondary)', fontSize: 14, lineHeight: 1.5, marginBottom: 18 }}>
                       {topic.description}
                     </p>
 
-                    <div style={{ marginBottom: 16 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }}>
-                        <span>Progress</span>
-                        <span>{topic.progressPercentage || 0}% Complete</span>
+                    <div style={{ marginBottom: 20 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--duo-text-muted)', marginBottom: 6, fontWeight: 700 }}>
+                        <span>Tiến độ hoàn thành</span>
+                        <span style={{ color: '#58CC02' }}>{topic.progressPercentage || 0}%</span>
                       </div>
-                      <Progress
-                        percent={topic.progressPercentage || 0}
-                        size="small"
-                        strokeColor="#6366F1"
-                        showInfo={false}
-                      />
+                      <div className="duo-progress-track" style={{ height: 10 }}>
+                        <div className="duo-progress-fill" style={{ width: `${topic.progressPercentage || 0}%` }} />
+                      </div>
                     </div>
                   </div>
 
                   <div>
                     {hasLessons ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                         {topic.lessons!.map((lesson) => (
                           <div
                             key={lesson.id}
                             onClick={() => navigate(`/learn/${lesson.id}`)}
-                            className="glass-card-interactive"
+                            className="duo-card-interactive"
                             style={{
-                              padding: '12px 14px',
+                              padding: '12px 16px',
                               display: 'flex',
                               justifyContent: 'space-between',
                               alignItems: 'center',
-                              borderRadius: 12,
-                              border: '2px solid rgba(88, 204, 2, 0.25)',
-                              cursor: 'pointer',
+                              borderRadius: 14,
                             }}
                           >
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                              <PlayCircle size={20} color="#58CC02" />
-                              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
+                              <PlayCircle size={22} color="#58CC02" />
+                              <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
                                 {lesson.title}
                               </span>
                             </div>
                             <button
                               className="duo-btn-green"
-                              style={{ padding: '6px 14px', fontSize: 12, minWidth: 70 }}
+                              style={{ padding: '6px 14px', fontSize: 12, minWidth: 80 }}
                             >
                               Học ngay
                             </button>
@@ -341,7 +333,7 @@ export const TopicsPage: React.FC = () => {
                       <button
                         className="duo-btn-green"
                         onClick={() => navigate(`/learn/1`)}
-                        style={{ width: '100%', padding: '12px' }}
+                        style={{ width: '100%', padding: '14px' }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                           <span>Bắt đầu bài học Duolingo</span>

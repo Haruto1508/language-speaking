@@ -463,7 +463,8 @@ export const DuoChatPage: React.FC = () => {
                   justifyContent: 'center',
                   fontSize: 22,
                   flexShrink: 0,
-                  border: '2px solid #37464F',
+                  border: '2px solid var(--duo-border)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
                 }}
               >
                 {isAi ? '🤖' : '🧑‍🎓'}

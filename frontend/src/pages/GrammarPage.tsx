@@ -96,13 +96,13 @@ export const GrammarPage: React.FC = () => {
             }
 
             return (
-              <div key={gram.id} className="glass-panel" style={{ padding: 28 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                  <h3 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)' }}>
+              <div key={gram.id} className="duo-card duo-card-interactive" style={{ padding: 26 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+                  <h3 style={{ fontSize: 22, fontWeight: 900, color: 'var(--duo-text-primary)' }}>
                     {gram.grammarPoint}
                   </h3>
                   {gram.formalityLevel && (
-                    <Tag color="magenta">{gram.formalityLevel}</Tag>
+                    <Tag color="magenta" style={{ borderRadius: 6, fontWeight: 800 }}>{gram.formalityLevel}</Tag>
                   )}
                 </div>
 
@@ -111,40 +111,41 @@ export const GrammarPage: React.FC = () => {
                   <div
                     style={{
                       padding: '14px 18px',
-                      borderRadius: 10,
-                      background: 'rgba(99, 102, 241, 0.12)',
-                      border: '1px solid rgba(99, 102, 241, 0.3)',
+                      borderRadius: 12,
+                      background: 'rgba(28, 176, 246, 0.1)',
+                      border: '1.5px solid rgba(28, 176, 246, 0.3)',
                       marginBottom: 16,
                     }}
                   >
-                    <div style={{ fontSize: 12, fontWeight: 700, color: '#A5B4FC', textTransform: 'uppercase', marginBottom: 4 }}>
-                      Structure Formula:
+                    <div style={{ fontSize: 12, fontWeight: 800, color: '#1CB0F6', textTransform: 'uppercase', marginBottom: 4 }}>
+                      Công thức cấu trúc:
                     </div>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
                       {gram.structureFormula}
                     </div>
                   </div>
                 )}
 
-                <p style={{ fontSize: 15, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 16 }}>
+                <p style={{ fontSize: 15, color: 'var(--duo-text-secondary)', lineHeight: 1.6, marginBottom: 16 }}>
                   {gram.explanation}
                 </p>
 
                 {/* Usage Guide */}
                 {gram.usageGuide && (
                   <div style={{ marginBottom: 16 }}>
-                    <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>
-                      Usage Guide:
+                    <h4 style={{ fontSize: 14, fontWeight: 800, color: 'var(--duo-text-primary)', marginBottom: 6 }}>
+                      Hướng dẫn sử dụng:
                     </h4>
                     <pre
                       style={{
                         fontFamily: 'inherit',
                         fontSize: 13,
-                        color: 'var(--text-secondary)',
+                        color: 'var(--duo-text-secondary)',
                         whiteSpace: 'pre-wrap',
-                        background: 'rgba(0, 0, 0, 0.25)',
+                        background: 'var(--duo-bg)',
+                        border: '1px solid var(--duo-border)',
                         padding: 12,
-                        borderRadius: 8,
+                        borderRadius: 10,
                         lineHeight: 1.5,
                       }}
                     >
@@ -156,40 +157,42 @@ export const GrammarPage: React.FC = () => {
                 {/* Example Conversations */}
                 {convExamples.length > 0 && (
                   <div style={{ marginBottom: 16 }}>
-                    <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
-                      Real-world Example Dialogue:
+                    <h4 style={{ fontSize: 14, fontWeight: 800, color: 'var(--duo-text-primary)', marginBottom: 8 }}>
+                      Hội thoại mẫu thực tế:
                     </h4>
-                    {convExamples.map((c, i) => (
-                      <div
-                        key={i}
-                        style={{
-                          padding: 12,
-                          borderRadius: 8,
-                          background: 'rgba(255, 255, 255, 0.03)',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          border: '1px solid var(--border-subtle)',
-                        }}
-                      >
-                        <div>
-                          <div className={isKo ? 'lang-ko' : ''} style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
-                            <strong>{c.speaker || 'A'}:</strong> "{c.text}"
-                          </div>
-                          {c.translation && (
-                            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
-                              {c.translation}
-                            </div>
-                          )}
-                        </div>
-                        <button
-                          onClick={() => speakText(c.text, isKo ? 'KO' : 'EN')}
-                          style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#06B6D4' }}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {convExamples.map((c, i) => (
+                        <div
+                          key={i}
+                          style={{
+                            padding: 12,
+                            borderRadius: 10,
+                            background: 'var(--duo-bg)',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            border: '1px solid var(--duo-border)',
+                          }}
                         >
-                          <Volume2 size={16} />
-                        </button>
-                      </div>
-                    ))}
+                          <div>
+                            <div className={isKo ? 'lang-ko' : ''} style={{ fontSize: 15, fontWeight: 700, color: 'var(--duo-text-primary)' }}>
+                              <strong style={{ color: '#1CB0F6' }}>{c.speaker || 'A'}:</strong> "{c.text}"
+                            </div>
+                            {c.translation && (
+                              <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)', marginTop: 4 }}>
+                                {c.translation}
+                              </div>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => speakText(c.text, isKo ? 'KO' : 'EN')}
+                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#1CB0F6', padding: 4 }}
+                          >
+                            <Volume2 size={18} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 
@@ -198,16 +201,16 @@ export const GrammarPage: React.FC = () => {
                   <div
                     style={{
                       padding: 14,
-                      borderRadius: 8,
-                      background: 'rgba(244, 63, 94, 0.08)',
-                      border: '1px solid rgba(244, 63, 94, 0.25)',
+                      borderRadius: 10,
+                      background: 'rgba(255, 75, 75, 0.08)',
+                      border: '1.5px solid rgba(255, 75, 75, 0.25)',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#F43F5E', fontWeight: 700, fontSize: 13, marginBottom: 4 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#FF4B4B', fontWeight: 800, fontSize: 13, marginBottom: 4 }}>
                       <AlertCircle size={16} />
-                      <span>Watch Out: Common Mistakes:</span>
+                      <span>Lỗi sai phổ biến cần lưu ý:</span>
                     </div>
-                    <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+                    <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)' }}>
                       {gram.commonMistakes}
                     </div>
                   </div>

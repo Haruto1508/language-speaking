@@ -198,31 +198,29 @@ export const ReviewPage: React.FC = () => {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <Title level={2} style={{ color: 'var(--text-primary)', margin: 0 }}>
-            Daily Spaced Repetition Review 🧠
+          <Title level={2} style={{ color: 'var(--duo-text-primary)', margin: 0, fontWeight: 900 }}>
+            Ôn tập thông minh Spaced Repetition 🧠
           </Title>
-          <Text style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
-            Reviewing words prioritized by the SM-2 algorithm to lock them into long-term memory.
+          <Text style={{ color: 'var(--duo-text-secondary)', fontSize: 14 }}>
+            Thuật toán SM-2 tự động phân tích độ nhớ để kích hoạt từ vựng vào trí nhớ dài hạn.
           </Text>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Flame size={20} color="#F59E0B" className="flame-icon" />
-          <span style={{ fontWeight: 800, color: '#F59E0B' }}>5 Day Streak</span>
+        <div className="duo-stat-pill streak">
+          <Flame size={18} color="#FF9600" className="flame-bounce" />
+          <span>5 Ngày Streak</span>
         </div>
       </div>
 
       {!isDone && queue.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-secondary)', marginBottom: 6 }}>
-            <span>Card {currentIndex + 1} of {queue.length}</span>
-            <span>{Math.round((completedCount / queue.length) * 100)}% Complete</span>
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--duo-text-secondary)', marginBottom: 6, fontWeight: 700 }}>
+            <span>Thẻ {currentIndex + 1} trên {queue.length}</span>
+            <span style={{ color: '#58CC02' }}>{Math.round((completedCount / queue.length) * 100)}% Hoàn thành</span>
           </div>
-          <Progress
-            percent={Math.round((completedCount / queue.length) * 100)}
-            strokeColor="linear-gradient(135deg, #6366F1, #06B6D4)"
-            showInfo={false}
-          />
+          <div className="duo-progress-track" style={{ height: 10 }}>
+            <div className="duo-progress-fill" style={{ width: `${Math.round((completedCount / queue.length) * 100)}%` }} />
+          </div>
         </div>
       )}
 
@@ -231,25 +229,24 @@ export const ReviewPage: React.FC = () => {
         <div style={{ perspective: 1000, margin: '20px 0 28px' }}>
           <div
             onClick={() => setIsFlipped(!isFlipped)}
-            className="glass-panel"
+            className="duo-card duo-card-interactive"
             style={{
-              padding: '44px 32px',
-              minHeight: 340,
+              padding: '48px 36px',
+              minHeight: 350,
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
               alignItems: 'center',
               textAlign: 'center',
               cursor: 'pointer',
-              border: '1px solid rgba(99, 102, 241, 0.35)',
               position: 'relative',
-              background: 'linear-gradient(180deg, rgba(17, 24, 39, 0.9) 0%, rgba(17, 24, 39, 0.6) 100%)',
+              borderRadius: 22,
             }}
           >
             {/* Top Badges */}
             <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Tag color="purple">{currentItem.partOfSpeech}</Tag>
-              <Tag color={currentItem.status === 'MASTERED' ? 'green' : 'blue'}>
+              <Tag color="purple" style={{ borderRadius: 6, fontWeight: 800 }}>{currentItem.partOfSpeech}</Tag>
+              <Tag color={currentItem.status === 'MASTERED' ? 'green' : 'blue'} style={{ borderRadius: 6, fontWeight: 800 }}>
                 {currentItem.status}
               </Tag>
             </div>
@@ -261,9 +258,9 @@ export const ReviewPage: React.FC = () => {
                 <div
                   className={isKo ? 'lang-ko' : ''}
                   style={{
-                    fontSize: 'clamp(2rem, 5vw, 3rem)',
-                    fontWeight: 800,
-                    color: 'var(--text-primary)',
+                    fontSize: 'clamp(2.2rem, 5.5vw, 3.2rem)',
+                    fontWeight: 900,
+                    color: 'var(--duo-text-primary)',
                     marginBottom: 12,
                   }}
                 >
@@ -271,7 +268,7 @@ export const ReviewPage: React.FC = () => {
                 </div>
 
                 {currentItem.romanization && (
-                  <div style={{ fontSize: 16, color: '#A5B4FC', fontStyle: 'italic', marginBottom: 12 }}>
+                  <div style={{ fontSize: 16, color: '#1CB0F6', fontStyle: 'italic', marginBottom: 14 }}>
                     [{currentItem.romanization}]
                   </div>
                 )}
@@ -281,22 +278,22 @@ export const ReviewPage: React.FC = () => {
                     e.stopPropagation();
                     speakText(currentItem.word, isKo ? 'KO' : 'EN', 0.9);
                   }}
-                  className="btn-secondary"
+                  className="duo-btn-outline"
                   style={{ padding: '8px 18px', borderRadius: 20 }}
                 >
-                  <Volume2 size={18} color="#06B6D4" />
-                  <span>Listen</span>
+                  <Volume2 size={18} color="#1CB0F6" />
+                  <span>Nghe phát âm</span>
                 </button>
               </div>
             ) : (
               // BACK OF FLASHCARD
               <div style={{ margin: 'auto 0', maxWidth: 540 }}>
-                <div style={{ fontSize: 24, fontWeight: 800, color: '#38BDF8', marginBottom: 12 }}>
+                <div style={{ fontSize: 26, fontWeight: 900, color: '#58CC02', marginBottom: 12 }}>
                   {currentItem.meaning}
                 </div>
 
                 {currentItem.pronunciationIpa && (
-                  <div style={{ fontSize: 14, color: '#A5B4FC', marginBottom: 12 }}>
+                  <div style={{ fontSize: 14, color: '#1CB0F6', marginBottom: 12, fontWeight: 600 }}>
                     IPA: {currentItem.pronunciationIpa}
                   </div>
                 )}
@@ -305,18 +302,18 @@ export const ReviewPage: React.FC = () => {
                   <div
                     style={{
                       padding: 14,
-                      borderRadius: 10,
-                      background: 'rgba(255, 255, 255, 0.04)',
-                      border: '1px solid var(--border-subtle)',
+                      borderRadius: 12,
+                      background: 'var(--duo-bg)',
+                      border: '1.5px solid var(--duo-border)',
                       marginTop: 14,
                       textAlign: 'left',
                     }}
                   >
-                    <div className={isKo ? 'lang-ko' : ''} style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>
+                    <div className={isKo ? 'lang-ko' : ''} style={{ fontSize: 15, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
                       "{currentItem.exampleSentence}"
                     </div>
                     {currentItem.translation && (
-                      <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
+                      <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)', marginTop: 4 }}>
                         {currentItem.translation}
                       </div>
                     )}
@@ -326,129 +323,134 @@ export const ReviewPage: React.FC = () => {
             )}
 
             {/* Bottom Flip Instruction */}
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ fontSize: 12, color: 'var(--duo-text-muted)', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}>
               <RotateCw size={14} />
-              <span>Click card to {isFlipped ? 'see word front' : 'reveal meaning & example'}</span>
+              <span>Chạm vào thẻ để {isFlipped ? 'xem mặt trước' : 'xem nghĩa và câu ví dụ'}</span>
             </div>
           </div>
 
           {/* Confidence Rating Buttons */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginTop: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginTop: 18 }}>
             <button
               onClick={() => handleRateCard(1)}
               style={{
                 padding: '14px 10px',
-                borderRadius: 12,
-                background: 'rgba(244, 63, 94, 0.12)',
-                border: '1px solid rgba(244, 63, 94, 0.3)',
-                color: '#F43F5E',
+                borderRadius: 14,
+                background: 'rgba(255, 75, 75, 0.12)',
+                border: '2px solid rgba(255, 75, 75, 0.35)',
+                borderBottom: '4px solid #EA2B2B',
+                color: '#FF4B4B',
                 cursor: 'pointer',
                 textAlign: 'center',
                 transition: 'all 0.15s ease',
               }}
             >
-              <div style={{ fontWeight: 800, fontSize: 15 }}>Again (1)</div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>&lt; 10 min</div>
+              <div style={{ fontWeight: 900, fontSize: 15 }}>Chưa nhớ (1)</div>
+              <div style={{ fontSize: 11, color: 'var(--duo-text-muted)', marginTop: 2, fontWeight: 700 }}>&lt; 10 phút</div>
             </button>
 
             <button
               onClick={() => handleRateCard(2)}
               style={{
                 padding: '14px 10px',
-                borderRadius: 12,
-                background: 'rgba(245, 158, 11, 0.12)',
-                border: '1px solid rgba(245, 158, 11, 0.3)',
-                color: '#F59E0B',
+                borderRadius: 14,
+                background: 'rgba(255, 150, 0, 0.12)',
+                border: '2px solid rgba(255, 150, 0, 0.35)',
+                borderBottom: '4px solid #E58500',
+                color: '#FF9600',
                 cursor: 'pointer',
                 textAlign: 'center',
                 transition: 'all 0.15s ease',
               }}
             >
-              <div style={{ fontWeight: 800, fontSize: 15 }}>Hard (2)</div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>1 Day</div>
+              <div style={{ fontWeight: 900, fontSize: 15 }}>Khá khó (2)</div>
+              <div style={{ fontSize: 11, color: 'var(--duo-text-muted)', marginTop: 2, fontWeight: 700 }}>1 Ngày</div>
             </button>
 
             <button
               onClick={() => handleRateCard(3)}
               style={{
                 padding: '14px 10px',
-                borderRadius: 12,
-                background: 'rgba(99, 102, 241, 0.12)',
-                border: '1px solid rgba(99, 102, 241, 0.3)',
-                color: '#818CF8',
+                borderRadius: 14,
+                background: 'rgba(28, 176, 246, 0.12)',
+                border: '2px solid rgba(28, 176, 246, 0.35)',
+                borderBottom: '4px solid #1899D6',
+                color: '#1CB0F6',
                 cursor: 'pointer',
                 textAlign: 'center',
                 transition: 'all 0.15s ease',
               }}
             >
-              <div style={{ fontWeight: 800, fontSize: 15 }}>Good (3)</div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>3 Days</div>
+              <div style={{ fontWeight: 900, fontSize: 15 }}>Tốt (3)</div>
+              <div style={{ fontSize: 11, color: 'var(--duo-text-muted)', marginTop: 2, fontWeight: 700 }}>3 Ngày</div>
             </button>
 
             <button
               onClick={() => handleRateCard(4)}
               style={{
                 padding: '14px 10px',
-                borderRadius: 12,
-                background: 'rgba(16, 185, 129, 0.12)',
-                border: '1px solid rgba(16, 185, 129, 0.3)',
-                color: '#10B981',
+                borderRadius: 14,
+                background: 'rgba(88, 204, 2, 0.12)',
+                border: '2px solid rgba(88, 204, 2, 0.35)',
+                borderBottom: '4px solid #46A302',
+                color: '#58CC02',
                 cursor: 'pointer',
                 textAlign: 'center',
                 transition: 'all 0.15s ease',
               }}
             >
-              <div style={{ fontWeight: 800, fontSize: 15 }}>Easy (4)</div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>6 Days</div>
+              <div style={{ fontWeight: 900, fontSize: 15 }}>Dễ dàng (4)</div>
+              <div style={{ fontSize: 11, color: 'var(--duo-text-muted)', marginTop: 2, fontWeight: 700 }}>6 Ngày</div>
             </button>
           </div>
         </div>
       ) : isDone ? (
         // Completed View
-        <div className="glass-panel" style={{ padding: 48, textAlign: 'center' }}>
+        <div className="duo-card" style={{ padding: 48, textAlign: 'center' }}>
           <div
             style={{
-              width: 72,
-              height: 72,
+              width: 80,
+              height: 80,
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #10B981, #06B6D4)',
+              background: 'linear-gradient(135deg, #FFC800, #FF9600)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: 20,
+              boxShadow: '0 8px 24px rgba(255, 200, 0, 0.4)',
             }}
           >
-            <Award size={40} color="white" />
+            <Award size={44} color="#131F24" />
           </div>
 
-          <h2 style={{ fontSize: 26, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 8 }}>
-            Daily Review Completed! 🎉
+          <h2 style={{ fontSize: 28, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 8 }}>
+            Hoàn thành phiên ôn tập hôm nay! 🎉
           </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 15, maxWidth: 480, margin: '0 auto 24px', lineHeight: 1.5 }}>
-            You reviewed all {queue.length} target words for today. Your spaced repetition intervals have been recalculated to maximize long-term retention.
+          <p style={{ color: 'var(--duo-text-secondary)', fontSize: 15, maxWidth: 480, margin: '0 auto 24px', lineHeight: 1.5 }}>
+            Bạn đã ôn tập toàn bộ {queue.length} từ vựng mục tiêu. Khoảng thời gian lặp lại đã được thuật toán cập nhật để tối ưu khả năng ghi nhớ dài hạn.
           </p>
 
           <Space size="middle">
-            <button className="btn-primary" onClick={() => navigate('/dashboard')}>
-              <span>Back to Dashboard</span>
-              <ArrowRight size={16} />
+            <button className="duo-btn-green" onClick={() => navigate('/dashboard')}>
+              <span>Về Bảng điều khiển</span>
+              <ArrowRight size={18} />
             </button>
-            <button className="btn-secondary" onClick={() => navigate('/topics')}>
-              Continue to Lessons
+            <button className="duo-btn-outline" onClick={() => navigate('/topics')}>
+              Tiếp tục học bài
             </button>
           </Space>
         </div>
       ) : (
-        <div className="glass-panel" style={{ padding: 40, textAlign: 'center' }}>
-          <CheckCircle size={36} color="#10B981" style={{ marginBottom: 12 }} />
-          <h3 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>
-            No Due Reviews Right Now!
+        <div className="duo-card" style={{ padding: 40, textAlign: 'center' }}>
+          <CheckCircle size={40} color="#58CC02" style={{ marginBottom: 12 }} />
+          <h3 style={{ fontSize: 22, fontWeight: 900, color: 'var(--duo-text-primary)' }}>
+            Không có từ nào cần ôn tập lúc này!
           </h3>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginTop: 4 }}>
-            You're completely caught up on your spaced repetition queue. Explore new lessons to expand your vocabulary!
+          <p style={{ color: 'var(--duo-text-secondary)', fontSize: 15, marginTop: 6 }}>
+            Bạn đã bắt kịp toàn bộ từ vựng trong hàng đợi Spaced Repetition. Hãy học thêm các bài học mới để mở rộng vốn từ!
           </p>
-          <button className="btn-primary" onClick={() => navigate('/topics')} style={{ marginTop: 20 }}>
-            Explore Topics & Lessons
+          <button className="duo-btn-green" onClick={() => navigate('/topics')} style={{ marginTop: 20 }}>
+            <span>Khám phá chủ đề bài học</span>
           </button>
         </div>
       )}

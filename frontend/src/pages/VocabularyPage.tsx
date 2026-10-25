@@ -179,26 +179,26 @@ export const VocabularyPage: React.FC = () => {
       {/* Title & Search Bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 24 }}>
         <div>
-          <Title level={2} style={{ color: 'var(--text-primary)', margin: 0 }}>
-            {isKo ? 'Korean Vocabulary Bank 🇰🇷' : 'English Vocabulary Bank 🇺🇸'}
+          <Title level={2} style={{ color: 'var(--duo-text-primary)', margin: 0, fontWeight: 900 }}>
+            {isKo ? 'Sổ từ vựng tiếng Hàn 🇰🇷' : 'Sổ từ vựng tiếng Anh 🇺🇸'}
           </Title>
-          <Text style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
-            Explore communication terms, morpheme breakdowns, phonetic sound changes, and collocations.
+          <Text style={{ color: 'var(--duo-text-secondary)', fontSize: 14 }}>
+            Khám phá từ vựng giao tiếp thực chiến, phân tích hình thái (morpheme), biến âm và cụm từ thông dụng.
           </Text>
         </div>
 
         <div style={{ width: 320 }}>
           <Input
-            prefix={<Search size={16} color="#9CA3AF" />}
-            placeholder="Search words, meanings, or romanizations..."
+            prefix={<Search size={16} color="var(--duo-text-muted)" />}
+            placeholder="Tìm kiếm từ, phiên âm, ý nghĩa..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
-              background: 'rgba(255, 255, 255, 0.04)',
-              borderColor: 'var(--border-subtle)',
-              color: 'var(--text-primary)',
-              borderRadius: 10,
-              padding: '8px 14px',
+              background: 'var(--duo-card-bg)',
+              borderColor: 'var(--duo-border)',
+              color: 'var(--duo-text-primary)',
+              borderRadius: 12,
+              padding: '10px 14px',
             }}
           />
         </div>
@@ -221,48 +221,48 @@ export const VocabularyPage: React.FC = () => {
             return (
               <div
                 key={vocab.id}
-                className="glass-panel"
-                style={{ padding: 24, border: '1px solid var(--border-subtle)' }}
+                className="duo-card duo-card-interactive"
+                style={{ padding: 22 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
                       <span
                         className={isKo ? 'lang-ko' : ''}
-                        style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)' }}
+                        style={{ fontSize: 24, fontWeight: 900, color: 'var(--duo-text-primary)' }}
                       >
                         {vocab.word}
                       </span>
                       {vocab.romanization && (
-                        <span style={{ fontSize: 14, color: '#A5B4FC', fontStyle: 'italic' }}>
+                        <span style={{ fontSize: 14, color: '#1CB0F6', fontStyle: 'italic' }}>
                           [{vocab.romanization}]
                         </span>
                       )}
                       {vocab.pronunciationIpa && (
-                        <span style={{ fontSize: 13, color: '#38BDF8' }}>
+                        <span style={{ fontSize: 13, color: '#58CC02', fontWeight: 600 }}>
                           {vocab.pronunciationIpa}
                         </span>
                       )}
-                      <Tag color="blue">{vocab.partOfSpeech}</Tag>
+                      <Tag color="blue" style={{ borderRadius: 6, fontWeight: 800 }}>{vocab.partOfSpeech}</Tag>
                       {vocab.userStatus && (
-                        <Tag color={vocab.userStatus === 'MASTERED' ? 'green' : 'geekblue'}>
+                        <Tag color={vocab.userStatus === 'MASTERED' ? 'green' : 'geekblue'} style={{ borderRadius: 6, fontWeight: 800 }}>
                           {vocab.userStatus}
                         </Tag>
                       )}
                     </div>
 
-                    <div style={{ fontSize: 16, color: 'var(--text-primary)', marginTop: 8, fontWeight: 600 }}>
+                    <div style={{ fontSize: 16, color: 'var(--duo-text-primary)', marginTop: 8, fontWeight: 700 }}>
                       {vocab.meaning}
                     </div>
                   </div>
 
                   <button
-                    className="btn-secondary"
+                    className="duo-btn-outline"
                     onClick={() => speakText(vocab.word, isKo ? 'KO' : 'EN')}
-                    style={{ padding: '8px 14px' }}
+                    style={{ padding: '8px 16px', fontSize: 13 }}
                   >
-                    <Volume2 size={18} color="#06B6D4" />
-                    <span>Pronounce</span>
+                    <Volume2 size={16} color="#1CB0F6" />
+                    <span>Phát âm</span>
                   </button>
                 </div>
 

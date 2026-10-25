@@ -27,11 +27,11 @@ export const App: React.FC = () => {
         algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
         token: {
           colorPrimary: '#58CC02',
-          colorBgBase: isDark ? '#131F24' : '#FFFFFF',
-          colorTextBase: isDark ? '#FFFFFF' : '#3C3C3C',
-          colorBorder: isDark ? '#37464F' : '#E5E5E5',
-          borderRadius: 12,
-          fontFamily: "'Nunito', 'Plus Jakarta Sans', -apple-system, sans-serif",
+          colorBgBase: isDark ? '#0D151A' : '#FFFFFF',
+          colorTextBase: isDark ? '#FFFFFF' : '#0F172A',
+          colorBorder: isDark ? '#24353E' : '#E2E8F0',
+          borderRadius: 14,
+          fontFamily: "'Outfit', 'Plus Jakarta Sans', 'Nunito', -apple-system, sans-serif",
         },
       }}
     >

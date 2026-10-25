@@ -242,58 +242,61 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
         </div>
       </div>
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+      {/* Modern Duolingo Tabs */}
+      <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
         <button
-          className={activeTab === 'generate' ? 'btn-primary' : 'btn-secondary'}
+          className={activeTab === 'generate' ? 'duo-btn-green' : 'duo-btn-outline'}
           onClick={() => setActiveTab('generate')}
+          style={{ padding: '10px 20px', fontSize: 14 }}
         >
           <Sparkles size={16} />
-          <span>AI Lesson Generator</span>
+          <span>Tạo giáo trình bằng AI</span>
         </button>
         <button
-          className={activeTab === 'ingest' ? 'btn-primary' : 'btn-secondary'}
+          className={activeTab === 'ingest' ? 'duo-btn-blue' : 'duo-btn-outline'}
           onClick={() => setActiveTab('ingest')}
+          style={{ padding: '10px 20px', fontSize: 14 }}
         >
           <Upload size={16} />
-          <span>Raw Source Ingestion</span>
+          <span>Nạp tài liệu thô (Ingestion)</span>
         </button>
         <button
-          className={activeTab === 'manage' ? 'btn-primary' : 'btn-secondary'}
+          className={activeTab === 'manage' ? 'duo-btn-purple' : 'duo-btn-outline'}
           onClick={() => setActiveTab('manage')}
+          style={{ padding: '10px 20px', fontSize: 14 }}
         >
           <Layers size={16} />
-          <span>Lesson Approval Workflow ({lessons.length})</span>
+          <span>Quản lý & Duyệt bài ({lessons.length})</span>
         </button>
       </div>
 
       {/* TAB 1: AI LESSON GENERATOR */}
       {activeTab === 'generate' && (
-        <div className="glass-panel" style={{ padding: 28 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 16 }}>
-            Generate Structured Curriculum with Educational AI
+        <div className="duo-card" style={{ padding: 28 }}>
+          <h3 style={{ fontSize: 20, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 16 }}>
+            Tạo Giáo trình Giao tiếp Tự động bằng AI Giáo dục
           </h3>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
             <div>
-              <label style={{ fontSize: 13, color: 'var(--text-secondary)', display: 'block', marginBottom: 6 }}>
-                Lesson Title:
+              <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-secondary)', display: 'block', marginBottom: 6 }}>
+                Tiêu đề bài học:
               </label>
               <Input
                 value={lessonTitle}
                 onChange={(e) => setLessonTitle(e.target.value)}
-                style={{ background: 'rgba(255, 255, 255, 0.04)', borderColor: 'var(--border-subtle)', color: 'var(--text-primary)' }}
+                style={{ background: 'var(--duo-card-bg)', borderColor: 'var(--duo-border)', color: 'var(--duo-text-primary)', borderRadius: 10, padding: '8px 12px' }}
               />
             </div>
 
             <div>
-              <label style={{ fontSize: 13, color: 'var(--text-secondary)', display: 'block', marginBottom: 6 }}>
-                Proficiency Level:
+              <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-secondary)', display: 'block', marginBottom: 6 }}>
+                Trình độ:
               </label>
               <Select
                 value={difficulty}
                 onChange={(val) => setDifficulty(val)}
-                style={{ width: '100%' }}
+                style={{ width: '100%', height: 40 }}
                 options={[
                   { value: 'BEGINNER', label: 'Beginner (A1)' },
                   { value: 'ELEMENTARY', label: 'Elementary (A2)' },
@@ -306,70 +309,70 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
           </div>
 
           <div style={{ marginBottom: 16 }}>
-            <label style={{ fontSize: 13, color: 'var(--text-secondary)', display: 'block', marginBottom: 6 }}>
-              Communication Scenario Description:
+            <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-secondary)', display: 'block', marginBottom: 6 }}>
+              Mô tả tình huống giao tiếp:
             </label>
             <Input
               value={scenario}
               onChange={(e) => setScenario(e.target.value)}
-              placeholder="e.g. Asking for directions, ordering food, job interview..."
-              style={{ background: 'rgba(255, 255, 255, 0.04)', borderColor: 'var(--border-subtle)', color: 'var(--text-primary)' }}
+              placeholder="Ví dụ: Đặt câu hỏi hỏi đường, gọi món ăn, phỏng vấn xin việc..."
+              style={{ background: 'var(--duo-card-bg)', borderColor: 'var(--duo-border)', color: 'var(--duo-text-primary)', borderRadius: 10, padding: '8px 12px' }}
             />
           </div>
 
           <div style={{ marginBottom: 24 }}>
-            <label style={{ fontSize: 13, color: 'var(--text-secondary)', display: 'block', marginBottom: 6 }}>
-              Pedagogical Objectives (Optional):
+            <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-secondary)', display: 'block', marginBottom: 6 }}>
+              Mục tiêu học tập (Tuỳ chọn):
             </label>
             <TextArea
               rows={3}
               value={objectives}
               onChange={(e) => setObjectives(e.target.value)}
-              style={{ background: 'rgba(255, 255, 255, 0.04)', borderColor: 'var(--border-subtle)', color: 'var(--text-primary)' }}
+              style={{ background: 'var(--duo-card-bg)', borderColor: 'var(--duo-border)', color: 'var(--duo-text-primary)', borderRadius: 10 }}
             />
           </div>
 
           <button
-            className="btn-primary"
+            className="duo-btn-green"
             onClick={handleGenerateLesson}
             disabled={generating}
             style={{ padding: '12px 28px', fontSize: 15 }}
           >
             {generating ? <Spin size="small" /> : <Sparkles size={16} />}
-            <span>{generating ? 'Synthesizing Curriculum...' : 'Generate Structured Lesson'}</span>
+            <span>{generating ? 'Đang soạn thảo giáo trình...' : 'Bắt đầu Tạo bài học với AI'}</span>
           </button>
         </div>
       )}
 
       {/* TAB 2: INGESTION PIPELINE */}
       {activeTab === 'ingest' && (
-        <div className="glass-panel" style={{ padding: 28 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
-            External Document / Syllabus Ingestion Pipeline
+        <div className="duo-card" style={{ padding: 28 }}>
+          <h3 style={{ fontSize: 20, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 8 }}>
+            Đường ống nạp Giáo trình & Tài liệu Thô (Ingestion Pipeline)
           </h3>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 20 }}>
-            Paste textbook notes, language curriculum guidelines, or syllabus excerpts. Our processor parses terms, generates explanations, creates audio dialogues, exercises, and roleplay scenarios.
+          <p style={{ color: 'var(--duo-text-secondary)', fontSize: 14, marginBottom: 20 }}>
+            Dán tài liệu học, ghi chú hoặc nội dung giáo trình bất kỳ. Hệ thống AI sẽ tự động phân tích từ vựng, tạo giải thích ngữ pháp, đoạn hội thoại audio và các bài tập luyện phát âm tương ứng.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 16 }}>
             <div>
-              <label style={{ fontSize: 13, color: 'var(--text-secondary)', display: 'block', marginBottom: 6 }}>
-                Target Topic:
+              <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-secondary)', display: 'block', marginBottom: 6 }}>
+                Chủ đề mục tiêu:
               </label>
               <Input
                 value={ingestTopic}
                 onChange={(e) => setIngestTopic(e.target.value)}
-                style={{ background: 'rgba(255, 255, 255, 0.04)', borderColor: 'var(--border-subtle)', color: 'var(--text-primary)' }}
+                style={{ background: 'var(--duo-card-bg)', borderColor: 'var(--duo-border)', color: 'var(--duo-text-primary)', borderRadius: 10, padding: '8px 12px' }}
               />
             </div>
             <div>
-              <label style={{ fontSize: 13, color: 'var(--text-secondary)', display: 'block', marginBottom: 6 }}>
-                Language:
+              <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-secondary)', display: 'block', marginBottom: 6 }}>
+                Ngôn ngữ:
               </label>
               <Select
                 value={ingestLang}
                 onChange={setIngestLang}
-                style={{ width: '100%' }}
+                style={{ width: '100%', height: 40 }}
                 options={[
                   { value: 'KO', label: '🇰🇷 Korean' },
                   { value: 'EN', label: '🇺🇸 English' },
@@ -377,13 +380,13 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
               />
             </div>
             <div>
-              <label style={{ fontSize: 13, color: 'var(--text-secondary)', display: 'block', marginBottom: 6 }}>
-                Target Level:
+              <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-secondary)', display: 'block', marginBottom: 6 }}>
+                Trình độ mục tiêu:
               </label>
               <Select
                 value={ingestLevel}
                 onChange={setIngestLevel}
-                style={{ width: '100%' }}
+                style={{ width: '100%', height: 40 }}
                 options={[
                   { value: 'BEGINNER', label: 'Beginner (A1)' },
                   { value: 'ELEMENTARY', label: 'Elementary (A2)' },
@@ -394,34 +397,34 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
           </div>
 
           <div style={{ marginBottom: 24 }}>
-            <label style={{ fontSize: 13, color: 'var(--text-secondary)', display: 'block', marginBottom: 6 }}>
-              Raw Source Material / Dataset:
+            <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-secondary)', display: 'block', marginBottom: 6 }}>
+              Dữ liệu tài liệu thô (Raw Source Dataset):
             </label>
             <TextArea
               rows={8}
               value={rawSource}
               onChange={(e) => setRawSource(e.target.value)}
-              style={{ background: 'rgba(255, 255, 255, 0.04)', borderColor: 'var(--border-subtle)', color: 'var(--text-primary)', fontFamily: 'monospace' }}
+              style={{ background: 'var(--duo-card-bg)', borderColor: 'var(--duo-border)', color: 'var(--duo-text-primary)', fontFamily: 'monospace', borderRadius: 10 }}
             />
           </div>
 
           <button
-            className="btn-primary"
+            className="duo-btn-blue"
             onClick={handleRunIngestion}
             disabled={ingesting}
             style={{ padding: '12px 28px', fontSize: 15 }}
           >
             {ingesting ? <Spin size="small" /> : <Upload size={16} />}
-            <span>{ingesting ? 'Processing Ingestion Pipeline...' : 'Run Ingestion Pipeline'}</span>
+            <span>{ingesting ? 'Đang nạp và xử lý pipeline...' : 'Chạy Đường ống nạp Giáo trình'}</span>
           </button>
         </div>
       )}
 
       {/* TAB 3: LESSON APPROVAL WORKFLOW */}
       {activeTab === 'manage' && (
-        <div className="glass-panel" style={{ padding: 24 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 16 }}>
-            Curriculum Status & Publishing Workflow
+        <div className="duo-card" style={{ padding: 24 }}>
+          <h3 style={{ fontSize: 20, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 16 }}>
+            Quy trình Xét duyệt & Xuất bản Giáo trình
           </h3>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -430,9 +433,9 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
                 key={lesson.id}
                 style={{
                   padding: 16,
-                  borderRadius: 12,
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 14,
+                  background: 'var(--duo-bg)',
+                  border: '1.5px solid var(--duo-border)',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
@@ -442,7 +445,7 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
               >
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
+                    <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
                       {lesson.title}
                     </span>
                     <Tag color={statusColorMap[lesson.status]}>{lesson.status}</Tag>

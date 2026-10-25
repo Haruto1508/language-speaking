@@ -1,72 +1,84 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Nunito:wght@600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Noto+Sans+KR:wght@400;500;700;900&family=Nunito:wght@600;700;800;900&display=swap');
 
 :root, [data-theme='dark'] {
-  --font-main: 'Nunito', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-korean: 'Noto Sans KR', 'Nunito', sans-serif;
+  --font-main: 'Outfit', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Nunito', 'Outfit', sans-serif;
+  --font-korean: 'Noto Sans KR', 'Outfit', sans-serif;
 
   /* Duolingo Signature Brand Colors */
   --duo-green: #58CC02;
   --duo-green-shadow: #46A302;
+  --duo-green-glow: rgba(88, 204, 2, 0.28);
+
   --duo-blue: #1CB0F6;
   --duo-blue-shadow: #1899D6;
+  --duo-blue-glow: rgba(28, 176, 246, 0.28);
+
   --duo-yellow: #FFC800;
   --duo-yellow-shadow: #E5A500;
+  --duo-yellow-glow: rgba(255, 200, 0, 0.28);
+
   --duo-red: #FF4B4B;
   --duo-red-shadow: #EA2B2B;
+  --duo-red-glow: rgba(255, 75, 75, 0.28);
+
   --duo-orange: #FF9600;
   --duo-orange-shadow: #E58500;
+  --duo-orange-glow: rgba(255, 150, 0, 0.28);
+
   --duo-purple: #CE82FF;
   --duo-purple-shadow: #A559D8;
+  --duo-purple-glow: rgba(206, 130, 255, 0.28);
 
-  /* Dark Theme Surfaces (Duolingo Dark) */
-  --duo-bg: #131F24;
-  --duo-content-bg: #131F24;
-  --duo-card-bg: #202F36;
-  --duo-card-hover: #283840;
-  --duo-border: #37464F;
-  --duo-border-light: #52656D;
-  --duo-header-bg: rgba(19, 31, 36, 0.95);
-  --duo-sider-bg: #131F24;
+  /* Dark Theme Surfaces (Duolingo Dark Ultra-Modern) */
+  --duo-bg: #0D151A;
+  --duo-content-bg: #0D151A;
+  --duo-card-bg: #162228;
+  --duo-card-hover: #1E2C33;
+  --duo-border: #24353E;
+  --duo-border-light: #324754;
+  --duo-header-bg: rgba(13, 21, 26, 0.88);
+  --duo-sider-bg: #111A20;
 
   --duo-text-primary: #FFFFFF;
-  --duo-text-secondary: #90A0A7;
-  --duo-text-muted: #5B6E76;
+  --duo-text-secondary: #9BA9B0;
+  --duo-text-muted: #5E717C;
 
-  --duo-bubble-ai-bg: #202F36;
-  --duo-bubble-ai-border: #37464F;
-  --duo-bubble-user-bg: rgba(88, 204, 2, 0.15);
-  --duo-bubble-user-border: rgba(88, 204, 2, 0.35);
+  --duo-bubble-ai-bg: #162228;
+  --duo-bubble-ai-border: #283B45;
+  --duo-bubble-user-bg: rgba(88, 204, 2, 0.16);
+  --duo-bubble-user-border: rgba(88, 204, 2, 0.4);
 
-  --duo-sheet-correct-bg: #182B21;
+  --duo-sheet-correct-bg: #13271C;
   --duo-sheet-correct-border: #205933;
   --duo-sheet-correct-text: #58CC02;
-  --duo-sheet-wrong-bg: #311A20;
+  --duo-sheet-wrong-bg: #2E171D;
   --duo-sheet-wrong-border: #63232C;
   --duo-sheet-wrong-text: #FF4B4B;
 
   --radius-sm: 10px;
   --radius-md: 16px;
-  --radius-lg: 20px;
+  --radius-lg: 22px;
   --radius-full: 9999px;
 }
 
 [data-theme='light'] {
-  /* Light Theme Surfaces (Duolingo Light) */
-  --duo-bg: #F7F7F7;
-  --duo-content-bg: #F7F7F7;
+  /* Light Theme Surfaces (Duolingo Light Apple-Clean) */
+  --duo-bg: #F8FAFC;
+  --duo-content-bg: #F8FAFC;
   --duo-card-bg: #FFFFFF;
-  --duo-card-hover: #F0F2F5;
-  --duo-border: #E5E5E5;
-  --duo-border-light: #ECECEC;
-  --duo-header-bg: rgba(255, 255, 255, 0.96);
+  --duo-card-hover: #F1F5F9;
+  --duo-border: #E2E8F0;
+  --duo-border-light: #CBD5E1;
+  --duo-header-bg: rgba(255, 255, 255, 0.92);
   --duo-sider-bg: #FFFFFF;
 
-  --duo-text-primary: #3C3C3C;
-  --duo-text-secondary: #777777;
-  --duo-text-muted: #AFAFAF;
+  --duo-text-primary: #0F172A;
+  --duo-text-secondary: #475569;
+  --duo-text-muted: #94A3B8;
 
-  --duo-bubble-ai-bg: #F7F7F7;
-  --duo-bubble-ai-border: #E5E5E5;
+  --duo-bubble-ai-bg: #F1F5F9;
+  --duo-bubble-ai-border: #E2E8F0;
   --duo-bubble-user-bg: #D7FFB8;
   --duo-bubble-user-border: #58CC02;
 
@@ -87,10 +99,15 @@
 body {
   font-family: var(--font-main);
   background-color: var(--duo-bg);
+  background-image: 
+    radial-gradient(circle at 10% 10%, rgba(88, 204, 2, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 90% 10%, rgba(28, 176, 246, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(206, 130, 255, 0.03) 0%, transparent 40%);
+  background-attachment: fixed;
   color: var(--duo-text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 .ant-layout-header {
@@ -103,18 +120,18 @@ body {
 }
 
 /* ========================================================
-   DUOLINGO 3D TACTILE BUTTONS
+   DUOLINGO 3D TACTILE BUTTONS (With Specular Highlights)
    ======================================================== */
 .duo-btn-green {
   background: var(--duo-green);
   border: none;
   border-bottom: 4px solid var(--duo-green-shadow);
   color: #FFFFFF;
-  font-family: var(--font-main);
+  font-family: var(--font-display);
   font-weight: 800;
   font-size: 15px;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.6px;
   border-radius: var(--radius-md);
   padding: 12px 24px;
   cursor: pointer;
@@ -124,10 +141,26 @@ body {
   gap: 10px;
   transition: transform 0.1s ease, border-bottom 0.1s ease, filter 0.1s ease;
   user-select: none;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(88, 204, 2, 0.25);
+}
+
+.duo-btn-green::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 6px;
+  right: 6px;
+  height: 35%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .duo-btn-green:hover:not(:disabled) {
   filter: brightness(1.08);
+  box-shadow: 0 6px 16px rgba(88, 204, 2, 0.35);
 }
 
 .duo-btn-green:active:not(:disabled) {
@@ -135,23 +168,16 @@ body {
   border-bottom: 1px solid var(--duo-green-shadow);
 }
 
-.duo-btn-green:disabled {
-  background: #37464F;
-  border-bottom: 4px solid #233138;
-  color: #6E818A;
-  cursor: not-allowed;
-}
-
-.duo-btn-blue {
-  background: var(--duo-blue);
+.duo-btn-yellow {
+  background: var(--duo-yellow);
   border: none;
-  border-bottom: 4px solid var(--duo-blue-shadow);
-  color: #FFFFFF;
-  font-family: var(--font-main);
-  font-weight: 800;
+  border-bottom: 4px solid var(--duo-yellow-shadow);
+  color: #131F24;
+  font-family: var(--font-display);
+  font-weight: 900;
   font-size: 15px;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.6px;
   border-radius: var(--radius-md);
   padding: 12px 24px;
   cursor: pointer;
@@ -161,40 +187,26 @@ body {
   gap: 10px;
   transition: transform 0.1s ease, border-bottom 0.1s ease, filter 0.1s ease;
   user-select: none;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(255, 200, 0, 0.25);
 }
 
-.duo-btn-blue:hover:not(:disabled) {
-  filter: brightness(1.08);
-}
-
-.duo-btn-blue:active:not(:disabled) {
-  transform: translateY(3px);
-  border-bottom: 1px solid var(--duo-blue-shadow);
-}
-
-.duo-btn-yellow {
-  background: var(--duo-yellow);
-  border: none;
-  border-bottom: 4px solid var(--duo-yellow-shadow);
-  color: #131F24;
-  font-family: var(--font-main);
-  font-weight: 900;
-  font-size: 15px;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  border-radius: var(--radius-md);
-  padding: 12px 24px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  transition: transform 0.1s ease, border-bottom 0.1s ease;
-  user-select: none;
+.duo-btn-yellow::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 6px;
+  right: 6px;
+  height: 35%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .duo-btn-yellow:hover:not(:disabled) {
   filter: brightness(1.06);
+  box-shadow: 0 6px 16px rgba(255, 200, 0, 0.35);
 }
 
 .duo-btn-yellow:active:not(:disabled) {
@@ -202,16 +214,62 @@ body {
   border-bottom: 1px solid var(--duo-yellow-shadow);
 }
 
+.duo-btn-purple {
+  background: var(--duo-purple);
+  border: none;
+  border-bottom: 4px solid var(--duo-purple-shadow);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-radius: var(--radius-md);
+  padding: 12px 24px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 0.1s ease, border-bottom 0.1s ease, filter 0.1s ease;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(206, 130, 255, 0.25);
+}
+
+.duo-btn-purple::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 6px;
+  right: 6px;
+  height: 35%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.duo-btn-purple:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 6px 16px rgba(206, 130, 255, 0.35);
+}
+
+.duo-btn-purple:active:not(:disabled) {
+  transform: translateY(3px);
+  border-bottom: 1px solid var(--duo-purple-shadow);
+}
+
 .duo-btn-outline {
   background: var(--duo-card-bg);
   border: 2px solid var(--duo-border);
   border-bottom: 4px solid var(--duo-border);
   color: var(--duo-text-primary);
-  font-family: var(--font-main);
+  font-family: var(--font-display);
   font-weight: 800;
   font-size: 14px;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.6px;
   border-radius: var(--radius-md);
   padding: 10px 20px;
   cursor: pointer;
@@ -219,18 +277,93 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: transform 0.1s ease, border-bottom 0.1s ease, background 0.1s ease;
+  transition: transform 0.1s ease, border-bottom 0.1s ease, background 0.15s ease, border-color 0.15s ease;
   user-select: none;
 }
 
 .duo-btn-outline:hover {
   background: var(--duo-card-hover);
-  border-color: #52656D;
+  border-color: var(--duo-border-light);
+  transform: translateY(-1px);
 }
 
 .duo-btn-outline:active {
   transform: translateY(2px);
   border-bottom: 2px solid var(--duo-border);
+}
+
+/* ========================================================
+   MODERN GAMIFICATION STAT PILLS (Header & Cards)
+   ======================================================== */
+.duo-stat-pill {
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border-radius: var(--radius-full);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  backdrop-filter: blur(8px);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+}
+
+.duo-stat-pill:hover {
+  transform: translateY(-2px);
+}
+
+.duo-stat-pill.streak {
+  background: rgba(255, 150, 0, 0.12);
+  color: #FF9600;
+  border-color: rgba(255, 150, 0, 0.28);
+}
+.duo-stat-pill.streak:hover {
+  background: rgba(255, 150, 0, 0.2);
+  box-shadow: 0 4px 14px rgba(255, 150, 0, 0.25);
+}
+
+.duo-stat-pill.gems {
+  background: rgba(28, 176, 246, 0.12);
+  color: #1CB0F6;
+  border-color: rgba(28, 176, 246, 0.28);
+}
+.duo-stat-pill.gems:hover {
+  background: rgba(28, 176, 246, 0.2);
+  box-shadow: 0 4px 14px rgba(28, 176, 246, 0.25);
+}
+
+.duo-stat-pill.hearts {
+  background: rgba(255, 75, 75, 0.12);
+  color: #FF4B4B;
+  border-color: rgba(255, 75, 75, 0.28);
+}
+.duo-stat-pill.hearts:hover {
+  background: rgba(255, 75, 75, 0.2);
+  box-shadow: 0 4px 14px rgba(255, 75, 75, 0.25);
+}
+
+.duo-stat-pill.xp {
+  background: rgba(255, 200, 0, 0.12);
+  color: #FFC800;
+  border-color: rgba(255, 200, 0, 0.28);
+}
+.duo-stat-pill.xp:hover {
+  background: rgba(255, 200, 0, 0.2);
+  box-shadow: 0 4px 14px rgba(255, 200, 0, 0.25);
+}
+
+/* Float Animations */
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-7px); }
+}
+
+.float-slow {
+  animation: floatSlow 3.2s ease-in-out infinite;
 }
 
 /* ========================================================
@@ -242,7 +375,8 @@ body {
   border-bottom: 5px solid var(--duo-border);
   border-radius: var(--radius-md);
   padding: 20px;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
 }
 
 .duo-card-interactive {
@@ -252,13 +386,15 @@ body {
   border-radius: var(--radius-md);
   padding: 18px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
 }
 
 .duo-card-interactive:hover {
   background: var(--duo-card-hover);
-  border-color: #52656D;
+  border-color: var(--duo-border-light);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 .duo-card-interactive:active {
@@ -267,10 +403,11 @@ body {
 }
 
 .duo-card-interactive.selected {
-  background: rgba(28, 176, 246, 0.15);
+  background: rgba(28, 176, 246, 0.12);
   border-color: var(--duo-blue);
   border-bottom-color: var(--duo-blue-shadow);
   color: var(--duo-blue);
+  box-shadow: 0 4px 16px rgba(28, 176, 246, 0.2);
 }
 
 /* ========================================================
@@ -468,6 +605,24 @@ body {
   background: var(--duo-card-hover);
   border-color: var(--duo-border-light);
   transform: translateY(-2px);
+}
+
+/* Duolingo Hero Banner */
+.duo-hero-banner {
+  background: linear-gradient(135deg, rgba(88, 204, 2, 0.12) 0%, rgba(28, 176, 246, 0.08) 50%, rgba(206, 130, 255, 0.06) 100%);
+  border: 2px solid var(--duo-border);
+  border-bottom: 5px solid var(--duo-border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+  transition: all 0.25s ease;
+}
+
+[data-theme='light'] .duo-hero-banner {
+  background: linear-gradient(135deg, rgba(215, 255, 184, 0.35) 0%, rgba(28, 176, 246, 0.08) 50%, rgba(255, 255, 255, 0.95) 100%);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
 }
 
 /* Mic pulsating ring for recording */

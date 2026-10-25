@@ -99,14 +99,14 @@ export const MainLayout: React.FC = () => {
   const langName = targetLanguage === 'KO' ? 'Korean' : 'English';
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh', background: 'transparent' }}>
       <LanguageModal />
 
       <Sider
         collapsible
         collapsed={collapsed}
         onCollapse={setCollapsed}
-        width={240}
+        width={260}
         style={{
           background: 'var(--duo-sider-bg)',
           borderRight: '2px solid var(--duo-border)',
@@ -114,41 +114,48 @@ export const MainLayout: React.FC = () => {
           top: 0,
           height: '100vh',
           zIndex: 100,
+          display: 'flex',
+          flexDirection: 'column',
+          overflowY: 'auto',
+          transition: 'all 0.25s ease',
         }}
       >
-        {/* Brand Logo */}
+        {/* Brand Logo & Mascot */}
         <div
           onClick={() => navigate('/')}
           style={{
-            padding: '20px 16px',
+            padding: '22px 18px 18px',
             display: 'flex',
             alignItems: 'center',
             gap: 12,
             cursor: 'pointer',
+            userSelect: 'none',
           }}
         >
           <div
+            className="float-slow"
             style={{
-              width: 38,
-              height: 38,
-              borderRadius: 10,
+              width: 44,
+              height: 44,
+              borderRadius: 14,
               background: 'linear-gradient(135deg, #58CC02, #1CB0F6)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 14px rgba(88, 204, 2, 0.4)',
+              boxShadow: '0 8px 20px rgba(88, 204, 2, 0.4)',
               flexShrink: 0,
+              fontSize: 22,
             }}
           >
-            <MessageSquare size={20} color="#FFFFFF" />
+            🦉
           </div>
           {!collapsed && (
             <div>
-              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--duo-text-primary)' }}>
+              <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--duo-text-primary)', lineHeight: 1.1 }}>
                 Lingua<span style={{ color: '#58CC02' }}>Talk</span>
               </div>
-              <div style={{ fontSize: 11, color: 'var(--duo-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>
-                Duolingo Edition
+              <div style={{ fontSize: 10, color: '#1CB0F6', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 800, marginTop: 3 }}>
+                Duolingo Master
               </div>
             </div>
           )}
@@ -156,81 +163,121 @@ export const MainLayout: React.FC = () => {
 
         {/* Language & Level Selector Pill */}
         {!collapsed && (
-          <div style={{ padding: '0 16px 16px' }}>
+          <div style={{ padding: '0 16px 14px' }}>
             <div
               onClick={openLangModal}
               style={{
-                padding: '10px 12px',
-                borderRadius: 12,
+                padding: '10px 14px',
+                borderRadius: 14,
                 background: 'var(--duo-card-bg)',
-                border: '1px solid var(--duo-border)',
+                border: '2px solid var(--duo-border)',
+                borderBottom: '3.5px solid var(--duo-border)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 cursor: 'pointer',
-                transition: 'all 0.2s',
+                transition: 'all 0.15s ease',
               }}
               className="glass-card-interactive"
+              title="Nhấn để đổi Ngôn ngữ hoặc Trình độ học"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 20 }}>{langFlag}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 24, lineHeight: 1 }}>{langFlag}</span>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-primary)' }}>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
                     {langName}
                   </div>
-                  <div style={{ fontSize: 11, color: '#1CB0F6', fontWeight: 600 }}>
+                  <div style={{ fontSize: 11, color: '#1CB0F6', fontWeight: 700 }}>
                     {targetLevel.replace('_', ' ')}
                   </div>
                 </div>
               </div>
-              <ChevronDown size={14} color="var(--duo-text-muted)" />
+              <ChevronDown size={16} color="var(--duo-text-muted)" />
             </div>
           </div>
         )}
 
-        <Menu
-          theme={themeMode === 'dark' ? 'dark' : 'light'}
-          mode="inline"
-          selectedKeys={[location.pathname]}
-          items={menuItems}
-          onClick={({ key }) => navigate(key)}
-          style={{ border: 'none', background: 'transparent' }}
-        />
+        {/* Navigation Menu */}
+        <div style={{ flex: 1, padding: '0 8px' }}>
+          <Menu
+            theme={themeMode === 'dark' ? 'dark' : 'light'}
+            mode="inline"
+            selectedKeys={[location.pathname]}
+            items={menuItems}
+            onClick={({ key }) => navigate(key)}
+            style={{ border: 'none', background: 'transparent' }}
+          />
+        </div>
+
+        {/* Duolingo League Mini Widget */}
+        {!collapsed && (
+          <div style={{ padding: '12px 16px' }}>
+            <div
+              className="duo-card"
+              style={{
+                padding: '12px 14px',
+                background: 'linear-gradient(135deg, rgba(255, 200, 0, 0.08) 0%, rgba(88, 204, 2, 0.05) 100%)',
+                borderColor: 'rgba(255, 200, 0, 0.3)',
+                borderBottomColor: 'rgba(255, 200, 0, 0.4)',
+                borderRadius: 14,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 16 }}>💎</span>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: '#FFC800' }}>
+                    Diamond League
+                  </span>
+                </div>
+                <Tag color="gold" style={{ margin: 0, fontSize: 10, fontWeight: 800, borderRadius: 6, border: 'none' }}>
+                  HẠNG #3
+                </Tag>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--duo-text-muted)', marginBottom: 4, fontWeight: 700 }}>
+                <span>Mục tiêu ngày</span>
+                <span style={{ color: '#58CC02' }}>12/15 min</span>
+              </div>
+              <div className="duo-progress-track" style={{ height: 8 }}>
+                <div className="duo-progress-fill" style={{ width: '80%' }} />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Quick Action Buttons in Sider */}
         {!collapsed && (
-          <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
             <button
               onClick={openApiKeyModal}
               className="duo-btn-outline"
               style={{
                 width: '100%',
-                padding: '8px 12px',
+                padding: '9px 12px',
                 fontSize: 12,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 6,
+                gap: 7,
                 color: '#1CB0F6',
-                borderColor: '#1CB0F6',
+                borderColor: 'rgba(28, 176, 246, 0.4)',
               }}
             >
               <Key size={14} />
-              <span>{apiKey ? 'API Key (Đã lưu)' : 'Cài đặt API Key AI'}</span>
+              <span>{apiKey ? 'API Key (Đã kết nối ✓)' : 'Cài đặt API Key AI'}</span>
             </button>
             <button
               onClick={openImportModal}
               className="duo-btn-outline"
               style={{
                 width: '100%',
-                padding: '8px 12px',
+                padding: '9px 12px',
                 fontSize: 12,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 6,
+                gap: 7,
                 color: '#FFC800',
-                borderColor: '#FFC800',
+                borderColor: 'rgba(255, 200, 0, 0.4)',
               }}
             >
               <Upload size={14} />
@@ -243,42 +290,37 @@ export const MainLayout: React.FC = () => {
         {!collapsed && user && (
           <div
             style={{
-              position: 'absolute',
-              bottom: 48,
-              left: 16,
-              right: 16,
-              padding: '12px',
-              borderRadius: 12,
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid var(--border-subtle)',
+              padding: '12px 16px 20px',
+              borderTop: '1px solid var(--duo-border)',
               display: 'flex',
               alignItems: 'center',
               gap: 10,
             }}
           >
-            <Avatar style={{ backgroundColor: '#58CC02' }}>
+            <Avatar style={{ backgroundColor: '#58CC02', fontWeight: 800 }}>
               {user.name.charAt(0)}
             </Avatar>
-            <div style={{ overflow: 'hidden' }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+            <div style={{ overflow: 'hidden', flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--duo-text-primary)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
                 {user.name}
               </div>
-              <div style={{ fontSize: 11, color: '#58CC02', fontWeight: 600 }}>
-                Học viên Duolingo
+              <div style={{ fontSize: 11, color: '#58CC02', fontWeight: 700 }}>
+                Học viên tích cực ✨
               </div>
             </div>
           </div>
         )}
       </Sider>
 
-      <Layout>
+      <Layout style={{ background: 'transparent' }}>
         {/* Top Header */}
         <Header
           style={{
             background: 'var(--duo-header-bg)',
-            backdropFilter: 'blur(12px)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
             borderBottom: '2px solid var(--duo-border)',
-            padding: '0 20px',
+            padding: '0 24px',
             height: 64,
             lineHeight: 'normal',
             display: 'flex',
@@ -287,184 +329,97 @@ export const MainLayout: React.FC = () => {
             position: 'sticky',
             top: 0,
             zIndex: 90,
-            transition: 'background 0.2s ease, border-color 0.2s ease',
+            transition: 'background 0.25s ease, border-color 0.25s ease',
           }}
         >
+          {/* Header Left Title */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flexShrink: 1, marginRight: 12 }}>
-            <span style={{ fontSize: 13, color: 'var(--duo-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              Học <strong style={{ color: 'var(--duo-text-primary)' }}>{langName}</strong> giao tiếp theo phong cách <strong style={{ color: '#58CC02' }}>Duolingo</strong>
+            <span style={{ fontSize: 14, color: 'var(--duo-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              Luyện nói <strong style={{ color: 'var(--duo-text-primary)' }}>{langName}</strong> thực chiến theo chuẩn <strong style={{ color: '#58CC02' }}>Duolingo 3D</strong>
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          {/* Header Right Gamification & Controls */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
             {/* Duolingo Streak Counter */}
             <Tooltip title="Chuỗi ngày học liên tục!">
-              <div
-                style={{
-                  height: 36,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '0 10px',
-                  borderRadius: 18,
-                  background: 'rgba(255, 150, 0, 0.12)',
-                  border: '1px solid rgba(255, 150, 0, 0.3)',
-                  cursor: 'pointer',
-                  userSelect: 'none',
-                  lineHeight: 'normal',
-                }}
-              >
-                <Flame size={17} color="#FF9600" className="flame-icon" />
-                <span style={{ fontWeight: 800, color: '#FF9600', fontSize: 13 }}>
-                  {user?.streakCount || 5}
-                </span>
+              <div className="duo-stat-pill streak">
+                <Flame size={18} color="#FF9600" className="flame-bounce" />
+                <span>{user?.streakCount || 5}</span>
               </div>
             </Tooltip>
 
             {/* Duolingo Gems Counter */}
             <Tooltip title="Đá quý tích lũy!">
-              <div
-                style={{
-                  height: 36,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '0 10px',
-                  borderRadius: 18,
-                  background: 'rgba(28, 176, 246, 0.12)',
-                  border: '1px solid rgba(28, 176, 246, 0.3)',
-                  cursor: 'pointer',
-                  userSelect: 'none',
-                  lineHeight: 'normal',
-                }}
-              >
-                <span style={{ fontSize: 15, lineHeight: 1 }}>💎</span>
-                <span style={{ fontWeight: 800, color: '#1CB0F6', fontSize: 13 }}>
-                  {gems}
-                </span>
+              <div className="duo-stat-pill gems">
+                <span style={{ fontSize: 16, lineHeight: 1 }}>💎</span>
+                <span>{gems}</span>
               </div>
             </Tooltip>
 
             {/* Duolingo Hearts Counter */}
-            <Tooltip title="Trái tim năng lượng - làm sai sẽ mất tim!">
-              <div
-                style={{
-                  height: 36,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '0 10px',
-                  borderRadius: 18,
-                  background: 'rgba(255, 75, 75, 0.12)',
-                  border: '1px solid rgba(255, 75, 75, 0.3)',
-                  cursor: 'pointer',
-                  userSelect: 'none',
-                  lineHeight: 'normal',
-                }}
-              >
+            <Tooltip title="Trái tim năng lượng!">
+              <div className="duo-stat-pill hearts">
                 <Heart size={16} color="#FF4B4B" fill="#FF4B4B" />
-                <span style={{ fontWeight: 800, color: '#FF4B4B', fontSize: 13 }}>
-                  {hearts}/5
-                </span>
+                <span>{hearts}/5</span>
               </div>
             </Tooltip>
 
-            {/* Header Action: API Key */}
-            <Button
-              type="text"
-              onClick={openApiKeyModal}
-              style={{
-                height: 36,
-                padding: '0 10px',
-                color: apiKey ? '#58CC02' : '#1CB0F6',
-                background: 'rgba(28, 176, 246, 0.08)',
-                border: '1px solid var(--duo-border)',
-                borderRadius: 12,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 5,
-                fontWeight: 700,
-                fontSize: 12,
-                lineHeight: 'normal',
-              }}
-            >
-              <Key size={14} />
-              <span>{apiKey ? 'API Key ✓' : 'API Key'}</span>
-            </Button>
-
-            {/* Header Action: Nạp JSON */}
-            <Button
-              type="text"
-              onClick={openImportModal}
-              style={{
-                height: 36,
-                padding: '0 10px',
-                color: '#FFC800',
-                background: 'rgba(255, 200, 0, 0.08)',
-                border: '1px solid var(--duo-border)',
-                borderRadius: 12,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 5,
-                fontWeight: 700,
-                fontSize: 12,
-                lineHeight: 'normal',
-              }}
-            >
-              <Upload size={14} />
-              <span>Nạp JSON</span>
-            </Button>
-
             {/* Theme Toggle Button (Light / Dark) */}
-            <Tooltip title={themeMode === 'dark' ? 'Chuyển sang giao diện Sáng ☀️' : 'Chuyển sang giao diện Tối 🌙'}>
-              <Button
-                type="text"
+            <Tooltip title={themeMode === 'dark' ? 'Chuyển sang Giao diện Sáng ☀️' : 'Chuyển sang Giao diện Tối 🌙'}>
+              <button
                 onClick={toggleTheme}
                 style={{
-                  height: 36,
-                  width: 36,
+                  height: 38,
+                  width: 38,
                   padding: 0,
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: themeMode === 'dark' ? '#FFC800' : '#6366F1',
-                  background: themeMode === 'dark' ? 'rgba(255, 200, 0, 0.1)' : 'rgba(99, 102, 241, 0.1)',
-                  border: '1px solid var(--duo-border)',
-                  borderRadius: 12,
+                  color: themeMode === 'dark' ? '#FFC800' : '#1CB0F6',
+                  background: 'var(--duo-card-bg)',
+                  border: '2px solid var(--duo-border)',
+                  borderBottom: '3px solid var(--duo-border)',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
                 }}
+                className="duo-card-interactive"
               >
-                {themeMode === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-              </Button>
+                {themeMode === 'dark' ? <Sun size={18} color="#FFC800" /> : <Moon size={18} color="#1CB0F6" />}
+              </button>
             </Tooltip>
 
             {/* Language Switch Button */}
-            <Button
-              type="text"
+            <button
               onClick={openLangModal}
               style={{
-                height: 36,
-                padding: '0 12px',
+                height: 38,
+                padding: '0 14px',
                 color: 'var(--duo-text-primary)',
                 background: 'var(--duo-card-bg)',
-                border: '1px solid var(--duo-border)',
-                borderRadius: 12,
+                border: '2px solid var(--duo-border)',
+                borderBottom: '3px solid var(--duo-border)',
+                borderRadius: 14,
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 6,
-                fontWeight: 700,
+                gap: 8,
+                fontWeight: 800,
                 fontSize: 13,
-                lineHeight: 'normal',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
               }}
+              className="duo-card-interactive"
             >
-              <span>{langFlag}</span>
+              <span style={{ fontSize: 16 }}>{langFlag}</span>
               <span>{langName}</span>
-              <ChevronDown size={14} />
-            </Button>
+              <ChevronDown size={14} color="var(--duo-text-muted)" />
+            </button>
           </div>
         </Header>
 
         {/* Main Content Area */}
-        <Content style={{ padding: '24px 32px', minHeight: 'calc(100vh - 64px)' }}>
+        <Content style={{ padding: '28px 36px', minHeight: 'calc(100vh - 64px)' }}>
           <Outlet />
         </Content>
       </Layout>
