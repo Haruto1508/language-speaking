@@ -79,6 +79,13 @@ export const ApiKeyModal: React.FC = () => {
       footer={null}
       width={640}
       centered
+      styles={{
+        body: {
+          maxHeight: 'calc(85vh - 70px)',
+          overflowY: 'auto',
+          paddingRight: 4,
+        },
+      }}
     >
       <div style={{ marginTop: 16 }}>
         {/* API Key Status Notice */}

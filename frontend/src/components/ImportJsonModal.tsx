@@ -101,6 +101,13 @@ export const ImportJsonModal: React.FC = () => {
       footer={null}
       width={680}
       centered
+      styles={{
+        body: {
+          maxHeight: 'calc(85vh - 70px)',
+          overflowY: 'auto',
+          paddingRight: 4,
+        },
+      }}
     >
       <div style={{ marginTop: 14 }}>
         <Paragraph style={{ fontSize: 13, color: 'var(--duo-text-secondary)', marginBottom: 14 }}>
