@@ -15,6 +15,7 @@ import { GrammarPage } from './pages/GrammarPage';
 import { AdminPage } from './pages/AdminPage';
 import { ApiKeyModal } from './components/ApiKeyModal';
 import { ImportJsonModal } from './components/ImportJsonModal';
+import { ScrollToTopButton } from './components/ScrollToTopButton';
 import { useAppStore } from './stores/useAppStore';
 
 export const App: React.FC = () => {
@@ -36,9 +37,10 @@ export const App: React.FC = () => {
       }}
     >
       <BrowserRouter>
-        {/* Global Modals for AI API Key & Scenario Generator, and JSON Scenario Importer */}
+        {/* Global Modals & Controls */}
         <ApiKeyModal />
         <ImportJsonModal />
+        <ScrollToTopButton />
 
         <Routes>
           {/* Public Landing Page */}
