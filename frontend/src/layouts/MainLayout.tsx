@@ -17,6 +17,9 @@ import {
   GraduationCap,
   Sun,
   Moon,
+  PanelLeftClose,
+  PanelLeftOpen,
+  PanelLeft,
 } from 'lucide-react';
 import { useAppStore } from '../stores/useAppStore';
 import { LanguageModal } from '../components/LanguageModal';
@@ -258,9 +261,9 @@ export const MainLayout: React.FC = () => {
               <button
                 onClick={() => setCollapsed(true)}
                 style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: 8,
+                  width: 32,
+                  height: 32,
+                  borderRadius: 10,
                   background: 'var(--duo-card-bg)',
                   border: '1.5px solid var(--duo-border)',
                   borderBottom: '2.5px solid var(--duo-border)',
@@ -274,7 +277,7 @@ export const MainLayout: React.FC = () => {
                 }}
                 className="duo-card-interactive"
               >
-                <ChevronLeft size={15} />
+                <PanelLeftClose size={17} />
               </button>
             </Tooltip>
           )}
@@ -287,9 +290,9 @@ export const MainLayout: React.FC = () => {
               <button
                 onClick={() => setCollapsed(false)}
                 style={{
-                  width: 34,
-                  height: 24,
-                  borderRadius: 8,
+                  width: 36,
+                  height: 28,
+                  borderRadius: 10,
                   background: 'var(--duo-card-bg)',
                   border: '1.5px solid var(--duo-border)',
                   borderBottom: '2.5px solid var(--duo-border)',
@@ -302,7 +305,7 @@ export const MainLayout: React.FC = () => {
                 }}
                 className="duo-card-interactive"
               >
-                <ChevronRight size={14} />
+                <PanelLeftOpen size={16} />
               </button>
             </Tooltip>
           </div>
@@ -453,6 +456,48 @@ export const MainLayout: React.FC = () => {
           ))}
         </div>
 
+        {/* Bottom Collapse Toggle Button */}
+        <div style={{ padding: collapsed ? '8px 6px' : '8px 12px', borderTop: '1px solid var(--duo-border)' }}>
+          <Tooltip title={collapsed ? 'Mở rộng thanh bên' : 'Thu gọn thanh bên'} placement="right">
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              className="duo-nav-item duo-card-interactive"
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: collapsed ? 'center' : 'flex-start',
+                gap: 10,
+                padding: collapsed ? '8px 0' : '9px 12px',
+                borderRadius: 12,
+                border: '1.5px solid var(--duo-border)',
+                borderBottom: '2.5px solid var(--duo-border)',
+                background: 'var(--duo-card-bg)',
+                color: 'var(--duo-text-secondary)',
+                cursor: 'pointer',
+              }}
+            >
+              <div
+                className="duo-nav-icon-box"
+                style={{
+                  background: 'transparent',
+                  color: 'var(--duo-text-secondary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+              </div>
+              {!collapsed && (
+                <span style={{ fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}>
+                  Thu gọn thanh bên
+                </span>
+              )}
+            </button>
+          </Tooltip>
+        </div>
+
         {/* User Card at Bottom of Sider */}
         {user && (
           <div
@@ -519,8 +564,31 @@ export const MainLayout: React.FC = () => {
             transition: 'background 0.25s ease, border-color 0.25s ease',
           }}
         >
-          {/* Header Left Title */}
+          {/* Header Left Title & Quick Sidebar Toggle */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flexShrink: 1, marginRight: 12 }}>
+            <Tooltip title={collapsed ? 'Mở rộng thanh bên' : 'Thu gọn thanh bên'}>
+              <button
+                onClick={() => setCollapsed(!collapsed)}
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 10,
+                  background: 'var(--duo-card-bg)',
+                  border: '1.5px solid var(--duo-border)',
+                  borderBottom: '2.5px solid var(--duo-border)',
+                  color: 'var(--duo-text-secondary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                }}
+                className="duo-card-interactive"
+              >
+                {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+              </button>
+            </Tooltip>
+
             <span style={{ fontSize: 14, color: 'var(--duo-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               Luyện nói <strong style={{ color: 'var(--duo-text-primary)' }}>{langName}</strong> thực chiến theo chuẩn <strong style={{ color: '#58CC02' }}>Duolingo 3D</strong>
             </span>

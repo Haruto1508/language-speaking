@@ -433,7 +433,7 @@ export const ReviewPage: React.FC = () => {
                   )}
 
                   {/* Bottom hint */}
-                  <div style={{ fontSize: 12, color: 'var(--duo-text-muted)', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}>
+                  <div style={{ fontSize: 12, color: 'var(--duo-text-muted)', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, marginTop: 20 }}>
                     <RotateCw size={14} />
                     <span>Chạm vào thẻ để {isFlipped ? 'xem từ gốc' : 'lật xem nghĩa & câu ví dụ'}</span>
                   </div>
