@@ -13,6 +13,8 @@ import { useAppStore } from '../stores/useAppStore';
 import { Vocabulary, formatStatusVietnamese, formatPartOfSpeechVietnamese } from '../types';
 import { speakText } from '../utils/speech';
 
+import { localDataService } from '../services/localDataService';
+
 const { Title, Text } = Typography;
 
 export const VocabularyPage: React.FC = () => {
@@ -29,137 +31,13 @@ export const VocabularyPage: React.FC = () => {
     try {
       setLoading(true);
       const data = await api.vocabulary.getAll(targetLanguage);
-      setVocabList(data);
-    } catch (e) {
-      console.warn('Failed to load vocab from backend, loading comprehensive mock items', e);
-      const isKo = targetLanguage === 'KO';
-      const fallbackVocab: Vocabulary[] = isKo
-        ? [
-            {
-              id: 1,
-              word: '안녕하세요',
-              meaning: 'Xin chào / Lời chào lịch sự thông dụng nhất',
-              partOfSpeech: 'Thán từ / Lời chào',
-              pronunciationIpa: '[aɲ.ɲʌŋ.ɦa.se.jo]',
-              exampleSentence: '안녕하세요! 두 명 자리 있나요?',
-              translation: 'Xin chào! Quán có bàn cho hai người không ạ?',
-              difficulty: 'Mới bắt đầu',
-              collocations: '안녕하세요, 반갑습니다',
-              hangul: '안녕하세요',
-              romanization: 'annyeonghaseyo',
-              batchimRules: 'Patchim ㅇ trong 안 / 녕 có âm mũi mềm [ŋ]',
-              soundChanges: 'Âm ㅎ trong 하 được nối mượt khi nói tự nhiên',
-              breakdownJson: '{"morphemes": [{"part": "안녕", "meaning": "bình an/an yên"}, {"part": "하(다)", "meaning": "làm/chúc"}, {"part": "-세요", "meaning": "đuôi câu kính ngữ lịch sự"}]}',
-              userStatus: 'LEARNING',
-            },
-            {
-              id: 2,
-              word: '김치찌개',
-              meaning: 'Canh kim chi (Món canh hầm cay kinh điển của Hàn Quốc với thịt heo/đậu phụ)',
-              partOfSpeech: 'Danh từ',
-              pronunciationIpa: '[kim.tɕʰi.tɕ͈i.ɡɛ]',
-              exampleSentence: '저희 김치찌개 2인분 주세요.',
-              translation: 'Cho chúng tôi 2 suất canh kim chi nhé.',
-              difficulty: 'Mới bắt đầu',
-              collocations: '김치찌개 1인분, 김치찌개 맛집',
-              hangul: '김치찌개',
-              romanization: 'gimchijjigae',
-              batchimRules: 'Patchim ㅁ trong 김 kết hợp âm căng ㅊ',
-              soundChanges: 'Phụ âm đôi 찌 phát âm với độ căng thanh môn rõ nét',
-              breakdownJson: '{"morphemes": [{"part": "김치", "meaning": "kim chi muối"}, {"part": "찌개", "meaning": "món canh hầm"}]}',
-              userStatus: 'NEW',
-            },
-            {
-              id: 3,
-              word: '주세요',
-              meaning: 'Làm ơn cho tôi / Xin hãy mang cho tôi',
-              partOfSpeech: 'Cụm động từ cầu khiến',
-              pronunciationIpa: '[tɕu.se.jo]',
-              exampleSentence: '물 좀 더 주세요.',
-              translation: 'Làm ơn cho tôi xin thêm chút nước với ạ.',
-              difficulty: 'Mới bắt đầu',
-              collocations: '메뉴판 주세요, 영수증 주세요',
-              hangul: '주세요',
-              romanization: 'juseyo',
-              batchimRules: 'Nguyên âm mở, ngữ điệu lịch sự nhẹ nhàng',
-              soundChanges: 'Phát âm chuẩn kính ngữ 해요체',
-              breakdownJson: '{"morphemes": [{"part": "주(다)", "meaning": "cho/đưa"}, {"part": "-(으)시-", "meaning": "tiền tố kính ngữ"}, {"part": "-어요", "meaning": "đuôi câu lịch sự"}]}',
-              userStatus: 'LEARNING',
-            },
-            {
-              id: 4,
-              word: '저기요',
-              meaning: 'Em ơi! / Anh ơi! (Cách gọi nhân viên nhà hàng lịch sự)',
-              partOfSpeech: 'Thán từ xưng hô',
-              pronunciationIpa: '[tɕʌ.ɡi.jo]',
-              exampleSentence: '저기요, 주문할게요!',
-              translation: 'Em ơi, cho anh/chị gọi món với!',
-              difficulty: 'Mới bắt đầu',
-              collocations: '저기요, 주문받아 주세요',
-              hangul: '저기요',
-              romanization: 'jeogiyo',
-              batchimRules: 'Không có patchim kết thúc',
-              soundChanges: 'Nói rõ ràng và cao giọng nhẹ ở cuối để gọi nhân viên',
-              breakdownJson: '{"morphemes": [{"part": "저기", "meaning": "đằng kia"}, {"part": "-요", "meaning": "tiểu từ lịch sự"}]}',
-              userStatus: 'REVIEW',
-            },
-            {
-              id: 5,
-              word: '계산하다',
-              meaning: 'Tính tiền / Thanh toán hóa đơn',
-              partOfSpeech: 'Động từ',
-              pronunciationIpa: '[kʲeː.san.ɦa.da]',
-              exampleSentence: '계산은 카드로 할게요.',
-              translation: 'Tôi xin thanh toán bằng thẻ nhé.',
-              difficulty: 'Mới bắt đầu',
-              collocations: '계산서, 계산해 주세요',
-              hangul: '계산하다',
-              romanization: 'gyesanhada',
-              batchimRules: 'Patchim ㄴ trong 산 là âm mũi răng [n]',
-              soundChanges: 'Trong văn nói tự nhiên nối âm thành [계사나다]',
-              breakdownJson: '{"morphemes": [{"part": "계산 (計算)", "meaning": "kê toán/tính toán"}, {"part": "-하다", "meaning": "làm"}]}',
-              userStatus: 'MASTERED',
-            },
-          ]
-        : [
-            {
-              id: 6,
-              word: 'single-origin',
-              meaning: 'Cà phê đơn nguồn gốc (hạt cà phê thu hoạch từ một vùng nông trại duy nhất)',
-              partOfSpeech: 'Tính từ',
-              pronunciationIpa: '/ˌsɪŋ.ɡəl ˈɔːr.ɪ.dʒɪn/',
-              exampleSentence: 'What single-origin beans do you have on pour-over today?',
-              translation: 'Hôm nay quán có loại hạt cà phê đơn nguồn gốc nào cho pha pour-over vậy?',
-              difficulty: 'Trung cấp',
-              collocations: 'single-origin espresso, single-origin roast',
-              userStatus: 'LEARNING',
-            },
-            {
-              id: 7,
-              word: 'oat milk',
-              meaning: 'Sữa yến mạch (loại sữa thực vật thơm béo làm từ yến mạch nguyên cám)',
-              partOfSpeech: 'Cụm danh từ',
-              pronunciationIpa: '/ˈoʊt ˌmɪlk/',
-              exampleSentence: 'Could I get an iced latte with oat milk instead of whole milk?',
-              translation: 'Tôi có thể lấy một ly latte đá với sữa yến mạch thay vì sữa tươi không?',
-              difficulty: 'Mới bắt đầu',
-              collocations: 'substitute oat milk, oat milk flat white',
-              userStatus: 'REVIEW',
-            },
-            {
-              id: 8,
-              word: 'for here or to go',
-              meaning: 'Dùng tại quán hay mang về (câu hỏi giao tiếp chuẩn của thu ngân)',
-              partOfSpeech: 'Cụm từ đàm thoại',
-              pronunciationIpa: '/fɔːr hɪr ɔːr tuː ɡoʊ/',
-              exampleSentence: 'Will that be for here or to go today?',
-              translation: 'Đơn hàng này bạn dùng tại quán hay mang đi ạ?',
-              difficulty: 'Mới bắt đầu',
-              collocations: 'make that to go, drink for here',
-              userStatus: 'MASTERED',
-            },
-          ];
-      setVocabList(fallbackVocab);
+      if (data && data.length > 0) {
+        setVocabList(data);
+      } else {
+        setVocabList(localDataService.getVocabulary(targetLanguage));
+      }
+    } catch {
+      setVocabList(localDataService.getVocabulary(targetLanguage));
     } finally {
       setLoading(false);
     }

@@ -29,6 +29,8 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   Hand: <Hand size={24} color="#EC4899" />,
 };
 
+import { localDataService } from '../services/localDataService';
+
 export const TopicsPage: React.FC = () => {
   const navigate = useNavigate();
   const { targetLanguage, targetLevel, setTargetLevel } = useAppStore();
@@ -43,129 +45,13 @@ export const TopicsPage: React.FC = () => {
     try {
       setLoading(true);
       const data = await api.topics.getAll(targetLanguage, targetLevel);
-      setTopics(data);
-    } catch (e) {
-      console.warn('Failed to fetch topics, using fallback mock data', e);
-      // Fallback topics
-      if (targetLanguage === 'KO') {
-        setTopics([
-          {
-            id: 1,
-            languageCode: 'KO',
-            levelCode: 'BEGINNER',
-            code: 'korean-restaurant',
-            name: 'Nhà hàng & Ẩm thực Hàn Quốc',
-            description: 'Thực hành gọi món truyền thống, xin thêm món phụ (banchan), yêu cầu tính tiền và giao tiếp lịch sự với nhân viên.',
-            icon: 'Utensils',
-            estimatedMinutes: 20,
-            totalLessons: 1,
-            completedLessons: 0,
-            progressPercentage: 0,
-            lessons: [
-              {
-                id: 1,
-                topicId: 1,
-                topicName: 'Nhà hàng & Ẩm thực Hàn Quốc',
-                title: 'Gọi món tại quán ăn Hàn Quốc (식당에서 주문하기)',
-                scenario: 'Gọi món canh kim chi, xin thêm nước và gọi thanh toán hóa đơn.',
-                description: 'Làm chủ đuôi câu lịch sự -요, xưng hô 저기요 và hỏi món gợi ý.',
-                difficulty: 'BEGINNER',
-                status: 'PUBLISHED',
-                orderIndex: 1,
-                vocabularyCount: 5,
-                grammarCount: 2,
-                exercisesCount: 3,
-                completed: false,
-              },
-            ],
-          },
-          {
-            id: 2,
-            languageCode: 'KO',
-            levelCode: 'BEGINNER',
-            code: 'korean-greetings',
-            name: 'Chào hỏi & Giới thiệu bản thân',
-            description: 'Nắm vững kính ngữ chào hỏi, giới thiệu tên và quốc tịch, tạo ấn tượng ấm áp ban đầu.',
-            icon: 'Hand',
-            estimatedMinutes: 15,
-            totalLessons: 1,
-            completedLessons: 0,
-            progressPercentage: 0,
-          },
-          {
-            id: 3,
-            languageCode: 'KO',
-            levelCode: 'BEGINNER',
-            code: 'korean-cafe',
-            name: 'Văn hóa Cà phê & Quán xá Seoul',
-            description: 'Trải nghiệm văn hóa cà phê Seoul: phân biệt nóng vs đá (아아), đồ tráng miệng, dùng tại quán vs mang đi.',
-            icon: 'Coffee',
-            estimatedMinutes: 20,
-            totalLessons: 1,
-            completedLessons: 0,
-            progressPercentage: 0,
-          },
-          {
-            id: 4,
-            languageCode: 'KO',
-            levelCode: 'BEGINNER',
-            code: 'korean-travel',
-            name: 'Tàu điện ngầm & Hỏi đường',
-            description: 'Đi tàu điện ngầm Seoul, hỏi người bản xứ hướng đi, chuyển tuyến và mua vé tàu.',
-            icon: 'Compass',
-            estimatedMinutes: 25,
-            totalLessons: 1,
-            completedLessons: 0,
-            progressPercentage: 0,
-          },
-        ]);
+      if (data && data.length > 0) {
+        setTopics(data);
       } else {
-        setTopics([
-          {
-            id: 5,
-            languageCode: 'EN',
-            levelCode: 'INTERMEDIATE',
-            code: 'english-cafe',
-            name: 'Quán Cà phê Specialty',
-            description: 'Đặt cà phê theo khẩu vị riêng, phân biệt các mức rang hạt, sữa thực vật và trò chuyện tự nhiên với Barista.',
-            icon: 'Coffee',
-            estimatedMinutes: 20,
-            totalLessons: 1,
-            completedLessons: 0,
-            progressPercentage: 0,
-            lessons: [
-              {
-                id: 2,
-                topicId: 5,
-                topicName: 'Quán Cà phê Specialty',
-                title: 'Gọi đồ uống tại quán Specialty Coffee',
-                scenario: 'Đặt thức uống tùy chỉnh, hỏi về hồ sơ hạt rang và thanh toán chạm.',
-                description: 'Làm chủ các mẫu câu lịch sự (Could I get), mức rang và lựa chọn mang về.',
-                difficulty: 'INTERMEDIATE',
-                status: 'PUBLISHED',
-                orderIndex: 1,
-                vocabularyCount: 4,
-                grammarCount: 1,
-                exercisesCount: 2,
-                completed: false,
-              },
-            ],
-          },
-          {
-            id: 6,
-            languageCode: 'EN',
-            levelCode: 'INTERMEDIATE',
-            code: 'english-interview',
-            name: 'Phỏng vấn Xin việc & Sự nghiệp',
-            description: 'Giới thiệu kinh nghiệm, trả lời câu hỏi hành vi và đặt câu hỏi thông minh cho nhà tuyển dụng.',
-            icon: 'Briefcase',
-            estimatedMinutes: 30,
-            totalLessons: 1,
-            completedLessons: 0,
-            progressPercentage: 0,
-          },
-        ]);
+        setTopics(localDataService.getTopics(targetLanguage, targetLevel));
       }
+    } catch {
+      setTopics(localDataService.getTopics(targetLanguage, targetLevel));
     } finally {
       setLoading(false);
     }

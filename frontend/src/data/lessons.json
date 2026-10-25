@@ -1,0 +1,104 @@
+[
+  {
+    "id": 1,
+    "languageCode": "KO",
+    "topicCode": "korean-restaurant",
+    "title": "Bài học 1: Gọi món tại quán ăn Hàn Quốc",
+    "levelCode": "BEGINNER",
+    "steps": [
+      {
+        "type": "word-builder",
+        "title": "Dịch câu này sang tiếng Việt",
+        "instruction": "Bấm vào các thẻ từ để ghép thành câu hoàn chỉnh:",
+        "prompt": "김치찌개 하나 주세요",
+        "romanization": "Gimchijjigae hana juseyo",
+        "audioText": "김치찌개 하나 주세요",
+        "tiles": ["cho tôi", "cơm trắng", "một phần", "canh kim chi", "nước lọc", "xin vui lòng", "hai phần"],
+        "correctTiles": ["cho tôi", "một phần", "canh kim chi"]
+      },
+      {
+        "type": "listen-choose",
+        "title": "Nghe và chọn câu trả lời đúng",
+        "instruction": "Lắng nghe nhân viên nhà hàng chào đón bạn:",
+        "prompt": "어서오세요! 몇 분이세요?",
+        "romanization": "Eoseo-oseyo! Myeot bun-iseyo?",
+        "audioText": "어서오세요! 몇 분이세요?",
+        "options": [
+          { "id": "1", "text": "Chào mừng quý khách! Đi mấy người ạ?", "correct": true },
+          { "id": "2", "text": "Xin hãy thanh toán bằng thẻ.", "correct": false },
+          { "id": "3", "text": "Món này rất cay.", "correct": false },
+          { "id": "4", "text": "Quán đã hết bàn rồi.", "correct": false }
+        ]
+      },
+      {
+        "type": "speak",
+        "title": "Luyện nói phát âm",
+        "instruction": "Bấm vào biểu tượng mic và nói to rõ ràng:",
+        "prompt": "안녕하세요! 두 명이에요.",
+        "romanization": "Annyeonghaseyo! Du myeong-ieyo.",
+        "audioText": "안녕하세요! 두 명이에요."
+      },
+      {
+        "type": "matching",
+        "title": "Nối các cặp từ tương ứng",
+        "instruction": "Chạm vào từ tiếng Hàn và nghĩa tương ứng:",
+        "prompt": "Ghép đúng 3 cặp từ:",
+        "audioText": "저기요. 주세요. 계산하다.",
+        "pairs": [
+          { "id": "1", "left": "저기요", "right": "Xin lỗi / Em ơi!" },
+          { "id": "2", "left": "주세요", "right": "Làm ơn cho tôi" },
+          { "id": "3", "left": "계산하다", "right": "Tính tiền / Thanh toán" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "languageCode": "EN",
+    "topicCode": "english-cafe",
+    "title": "Lesson 1: Ordering Coffee like a Native",
+    "levelCode": "INTERMEDIATE",
+    "steps": [
+      {
+        "type": "word-builder",
+        "title": "Dịch câu này sang tiếng Việt",
+        "instruction": "Chạm vào các thẻ từ để ghép thành câu hoàn chỉnh:",
+        "prompt": "Could I please get an iced oat latte?",
+        "audioText": "Could I please get an iced oat latte?",
+        "tiles": ["Cho tôi", "ly latte", "sữa yến mạch đá", "với", "nóng", "trà xanh", "được không"],
+        "correctTiles": ["Cho tôi", "ly latte", "sữa yến mạch đá", "được không"]
+      },
+      {
+        "type": "listen-choose",
+        "title": "Nghe và chọn nghĩa tiếng Việt đúng",
+        "instruction": "Lắng nghe nhân viên pha chế hỏi về đơn hàng của bạn:",
+        "prompt": "Will that be for here or to go?",
+        "audioText": "Will that be for here or to go?",
+        "options": [
+          { "id": "1", "text": "Bạn dùng ở đây hay mang đi ạ?", "correct": true },
+          { "id": "2", "text": "Bạn muốn thanh toán bằng thẻ hay tiền mặt?", "correct": false },
+          { "id": "3", "text": "Quán hôm nay hết cà phê rồi.", "correct": false }
+        ]
+      },
+      {
+        "type": "speak",
+        "title": "Luyện phát âm câu nói tự nhiên",
+        "instruction": "Nhấn nút micro và nói to rõ ràng:",
+        "prompt": "Make that to-go, please!",
+        "audioText": "Make that to-go, please!"
+      },
+      {
+        "type": "matching",
+        "title": "Ghép cặp từ đồng nghĩa & đối nghĩa",
+        "instruction": "Chạm vào 2 thẻ tương ứng để hoàn thành bài tập:",
+        "prompt": "Ghép các cặp cụm từ gọi món:",
+        "audioText": "For here. To go. Decaf.",
+        "pairs": [
+          { "id": "1", "left": "For here", "right": "Dùng tại quán" },
+          { "id": "2", "left": "To-go", "right": "Mang đi" },
+          { "id": "3", "left": "Decaf", "right": "Cà phê không caffeine" }
+        ]
+      }
+    ]
+  }
+]

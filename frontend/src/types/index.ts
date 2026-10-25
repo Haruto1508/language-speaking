@@ -63,9 +63,9 @@ export interface Topic {
   description: string;
   icon: string;
   estimatedMinutes: number;
-  totalLessons: number;
-  completedLessons: number;
-  progressPercentage: number;
+  totalLessons?: number;
+  completedLessons?: number;
+  progressPercentage?: number;
   lessons?: LessonSummary[];
 }
 
@@ -99,6 +99,8 @@ export interface HangulBreakdown {
 export interface Vocabulary {
   id: number;
   lessonId?: number;
+  languageCode?: LanguageCode;
+  levelCode?: ProficiencyLevelCode;
   word: string;
   meaning: string;
   partOfSpeech: string;
@@ -121,14 +123,21 @@ export interface Vocabulary {
 export interface Grammar {
   id: number;
   lessonId?: number;
+  languageCode?: LanguageCode;
+  levelCode?: ProficiencyLevelCode;
   grammarPoint: string;
+  pattern?: string;
   explanation: string;
   usageGuide?: string;
   structureFormula?: string;
+  formula?: string;
   commonMistakes?: string;
+  pitfalls?: string;
   formalityLevel?: string;
   koreanPattern?: string;
   exampleConversationsJson?: string;
+  exampleSentence?: string;
+  translation?: string;
 }
 
 export interface DialogueLine {

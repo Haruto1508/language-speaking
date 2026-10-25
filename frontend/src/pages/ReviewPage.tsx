@@ -17,6 +17,8 @@ import { useAppStore } from '../stores/useAppStore';
 import { ReviewItem, formatStatusVietnamese, formatPartOfSpeechVietnamese } from '../types';
 import { speakText } from '../utils/speech';
 
+import { localDataService } from '../services/localDataService';
+
 const { Title, Text, Paragraph } = Typography;
 
 export const ReviewPage: React.FC = () => {
@@ -37,131 +39,13 @@ export const ReviewPage: React.FC = () => {
     try {
       setLoading(true);
       const data = await api.reviews.getDue(10);
-      setQueue(data);
-    } catch (e) {
-      console.warn('Review queue error, using fallback review queue', e);
-      const isKo = targetLanguage === 'KO';
-      const fallbackQueue: ReviewItem[] = isKo
-        ? [
-            {
-              progressId: 1,
-              vocabularyId: 1,
-              word: '안녕하세요',
-              meaning: 'Xin chào / Lời chào lịch sự thông dụng nhất',
-              partOfSpeech: 'Thán từ / Lời chào',
-              pronunciationIpa: '[aɲ.ɲʌŋ.ɦa.se.jo]',
-              exampleSentence: '안녕하세요! 두 명 자리 있나요?',
-              translation: 'Xin chào! Quán có bàn cho hai người không ạ?',
-              hangul: '안녕하세요',
-              romanization: 'annyeonghaseyo',
-              status: 'LEARNING',
-              repetitions: 1,
-              correctCount: 2,
-              incorrectCount: 1,
-              nextReviewAt: new Date().toISOString(),
-            },
-            {
-              progressId: 2,
-              vocabularyId: 2,
-              word: '김치찌개',
-              meaning: 'Canh kim chi (Món canh hầm cay kinh điển của Hàn Quốc)',
-              partOfSpeech: 'Danh từ',
-              pronunciationIpa: '[kim.tɕʰi.tɕ͈i.ɡɛ]',
-              exampleSentence: '저희 김치찌개 2인분 주세요.',
-              translation: 'Cho chúng tôi 2 suất canh kim chi nhé.',
-              hangul: '김치찌개',
-              romanization: 'gimchijjigae',
-              status: 'NEW',
-              repetitions: 0,
-              correctCount: 1,
-              incorrectCount: 0,
-              nextReviewAt: new Date().toISOString(),
-            },
-            {
-              progressId: 3,
-              vocabularyId: 3,
-              word: '주세요',
-              meaning: 'Làm ơn cho tôi / Xin hãy mang cho tôi',
-              partOfSpeech: 'Cụm động từ cầu khiến',
-              pronunciationIpa: '[tɕu.se.jo]',
-              exampleSentence: '물 좀 더 주세요.',
-              translation: 'Làm ơn cho tôi xin thêm chút nước với ạ.',
-              hangul: '주세요',
-              romanization: 'juseyo',
-              status: 'LEARNING',
-              repetitions: 2,
-              correctCount: 3,
-              incorrectCount: 1,
-              nextReviewAt: new Date().toISOString(),
-            },
-            {
-              progressId: 4,
-              vocabularyId: 4,
-              word: '저기요',
-              meaning: 'Em ơi! / Anh ơi! (Cách gọi nhân viên nhà hàng lịch sự)',
-              partOfSpeech: 'Thán từ xưng hô',
-              pronunciationIpa: '[tɕʌ.ɡi.jo]',
-              exampleSentence: '저기요, 주문할게요!',
-              translation: 'Em ơi, cho anh/chị gọi món với!',
-              hangul: '저기요',
-              romanization: 'jeogiyo',
-              status: 'REVIEW',
-              repetitions: 3,
-              correctCount: 5,
-              incorrectCount: 0,
-              nextReviewAt: new Date().toISOString(),
-            },
-            {
-              progressId: 5,
-              vocabularyId: 5,
-              word: '계산하다',
-              meaning: 'Tính tiền / Thanh toán hóa đơn',
-              partOfSpeech: 'Động từ',
-              pronunciationIpa: '[kʲeː.san.ɦa.da]',
-              exampleSentence: '계산은 카드로 할게요.',
-              translation: 'Tôi xin thanh toán bằng thẻ nhé.',
-              hangul: '계산하다',
-              romanization: 'gyesanhada',
-              status: 'NEW',
-              repetitions: 0,
-              correctCount: 0,
-              incorrectCount: 0,
-              nextReviewAt: new Date().toISOString(),
-            },
-          ]
-        : [
-            {
-              progressId: 6,
-              vocabularyId: 6,
-              word: 'single-origin',
-              meaning: 'Cà phê đơn nguồn gốc (hạt từ một nông trại hoặc vùng địa lý duy nhất)',
-              partOfSpeech: 'Tính từ',
-              pronunciationIpa: '/ˌsɪŋ.ɡəl ˈɔːr.ɪ.dʒɪn/',
-              exampleSentence: 'What single-origin pour-over do you recommend?',
-              translation: 'Bạn đề xuất loại hạt đơn nguồn gốc nào cho pha pour-over vậy?',
-              status: 'LEARNING',
-              repetitions: 1,
-              correctCount: 2,
-              incorrectCount: 1,
-              nextReviewAt: new Date().toISOString(),
-            },
-            {
-              progressId: 7,
-              vocabularyId: 7,
-              word: 'oat milk',
-              meaning: 'Sữa yến mạch (loại sữa thực vật thơm béo làm từ yến mạch nguyên cám)',
-              partOfSpeech: 'Cụm danh từ',
-              pronunciationIpa: '/ˈoʊt ˌmɪlk/',
-              exampleSentence: 'Could I get an iced latte with oat milk, please?',
-              translation: 'Cho mình latte đá với sữa yến mạch nhé?',
-              status: 'REVIEW',
-              repetitions: 3,
-              correctCount: 4,
-              incorrectCount: 0,
-              nextReviewAt: new Date().toISOString(),
-            },
-          ];
-      setQueue(fallbackQueue);
+      if (data && data.length > 0) {
+        setQueue(data);
+      } else {
+        setQueue(localDataService.getDueReviews(targetLanguage, 10));
+      }
+    } catch {
+      setQueue(localDataService.getDueReviews(targetLanguage, 10));
     } finally {
       setLoading(false);
     }
@@ -173,8 +57,10 @@ export const ReviewPage: React.FC = () => {
 
     try {
       await api.reviews.submit(current.vocabularyId, rating);
-    } catch (e) {
-      // offline rate
+    } catch {
+      // offline rate update
+      const newStatus = rating >= 3 ? 'MASTERED' : rating === 2 ? 'LEARNING' : 'REVIEW';
+      localDataService.updateVocabStatus(current.vocabularyId, newStatus);
     }
 
     setCompletedCount((prev) => prev + 1);

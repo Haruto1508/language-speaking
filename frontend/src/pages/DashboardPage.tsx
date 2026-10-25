@@ -18,6 +18,8 @@ import { useAppStore } from '../stores/useAppStore';
 import { api } from '../services/api';
 import { DashboardSummary, formatLevelVietnamese } from '../types';
 
+import { localDataService } from '../services/localDataService';
+
 const { Title, Text, Paragraph } = Typography;
 
 export const DashboardPage: React.FC = () => {
@@ -34,59 +36,18 @@ export const DashboardPage: React.FC = () => {
     try {
       setLoading(true);
       const data = await api.progress.getDashboard();
-      setDashboard(data);
-    } catch (e) {
-      console.warn('Dashboard load error, using default metrics', e);
-      // Fallback fallback dashboard metrics
-      setDashboard({
-        streakCount: user?.streakCount || 5,
-        dailyGoalMinutes: user?.dailyGoalMinutes || 15,
-        minutesStudiedToday: 12,
-        vocabularyLearnedCount: 14,
-        vocabularyMasteredCount: 6,
-        lessonsCompletedCount: 2,
-        grammarPointsCount: 8,
-        conversationsCompletedCount: 3,
-        dueReviewsCount: 5,
-        recentMistakes: [
-          {
-            id: 1,
-            type: 'GRAMMAR',
-            originalText: '저기요! 김치찌개 주문합니다',
-            correctedText: '저기요, 김치찌개 하나 주세요',
-            explanation: 'Khi vào nhà hàng, hãy dùng "N + 하나 주세요" để gọi món thay vì dùng câu trần thuật "합니다".',
-            reviewed: false,
-            createdAt: '2026-10-24T18:00:00Z',
-          },
-          {
-            id: 2,
-            type: 'VOCABULARY',
-            originalText: 'Could you give me coffee?',
-            correctedText: 'Could I please get an oat latte to go?',
-            explanation: 'Mẫu câu lịch sự "Could I please get..." nghe tự nhiên, nhã nhặn hơn nhiều so với "Give me".',
-            reviewed: true,
-            createdAt: '2026-10-23T14:30:00Z',
-          },
-        ],
-        recommendedLesson: {
-          id: 1,
-          topicId: 1,
-          topicName: targetLanguage === 'KO' ? 'Nhà hàng & Gọi món' : 'Quán cà phê Specialty',
-          title: targetLanguage === 'KO' ? 'Gọi món tại nhà hàng Hàn Quốc (식당에서 주문하기)' : 'Gọi đồ uống tại quán Specialty Coffee',
-          scenario: 'Thực hành gọi món ăn, xin thêm món phụ/nước uống và yêu cầu thanh toán hóa đơn lịch sự.',
-          description: 'Học các mẫu câu ăn uống thực tế và cách xưng hô lịch sự.',
-          difficulty: 'BEGINNER',
-          status: 'PUBLISHED',
-          orderIndex: 1,
-          vocabularyCount: 5,
-          grammarCount: 2,
-          exercisesCount: 3,
-        },
-      });
+      if (data) {
+        setDashboard(data);
+      } else {
+        setDashboard(localDataService.getDashboardSummary(targetLanguage));
+      }
+    } catch {
+      setDashboard(localDataService.getDashboardSummary(targetLanguage));
     } finally {
       setLoading(false);
     }
   };
+
 
   const minutesGoal = dashboard?.dailyGoalMinutes || 15;
   const minutesDone = dashboard?.minutesStudiedToday || 12;

@@ -6,6 +6,8 @@ import { useAppStore } from '../stores/useAppStore';
 import { Grammar } from '../types';
 import { speakText } from '../utils/speech';
 
+import { localDataService } from '../services/localDataService';
+
 const { Title, Text, Paragraph } = Typography;
 
 export const GrammarPage: React.FC = () => {
@@ -21,48 +23,13 @@ export const GrammarPage: React.FC = () => {
     try {
       setLoading(true);
       const data = await api.grammar.getAll(targetLanguage);
-      setGrammarList(data);
-    } catch (e) {
-      console.warn('Failed to load grammar from API, loading mock grammar library', e);
-      const isKo = targetLanguage === 'KO';
-      const fallbackGrammar: Grammar[] = isKo
-        ? [
-            {
-              id: 1,
-              grammarPoint: 'V + -(으)세요 (Đuôi câu mệnh lệnh lịch sự / Yêu cầu nhã nhặn)',
-              explanation: 'Dùng để yêu cầu, nhờ vả hoặc hướng dẫn người đối diện làm một hành động nào đó một cách lịch sự, nhã nhặn trong giao tiếp hàng ngày.',
-              usageGuide: '1. Nếu thân động từ kết thúc bằng nguyên âm, gắn -세요 (가다 -> 가세요 - Xin mời đi).\n2. Nếu thân động từ kết thúc bằng phụ âm (patchim), gắn -으세요 (앉다 -> 앉으세요 - Xin mời ngồi).\n3. Động từ bất quy tắc: 듣다 -> 들으세요 (Xin hãy lắng nghe), 만들다 -> 만드세요 (Xin hãy làm).',
-              structureFormula: 'Thân động từ + -(으)세요',
-              commonMistakes: 'Không dùng -(으)세요 để nói về hành động của chính bản thân mình. Đuôi câu này chỉ dành riêng để nói với người nghe.',
-              formalityLevel: 'Kính ngữ 존댓말 (Chuẩn lịch sự)',
-              koreanPattern: 'V + -(으)세요',
-              exampleConversationsJson: '[{"speaker": "Nhân viên", "text": "편하신 자리에 앉으세요.", "translation": "Xin mời quý khách ngồi vào bất kỳ chỗ nào thuận tiện ạ."}]',
-            },
-            {
-              id: 2,
-              grammarPoint: 'N + 주세요 (Làm ơn cho tôi N / Cho tôi xin N)',
-              explanation: 'Mẫu câu đề nghị vạn năng thường dùng nhất khi gọi món ăn, mua hàng hóa hoặc yêu cầu dịch vụ.',
-              usageGuide: 'Gắn trực tiếp vào sau bất kỳ danh từ nào. Ví dụ: 물 주세요 (Cho tôi xin nước ạ), 메뉴판 주세요 (Cho tôi xin thực đơn ạ).',
-              structureFormula: 'Danh từ (N) + 주세요',
-              commonMistakes: 'Tránh nhầm lẫn giữa 주세요 (cho tôi xin) với 드리다 (kính tặng/gửi dâng lên người bề trên).',
-              formalityLevel: 'Kính ngữ 존댓말 / 해요체',
-              koreanPattern: 'N + 주세요',
-              exampleConversationsJson: '[{"speaker": "Khách hàng", "text": "물 좀 더 주세요.", "translation": "Làm ơn cho tôi xin thêm chút nước với ạ."}]',
-            },
-          ]
-        : [
-            {
-              id: 3,
-              grammarPoint: 'Yêu cầu lịch sự: Could I please get / I would like',
-              explanation: 'Trong tiếng Anh giao tiếp và dịch vụ, các câu mệnh lệnh trực tiếp như "Give me coffee" nghe rất thô lỗ và cộc lốc. Người bản xứ luôn dùng các trợ động từ tình thái (could, would) và từ đệm lịch sự.',
-              usageGuide: 'Dùng cấu trúc: "Could I please get + [Món]?" hoặc "I would like to have + [Món], please."',
-              structureFormula: 'Could I (please) get + [Size] + [Món] + with [Tùy chọn], please?',
-              commonMistakes: 'Tránh nói cộc lốc "Give me" hoặc "I want". Luôn làm mềm câu nói bằng "Could I" và "please".',
-              formalityLevel: 'Văn phong đàm thoại lịch sự (Polite)',
-              exampleConversationsJson: '[{"speaker": "Khách hàng", "text": "Could I get a medium flat white with oat milk, please?", "translation": "Làm ơn cho mình một ly flat white cỡ vừa với sữa yến mạch nhé?"}]',
-            },
-          ];
-      setGrammarList(fallbackGrammar);
+      if (data && data.length > 0) {
+        setGrammarList(data);
+      } else {
+        setGrammarList(localDataService.getGrammar(targetLanguage));
+      }
+    } catch {
+      setGrammarList(localDataService.getGrammar(targetLanguage));
     } finally {
       setLoading(false);
     }
