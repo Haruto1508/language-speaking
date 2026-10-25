@@ -130,70 +130,6 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
     }
   };
 
-  const handleGenerateLesson = async () => {
-    if (!lessonTitle || !scenario) {
-      message.error('Please enter a lesson title and scenario');
-      return;
-    }
-    setGenerating(true);
-    try {
-      const result = await api.admin.generateLesson({
-        topicId,
-        title: lessonTitle,
-        scenario,
-        difficulty,
-        learningObjectives: objectives,
-      });
-      setGeneratedLesson(result);
-      setIsPreviewOpen(true);
-      message.success('AI Lesson generated successfully!');
-      loadLessons();
-    } catch (e) {
-      message.error('Failed to generate lesson with AI');
-    } finally {
-      setGenerating(false);
-    }
-  };
-
-  const handleRunIngestion = async () => {
-    if (!rawSource.trim()) {
-      message.error('Please provide raw curriculum text');
-      return;
-    }
-    setIngesting(true);
-    try {
-      const result = await api.admin.ingestContent({
-        languageCode: ingestLang,
-        levelCode: ingestLevel,
-        topicTitle: ingestTopic,
-        rawSourceText: rawSource,
-      });
-      setGeneratedLesson(result);
-      setIsPreviewOpen(true);
-      message.success('Source material ingested and converted to structured lesson!');
-      loadLessons();
-    } catch (e) {
-      message.error('Failed to ingest content');
-    } finally {
-      setIngesting(false);
-    }
-  };
-
-  const handleUpdateStatus = async (id: number, status: ContentStatus) => {
-    try {
-      await api.admin.updateLessonStatus(id, status);
-      message.success(`Status updated to ${status}`);
-      setLessons((prev) =>
-        prev.map((l) => (l.id === id ? { ...l, status } : l))
-      );
-      if (status === 'PUBLISHED') {
-        confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 } });
-      }
-    } catch (e) {
-      message.error('Failed to update status');
-    }
-  };
-
   const statusColorMap: Record<ContentStatus, string> = {
     DRAFT: 'default',
     AI_GENERATED: 'purple',
@@ -210,6 +146,70 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
     APPROVED: 'Đã phê duyệt',
     PUBLISHED: 'Đã xuất bản',
     ARCHIVED: 'Đã lưu trữ',
+  };
+
+  const handleGenerateLesson = async () => {
+    if (!lessonTitle || !scenario) {
+      message.error('Vui lòng nhập tiêu đề bài học và tình huống');
+      return;
+    }
+    setGenerating(true);
+    try {
+      const result = await api.admin.generateLesson({
+        topicId,
+        title: lessonTitle,
+        scenario,
+        difficulty,
+        learningObjectives: objectives,
+      });
+      setGeneratedLesson(result);
+      setIsPreviewOpen(true);
+      message.success('Tạo bài học bằng AI thành công!');
+      loadLessons();
+    } catch (e) {
+      message.error('Không thể tạo bài học bằng AI');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const handleRunIngestion = async () => {
+    if (!rawSource.trim()) {
+      message.error('Vui lòng nhập văn bản giáo trình thô');
+      return;
+    }
+    setIngesting(true);
+    try {
+      const result = await api.admin.ingestContent({
+        languageCode: ingestLang,
+        levelCode: ingestLevel,
+        topicTitle: ingestTopic,
+        rawSourceText: rawSource,
+      });
+      setGeneratedLesson(result);
+      setIsPreviewOpen(true);
+      message.success('Đã nạp và biên dịch giáo trình thành bài học chuẩn!');
+      loadLessons();
+    } catch (e) {
+      message.error('Không thể nạp nội dung');
+    } finally {
+      setIngesting(false);
+    }
+  };
+
+  const handleUpdateStatus = async (id: number, status: ContentStatus) => {
+    try {
+      await api.admin.updateLessonStatus(id, status);
+      message.success(`Đã cập nhật trạng thái: ${statusLabelMap[status] || status}`);
+      setLessons((prev) =>
+        prev.map((l) => (l.id === id ? { ...l, status } : l))
+      );
+      if (status === 'PUBLISHED') {
+        confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 } });
+      }
+    } catch (e) {
+      message.error('Không thể cập nhật trạng thái');
+    }
   };
 
   return (
@@ -357,7 +357,7 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
       {activeTab === 'ingest' && (
         <div className="duo-card" style={{ padding: 28 }}>
           <h3 style={{ fontSize: 20, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 8 }}>
-            Đường ống nạp Giáo trình & Tài liệu Thô (Ingestion Pipeline)
+            Đường ống nạp Giáo trình & Tài liệu Thô tự động
           </h3>
           <p style={{ color: 'var(--duo-text-secondary)', fontSize: 14, marginBottom: 20 }}>
             Dán tài liệu học, ghi chú hoặc nội dung giáo trình bất kỳ. Hệ thống AI sẽ tự động phân tích từ vựng, tạo giải thích ngữ pháp, đoạn hội thoại audio và các bài tập luyện phát âm tương ứng.
@@ -383,8 +383,8 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
                 onChange={setIngestLang}
                 style={{ width: '100%', height: 40 }}
                 options={[
-                  { value: 'KO', label: '🇰🇷 Korean' },
-                  { value: 'EN', label: '🇺🇸 English' },
+                  { value: 'KO', label: '🇰🇷 Tiếng Hàn' },
+                  { value: 'EN', label: '🇺🇸 Tiếng Anh' },
                 ]}
               />
             </div>
@@ -397,9 +397,9 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
                 onChange={setIngestLevel}
                 style={{ width: '100%', height: 40 }}
                 options={[
-                  { value: 'BEGINNER', label: 'Beginner (A1)' },
-                  { value: 'ELEMENTARY', label: 'Elementary (A2)' },
-                  { value: 'INTERMEDIATE', label: 'Intermediate (B1)' },
+                  { value: 'BEGINNER', label: 'Mới bắt đầu (A1)' },
+                  { value: 'ELEMENTARY', label: 'Sơ cấp (A2)' },
+                  { value: 'INTERMEDIATE', label: 'Trung cấp (B1)' },
                 ]}
               />
             </div>
@@ -407,7 +407,7 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
 
           <div style={{ marginBottom: 24 }}>
             <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-secondary)', display: 'block', marginBottom: 6 }}>
-              Dữ liệu tài liệu thô (Raw Source Dataset):
+              Dữ liệu tài liệu thô (Văn bản / Giáo trình):
             </label>
             <TextArea
               rows={8}

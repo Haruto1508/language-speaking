@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useAppStore } from '../stores/useAppStore';
-import { Vocabulary } from '../types';
+import { Vocabulary, formatStatusVietnamese, formatPartOfSpeechVietnamese } from '../types';
 import { speakText } from '../utils/speech';
 
 const { Title, Text } = Typography;
@@ -243,10 +243,12 @@ export const VocabularyPage: React.FC = () => {
                           {vocab.pronunciationIpa}
                         </span>
                       )}
-                      <Tag color="blue" style={{ borderRadius: 6, fontWeight: 800 }}>{vocab.partOfSpeech}</Tag>
+                      <Tag color="blue" style={{ borderRadius: 6, fontWeight: 800 }}>
+                        {formatPartOfSpeechVietnamese(vocab.partOfSpeech)}
+                      </Tag>
                       {vocab.userStatus && (
                         <Tag color={vocab.userStatus === 'MASTERED' ? 'green' : 'geekblue'} style={{ borderRadius: 6, fontWeight: 800 }}>
-                          {vocab.userStatus}
+                          {formatStatusVietnamese(vocab.userStatus)}
                         </Tag>
                       )}
                     </div>
@@ -278,7 +280,7 @@ export const VocabularyPage: React.FC = () => {
                     }}
                   >
                     <div style={{ fontSize: 12, fontWeight: 700, color: '#A5B4FC', textTransform: 'uppercase', marginBottom: 4 }}>
-                      🧩 Word Construction:
+                      🧩 Cấu tạo & Hình thái từ:
                     </div>
                     {breakdownData.morphemes ? (
                       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', fontSize: 13 }}>
@@ -300,8 +302,8 @@ export const VocabularyPage: React.FC = () => {
                 {/* Batchim / Sound Changes */}
                 {(vocab.batchimRules || vocab.soundChanges) && (
                   <div style={{ marginTop: 10, fontSize: 12, color: 'var(--text-muted)' }}>
-                    {vocab.batchimRules && <div>📝 <strong>Batchim Rule:</strong> {vocab.batchimRules}</div>}
-                    {vocab.soundChanges && <div>🔊 <strong>Sound Change:</strong> {vocab.soundChanges}</div>}
+                    {vocab.batchimRules && <div>📝 <strong>Quy tắc Patchim:</strong> {vocab.batchimRules}</div>}
+                    {vocab.soundChanges && <div>🔊 <strong>Quy tắc Biến âm:</strong> {vocab.soundChanges}</div>}
                   </div>
                 )}
 
@@ -338,7 +340,7 @@ export const VocabularyPage: React.FC = () => {
                 {/* Collocations */}
                 {vocab.collocations && (
                   <div style={{ marginTop: 10, fontSize: 12, color: 'var(--text-secondary)' }}>
-                    <strong>Common Collocations:</strong> <span style={{ color: '#A5B4FC' }}>{vocab.collocations}</span>
+                    <strong>Cụm từ thông dụng:</strong> <span style={{ color: '#A5B4FC' }}>{vocab.collocations}</span>
                   </div>
                 )}
               </div>

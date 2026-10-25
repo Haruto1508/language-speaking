@@ -193,7 +193,7 @@ export const DashboardPage: React.FC = () => {
               <span style={{ fontSize: 14, fontWeight: 700, color: '#FF9600' }}>Ngày</span>
             </div>
             <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--duo-text-secondary)', marginTop: 4 }}>
-              Chuỗi học tập (Streak)
+              Chuỗi ngày học liên tục 🔥
             </div>
           </div>
         </Col>
@@ -388,7 +388,7 @@ export const DashboardPage: React.FC = () => {
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                       <Tag color={mistake.type === 'GRAMMAR' ? 'volcano' : 'gold'} style={{ fontWeight: 800, borderRadius: 6 }}>
-                        {mistake.type}
+                        {mistake.type === 'GRAMMAR' ? 'NGỮ PHÁP' : 'TỪ VỰNG'}
                       </Tag>
                       {mistake.reviewed && <CheckCircle2 size={16} color="#58CC02" />}
                     </div>

@@ -14,7 +14,7 @@ import {
 import confetti from 'canvas-confetti';
 import { api } from '../services/api';
 import { useAppStore } from '../stores/useAppStore';
-import { ReviewItem } from '../types';
+import { ReviewItem, formatStatusVietnamese, formatPartOfSpeechVietnamese } from '../types';
 import { speakText } from '../utils/speech';
 
 const { Title, Text, Paragraph } = Typography;
@@ -199,7 +199,7 @@ export const ReviewPage: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
           <Title level={2} style={{ color: 'var(--duo-text-primary)', margin: 0, fontWeight: 900 }}>
-            Ôn tập thông minh Spaced Repetition 🧠
+            Ôn tập Lặp lại Ngắt quãng Thông minh 🧠
           </Title>
           <Text style={{ color: 'var(--duo-text-secondary)', fontSize: 14 }}>
             Thuật toán SM-2 tự động phân tích độ nhớ để kích hoạt từ vựng vào trí nhớ dài hạn.
@@ -208,7 +208,7 @@ export const ReviewPage: React.FC = () => {
 
         <div className="duo-stat-pill streak">
           <Flame size={18} color="#FF9600" className="flame-bounce" />
-          <span>5 Ngày Streak</span>
+          <span>5 Ngày Liên tục 🔥</span>
         </div>
       </div>
 
@@ -245,9 +245,11 @@ export const ReviewPage: React.FC = () => {
           >
             {/* Top Badges */}
             <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Tag color="purple" style={{ borderRadius: 6, fontWeight: 800 }}>{currentItem.partOfSpeech}</Tag>
+              <Tag color="purple" style={{ borderRadius: 6, fontWeight: 800 }}>
+                {formatPartOfSpeechVietnamese(currentItem.partOfSpeech)}
+              </Tag>
               <Tag color={currentItem.status === 'MASTERED' ? 'green' : 'blue'} style={{ borderRadius: 6, fontWeight: 800 }}>
-                {currentItem.status}
+                {formatStatusVietnamese(currentItem.status)}
               </Tag>
             </div>
 
@@ -447,7 +449,7 @@ export const ReviewPage: React.FC = () => {
             Không có từ nào cần ôn tập lúc này!
           </h3>
           <p style={{ color: 'var(--duo-text-secondary)', fontSize: 15, marginTop: 6 }}>
-            Bạn đã bắt kịp toàn bộ từ vựng trong hàng đợi Spaced Repetition. Hãy học thêm các bài học mới để mở rộng vốn từ!
+            Bạn đã bắt kịp toàn bộ từ vựng trong hàng đợi lặp lại ngắt quãng thông minh. Hãy học thêm các bài học mới để mở rộng vốn từ!
           </p>
           <button className="duo-btn-green" onClick={() => navigate('/topics')} style={{ marginTop: 20 }}>
             <span>Khám phá chủ đề bài học</span>

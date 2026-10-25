@@ -314,3 +314,32 @@ export const formatLevelVietnamese = (level?: string): string => {
   }
 };
 
+export const formatStatusVietnamese = (status?: string): string => {
+  if (!status) return '';
+  switch (status.toUpperCase()) {
+    case 'NEW':
+      return 'TỪ MỚI';
+    case 'LEARNING':
+      return 'ĐANG HỌC';
+    case 'REVIEW':
+      return 'CẦN ÔN TẬP';
+    case 'MASTERED':
+      return 'ĐÃ THUỘC';
+    default:
+      return status;
+  }
+};
+
+export const formatPartOfSpeechVietnamese = (pos?: string): string => {
+  if (!pos) return '';
+  const lower = pos.toLowerCase();
+  if (lower.includes('noun') || lower.includes('danh từ')) return 'Danh từ';
+  if (lower.includes('verb') || lower.includes('động từ')) return 'Động từ';
+  if (lower.includes('adjective') || lower.includes('tính từ')) return 'Tính từ';
+  if (lower.includes('adverb') || lower.includes('phó từ')) return 'Phó từ';
+  if (lower.includes('phrase') || lower.includes('cụm từ')) return 'Cụm từ';
+  if (lower.includes('interjection') || lower.includes('thán từ') || lower.includes('expression')) return 'Thán từ / Lời chào';
+  return pos;
+};
+
+

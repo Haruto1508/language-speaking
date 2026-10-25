@@ -28,20 +28,20 @@ export const LandingPage: React.FC = () => {
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 0 60px' }}>
       {/* Hero Section */}
       <div style={{ textAlign: 'center', padding: '60px 20px 40px' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px', borderRadius: 20, background: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.25)', marginBottom: 20 }}>
-          <Sparkles size={16} color="#6366F1" />
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#A5B4FC' }}>
-            Next-Gen Communication-First Language Mastery
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px', borderRadius: 20, background: 'rgba(88, 204, 2, 0.12)', border: '1.5px solid rgba(88, 204, 2, 0.3)', marginBottom: 20 }}>
+          <Sparkles size={16} color="#58CC02" />
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#58CC02' }}>
+            Luyện nói Giao tiếp Thực chiến Thế hệ Mới 🚀
           </span>
         </div>
 
-        <h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 3.8rem)', fontWeight: 800, lineHeight: 1.15, letterSpacing: '-0.03em', marginBottom: 20 }}>
-          Don't Just Memorize Words.<br />
-          <span className="gradient-text">Speak with Real Confidence.</span>
+        <h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 3.8rem)', fontWeight: 900, lineHeight: 1.15, letterSpacing: '-0.03em', marginBottom: 20, color: 'var(--duo-text-primary)' }}>
+          Đừng chỉ học thuộc từ vựng đơn thuần.<br />
+          <span className="gradient-text">Hãy tự tin nói chuẩn tự nhiên.</span>
         </h1>
 
-        <Paragraph style={{ fontSize: 18, color: 'var(--text-secondary)', maxWidth: 720, margin: '0 auto 36px', lineHeight: 1.6 }}>
-          LinguaTalk immerses you into real-world communication scenarios for <strong>Korean</strong> and <strong>English</strong>. From ordering kimchi stew in Seoul to negotiating in global business meetings, master pronunciation, authentic dialogues, and turn-by-turn AI conversations.
+        <Paragraph style={{ fontSize: 18, color: 'var(--duo-text-secondary)', maxWidth: 740, margin: '0 auto 36px', lineHeight: 1.6 }}>
+          LinguaTalk đưa bạn hòa mình vào các tình huống giao tiếp đời thực bằng <strong>Tiếng Hàn</strong> và <strong>Tiếng Anh</strong>. Từ gọi món canh kim chi tại Seoul đến phỏng vấn và làm việc quốc tế, bạn sẽ làm chủ phát âm, đoạn hội thoại sinh động và trò chuyện phản xạ trực tiếp với AI.
         </Paragraph>
 
         <Space size="middle" wrap orientation="horizontal" style={{ justifyContent: 'center' }}>
@@ -69,7 +69,7 @@ export const LandingPage: React.FC = () => {
           </button>
 
           <button
-            className="btn-secondary"
+            className="duo-btn-outline"
             style={{ padding: '14px 24px', fontSize: 15 }}
             onClick={() => {
               setTargetLanguage('EN');
@@ -82,9 +82,9 @@ export const LandingPage: React.FC = () => {
           <Button
             type="text"
             onClick={() => navigate('/dashboard')}
-            style={{ color: '#58CC02', fontWeight: 700, padding: '14px 20px', fontSize: 15 }}
+            style={{ color: '#58CC02', fontWeight: 800, padding: '14px 20px', fontSize: 15 }}
           >
-            Vào Dashboard ➔
+            Vào Bảng điều khiển ➔
           </Button>
         </Space>
       </div>
@@ -92,44 +92,41 @@ export const LandingPage: React.FC = () => {
       {/* Methodology Section */}
       <div style={{ marginTop: 60 }}>
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <Text style={{ color: '#6366F1', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 13 }}>
-            The LinguaTalk Loop
+          <Text style={{ color: '#1CB0F6', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 13 }}>
+            Quy trình Học tập LinguaTalk
           </Text>
-          <h2 style={{ fontSize: 28, fontWeight: 700, marginTop: 6 }}>
-            Communication-First Learning Methodology
+          <h2 style={{ fontSize: 28, fontWeight: 900, marginTop: 6, color: 'var(--duo-text-primary)' }}>
+            Phương pháp Học Lấy Giao tiếp Thực chiến làm Trọng tâm
           </h2>
-          <Text style={{ color: 'var(--text-secondary)' }}>
-            We bridge the gap between textbook knowledge and instinctive spoken fluency.
+          <Text style={{ color: 'var(--duo-text-secondary)', fontSize: 15 }}>
+            Xóa bỏ khoảng cách giữa lý thuyết sách vở và phản xạ giao tiếp tự nhiên ngoài đời sống.
           </Text>
         </div>
 
         <Row gutter={[16, 16]}>
           {[
-            { step: '1. Learn', title: 'Target Vocab & Hangul Breakdown', desc: 'Study words in context with IPA, batchim rules, sound changes, and collocations.' },
-            { step: '2. Understand', title: 'Grammar in Social Context', desc: 'Grasp formality levels (존댓말 vs 반말, English modal politeness) with clear formulas.' },
-            { step: '3. Practice', title: 'Interactive Multi-Speaker Audio', desc: 'Listen to line-by-line dialogues, train listening comprehension at 0.8x/1.0x speed.' },
-            { step: '4. Pronounce', title: 'AI Speech Recognition', desc: 'Speak into your mic and get immediate accuracy scoring and phonetic feedback.' },
-            { step: '5. Communicate', title: 'Turn-by-Turn AI Roleplay', desc: 'Interact with AI roleplay partners (Waiter, Barista, Interviewer) in realistic situations.' },
-            { step: '6. Review', title: 'Spaced Repetition (SM-2)', desc: 'Prioritize tricky vocabulary and past mistakes so what you learn stays with you forever.' },
+            { step: '1. Nạp từ vựng', title: 'Từ vựng & Cấu tạo Hangul', desc: 'Học từ trong ngữ cảnh thực tế với phiên âm IPA, quy tắc patchim, biến âm và cụm từ thường gặp.' },
+            { step: '2. Thấu hiểu', title: 'Ngữ pháp theo Ngữ cảnh Xã hội', desc: 'Nắm vững cấp độ kính ngữ (존댓말 vs 반말, mẫu câu lịch sự tiếng Anh) với công thức dễ nhớ.' },
+            { step: '3. Luyện nghe', title: 'Hội thoại Đa giọng nói Chân thực', desc: 'Lắng nghe từng câu thoại sinh động, rèn luyện phản xạ nghe hiểu với tốc độ 0.8x và 1.0x.' },
+            { step: '4. Phát âm', title: 'Nhận diện Giọng nói AI', desc: 'Nói trực tiếp qua micro và nhận điểm đánh giá độ chính xác cùng góp ý chi tiết ngay lập tức.' },
+            { step: '5. Phản xạ', title: 'Nhập vai Giao tiếp cùng AI', desc: 'Tương tác hỏi-đáp từng lượt với trợ lý AI (Bồi bàn, Barista, Phỏng vấn viên) trong tình huống thực tế.' },
+            { step: '6. Ghi nhớ', title: 'Lặp lại Ngắt quãng (SM-2)', desc: 'Tự động phân bổ từ vựng khó và lỗi sai vào lịch ôn tập để kích hoạt trí nhớ dài hạn vĩnh viễn.' },
           ].map((item, idx) => (
             <Col xs={24} sm={12} md={8} key={idx}>
               <div
-                className="glass-panel"
+                className="duo-card duo-card-interactive"
                 style={{
                   padding: 24,
                   height: '100%',
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  position: 'relative',
-                  overflow: 'hidden',
                 }}
               >
-                <div style={{ color: '#6366F1', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', marginBottom: 8 }}>
+                <div style={{ color: '#58CC02', fontSize: 12, fontWeight: 900, textTransform: 'uppercase', marginBottom: 8 }}>
                   {item.step}
                 </div>
-                <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 10, color: 'var(--text-primary)' }}>
+                <h3 style={{ fontSize: 17, fontWeight: 800, marginBottom: 10, color: 'var(--duo-text-primary)' }}>
                   {item.title}
                 </h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.5 }}>
+                <p style={{ color: 'var(--duo-text-secondary)', fontSize: 14, lineHeight: 1.5, margin: 0 }}>
                   {item.desc}
                 </p>
               </div>
@@ -143,102 +140,100 @@ export const LandingPage: React.FC = () => {
         <Row gutter={[24, 24]}>
           {/* Korean Spotlight */}
           <Col xs={24} lg={12}>
-            <div className="glass-panel" style={{ padding: 28, height: '100%', border: '1px solid rgba(99, 102, 241, 0.3)' }}>
+            <div className="duo-card duo-card-interactive" style={{ padding: 28, height: '100%', borderColor: 'rgba(206, 130, 255, 0.35)', borderBottomColor: '#A559D8' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <Tag color="purple" style={{ fontSize: 13, padding: '4px 10px', borderRadius: 6 }}>
-                  🇰🇷 Korean Spotlight
+                <Tag color="purple" style={{ fontSize: 13, padding: '4px 10px', borderRadius: 6, fontWeight: 800 }}>
+                  🇰🇷 Điểm nhấn Tiếng Hàn
                 </Tag>
-                <Button
-                  size="small"
-                  type="text"
-                  icon={<Volume2 size={16} color="#06B6D4" />}
+                <button
+                  className="duo-btn-outline"
                   onClick={() => speakText('안녕하세요. 김치찌개 하나 주세요.', 'KO')}
-                  style={{ color: '#06B6D4' }}
+                  style={{ padding: '6px 14px', fontSize: 13 }}
                 >
-                  Listen
-                </Button>
+                  <Volume2 size={16} color="#1CB0F6" />
+                  <span>Nghe phát âm</span>
+                </button>
               </div>
 
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#A5B4FC', marginBottom: 6 }}>
-                식당에서 주문하기 (Ordering at Restaurant)
+              <div style={{ fontSize: 24, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 6 }}>
+                식당에서 주문하기 (Gọi món tại Nhà hàng)
               </div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 16 }}>
-                Break down expressions into living components rather than robotic memorization:
+              <p style={{ color: 'var(--duo-text-secondary)', fontSize: 14, marginBottom: 16 }}>
+                Phân tích câu thành các thành phần sống động thay vì học vẹt máy móc:
               </p>
 
               {/* Breakdown chip */}
-              <div style={{ padding: 14, borderRadius: 10, background: 'rgba(0, 0, 0, 0.3)', marginBottom: 16 }}>
-                <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>
-                  안녕하세요 = 안녕 (Wellness) + 하(다) (Do) + -세요 (Polite Imperative)
+              <div style={{ padding: 14, borderRadius: 12, background: 'var(--duo-bg)', border: '1.5px solid var(--duo-border)', marginBottom: 16 }}>
+                <div style={{ fontWeight: 800, color: 'var(--duo-text-primary)', marginBottom: 6 }}>
+                  안녕하세요 = 안녕 (Bình an) + 하(다) (Chúc) + -세요 (Đuôi kính ngữ lịch sự)
                 </div>
-                <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-                  💡 <strong>Batchim Rule:</strong> The 'ㅇ' in '안/녕' produces a smooth nasal resonance [aɲ.ɲʌŋ.ɦa.se.jo].
+                <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)' }}>
+                  💡 <strong>Quy tắc Patchim:</strong> Phụ âm 'ㅇ' trong '안/녕' tạo âm mũi mềm [aɲ.ɲʌŋ.ɦa.se.jo].
                 </div>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Lesson Level: Beginner (A1)</span>
-                <Button
-                  type="primary"
+                <span style={{ fontSize: 13, color: 'var(--duo-text-muted)', fontWeight: 700 }}>Trình độ: Mới bắt đầu (A1)</span>
+                <button
+                  className="duo-btn-purple"
                   onClick={() => {
                     setTargetLanguage('KO');
                     navigate('/topics');
                   }}
-                  style={{ background: '#6366F1' }}
+                  style={{ padding: '10px 20px', fontSize: 14 }}
                 >
-                  Start Korean Lesson
-                </Button>
+                  Bắt đầu Bài học Tiếng Hàn
+                </button>
               </div>
             </div>
           </Col>
 
           {/* English Spotlight */}
           <Col xs={24} lg={12}>
-            <div className="glass-panel" style={{ padding: 28, height: '100%', border: '1px solid rgba(6, 182, 212, 0.3)' }}>
+            <div className="duo-card duo-card-interactive" style={{ padding: 28, height: '100%', borderColor: 'rgba(28, 176, 246, 0.35)', borderBottomColor: '#1899D6' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <Tag color="cyan" style={{ fontSize: 13, padding: '4px 10px', borderRadius: 6 }}>
-                  🇺🇸 English Spotlight
+                <Tag color="cyan" style={{ fontSize: 13, padding: '4px 10px', borderRadius: 6, fontWeight: 800 }}>
+                  🇺🇸 Điểm nhấn Tiếng Anh
                 </Tag>
-                <Button
-                  size="small"
-                  type="text"
-                  icon={<Volume2 size={16} color="#06B6D4" />}
+                <button
+                  className="duo-btn-outline"
                   onClick={() => speakText('Could I please get an iced oat latte with an extra shot?', 'EN')}
-                  style={{ color: '#06B6D4' }}
+                  style={{ padding: '6px 14px', fontSize: 13 }}
                 >
-                  Listen
-                </Button>
+                  <Volume2 size={16} color="#1CB0F6" />
+                  <span>Nghe phát âm</span>
+                </button>
               </div>
 
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#38BDF8', marginBottom: 6 }}>
-                Specialty Coffee & Professional Small Talk
+              <div style={{ fontSize: 24, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 6 }}>
+                Specialty Coffee & Giao tiếp Đời thực
               </div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 16 }}>
-                Learn polite modal hedging and native collocations rather than blunt textbook phrasing:
+              <p style={{ color: 'var(--duo-text-secondary)', fontSize: 14, marginBottom: 16 }}>
+                Học cách đề nghị lịch sự và cụm từ bản xứ thay vì dịch thô từ tiếng mẹ đẻ:
               </p>
 
               {/* Phrasing chip */}
-              <div style={{ padding: 14, borderRadius: 10, background: 'rgba(0, 0, 0, 0.3)', marginBottom: 16 }}>
-                <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>
-                  "Could I please get..." vs "Give me a coffee"
+              <div style={{ padding: 14, borderRadius: 12, background: 'var(--duo-bg)', border: '1.5px solid var(--duo-border)', marginBottom: 16 }}>
+                <div style={{ fontWeight: 800, color: 'var(--duo-text-primary)', marginBottom: 6 }}>
+                  Dùng "Could I please get..." thay vì câu cụt ngủn "Give me a coffee"
                 </div>
-                <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-                  💡 <strong>Collocation:</strong> "Single-origin pour-over", "Make that to-go", "Under the name..."
+                <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)' }}>
+                  💡 <strong>Cụm từ tự nhiên:</strong> "Single-origin pour-over", "Make that to-go", "Under the name..."
                 </div>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Lesson Level: Intermediate (B1)</span>
-                <Button
-                  type="primary"
+                <span style={{ fontSize: 13, color: 'var(--duo-text-muted)', fontWeight: 700 }}>Trình độ: Trung cấp (B1)</span>
+                <button
+                  className="duo-btn-blue"
                   onClick={() => {
                     setTargetLanguage('EN');
                     navigate('/topics');
                   }}
-                  style={{ background: '#06B6D4' }}
+                  style={{ padding: '10px 20px', fontSize: 14 }}
                 >
-                  Start English Lesson
-                </Button>
+                  Bắt đầu Bài học Tiếng Anh
+                </button>
               </div>
             </div>
           </Col>
@@ -247,28 +242,30 @@ export const LandingPage: React.FC = () => {
 
       {/* AI Conversation Partner Callout */}
       <div
-        className="glass-panel"
+        className="duo-card"
         style={{
           marginTop: 60,
           padding: '40px 30px',
           textAlign: 'center',
-          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(6, 182, 212, 0.08))',
-          border: '1px solid rgba(99, 102, 241, 0.3)',
+          background: 'linear-gradient(135deg, rgba(88, 204, 2, 0.1) 0%, rgba(28, 176, 246, 0.08) 100%)',
+          borderColor: 'rgba(88, 204, 2, 0.35)',
+          borderBottomColor: '#46A302',
         }}
       >
-        <MessageSquare size={36} color="#6366F1" style={{ marginBottom: 16 }} />
-        <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 12 }}>
-          Practice Turn-by-Turn with Your AI Language Partner
+        <div style={{ fontSize: 40, marginBottom: 12 }}>🤖</div>
+        <h2 style={{ fontSize: 28, fontWeight: 900, marginBottom: 12, color: 'var(--duo-text-primary)' }}>
+          Luyện phản xạ Nói từng lượt cùng Bạn học AI
         </h2>
-        <Paragraph style={{ color: 'var(--text-secondary)', maxWidth: 640, margin: '0 auto 24px', fontSize: 16 }}>
-          Step into 20+ realistic scenarios: Job Interviews, Cafe Orders, Hotel Check-ins, Doctor Visits, and Metro navigation. Speak with voice recognition and receive detailed feedback on fluency, grammar, and more natural native alternatives.
+        <Paragraph style={{ color: 'var(--duo-text-secondary)', maxWidth: 680, margin: '0 auto 24px', fontSize: 16, lineHeight: 1.6 }}>
+          Trải nghiệm hơn 20+ tình huống thực tế: Phỏng vấn xin việc, Gọi cà phê, Nhận phòng khách sạn, Khám bác sĩ và Đi tàu điện ngầm. Nói trực tiếp qua micro và nhận phản hồi chi tiết về độ trôi chảy, ngữ pháp cùng gợi ý cách diễn đạt bản xứ tự nhiên hơn.
         </Paragraph>
         <button
-          className="btn-primary"
-          style={{ padding: '12px 28px', fontSize: 15 }}
-          onClick={() => navigate('/conversation')}
+          className="duo-btn-green"
+          style={{ padding: '14px 32px', fontSize: 16 }}
+          onClick={() => navigate('/chat')}
         >
-          Try AI Conversation Partner
+          <span>Bắt đầu Luyện Hội thoại với AI</span>
+          <ArrowRight size={18} />
         </button>
       </div>
     </div>

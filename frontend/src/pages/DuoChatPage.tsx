@@ -21,7 +21,7 @@ import {
 import confetti from 'canvas-confetti';
 import { useAppStore } from '../stores/useAppStore';
 import { api } from '../services/api';
-import { ConversationScenario, ConversationMessage, ConversationFeedback } from '../types';
+import { ConversationScenario, ConversationMessage, ConversationFeedback, formatLevelVietnamese } from '../types';
 import { speakText, recordSpeech } from '../utils/speech';
 
 const { Text, Paragraph } = Typography;
@@ -324,7 +324,7 @@ export const DuoChatPage: React.FC = () => {
               <span style={{ fontSize: 18, fontWeight: 900, color: 'var(--duo-text-primary)' }}>
                 {selectedScenario.title}
               </span>
-              <Tag color="green">{selectedScenario.levelCode}</Tag>
+              <Tag color="green">{formatLevelVietnamese(selectedScenario.levelCode)}</Tag>
             </div>
             <div style={{ fontSize: 12, color: 'var(--duo-text-secondary)' }}>
               Bạn là: <strong style={{ color: '#58CC02' }}>{selectedScenario.userRole}</strong> | AI đóng vai: <strong style={{ color: '#1CB0F6' }}>{selectedScenario.aiRole}</strong>
@@ -663,7 +663,7 @@ export const DuoChatPage: React.FC = () => {
             placeholder={
               isKo
                 ? 'Nhập bằng tiếng Hàn hoặc bấm mic để nói (ví dụ: 네, 김치찌개 하나 주세요)...'
-                : 'Type your message in English or tap mic to speak...'
+                : 'Nhập bằng tiếng Anh hoặc bấm mic để nói (ví dụ: Could I get an iced latte, please?)...'
             }
             style={{
               flex: 1,

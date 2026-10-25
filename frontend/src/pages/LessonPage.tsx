@@ -1215,46 +1215,46 @@ export const LessonPage: React.FC = () => {
               <Award size={36} color="white" />
             </div>
 
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 8 }}>
-              Lesson Mastered! 🎉
+            <h2 style={{ fontSize: 24, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 8 }}>
+              Hoàn thành xuất sắc bài học! 🎉
             </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 20 }}>
-              You completed <strong>{lesson.title}</strong>! You acquired {lesson.vocabulary.length} new communication terms and completed interactive listening & grammar checks.
+            <p style={{ color: 'var(--duo-text-secondary)', fontSize: 14, marginBottom: 20 }}>
+              Bạn đã hoàn thành bài học <strong>{lesson.title}</strong>! Bạn đã tiếp thu {lesson.vocabulary.length} từ vựng giao tiếp thực chiến và vượt qua bài luyện nghe & ngữ pháp.
             </p>
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginBottom: 24 }}>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 22, fontWeight: 800, color: '#10B981' }}>+50 XP</div>
-                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Earned</div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: '#58CC02' }}>+50 XP</div>
+                <div style={{ fontSize: 12, color: 'var(--duo-text-muted)', fontWeight: 700 }}>Đạt được</div>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 22, fontWeight: 800, color: '#F59E0B' }}>5 Days</div>
-                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Streak Kept</div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: '#FF9600' }}>5 Ngày</div>
+                <div style={{ fontSize: 12, color: 'var(--duo-text-muted)', fontWeight: 700 }}>Duy trì chuỗi học 🔥</div>
               </div>
             </div>
 
             <Space direction="vertical" style={{ width: '100%' }}>
               <button
-                className="btn-primary"
+                className="duo-btn-green"
                 onClick={() => {
                   setIsCompletedModalOpen(false);
-                  navigate('/conversation');
+                  navigate('/chat');
                 }}
                 style={{ width: '100%', padding: '12px' }}
               >
-                <span>Practice with AI Partner Now</span>
+                <span>Luyện phản xạ với AI ngay</span>
                 <ArrowRight size={16} />
               </button>
 
               <button
-                className="btn-secondary"
+                className="duo-btn-outline"
                 onClick={() => {
                   setIsCompletedModalOpen(false);
                   navigate('/dashboard');
                 }}
                 style={{ width: '100%', padding: '12px' }}
               >
-                Return to Dashboard
+                Về Bảng điều khiển
               </button>
             </Space>
           </div>

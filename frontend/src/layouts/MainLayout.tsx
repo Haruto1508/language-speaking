@@ -388,7 +388,7 @@ export const MainLayout: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ fontSize: 16 }}>💎</span>
                   <span style={{ fontSize: 12, fontWeight: 900, color: '#FFC800' }}>
-                    Diamond League
+                    Bảng Vàng Kim Cương
                   </span>
                 </div>
                 <Tag color="gold" style={{ margin: 0, fontSize: 10, fontWeight: 900, borderRadius: 6, border: 'none' }}>
@@ -399,7 +399,7 @@ export const MainLayout: React.FC = () => {
               {/* Daily Goal progress */}
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--duo-text-muted)', marginBottom: 5, fontWeight: 700 }}>
                 <span>Mục tiêu ngày</span>
-                <span style={{ color: '#58CC02' }}>12/15 min</span>
+                <span style={{ color: '#58CC02' }}>12/15 phút</span>
               </div>
               <div className="duo-progress-track" style={{ height: 6, marginBottom: 10 }}>
                 <div className="duo-progress-fill" style={{ width: '80%' }} />
@@ -449,7 +449,7 @@ export const MainLayout: React.FC = () => {
         ) : (
           /* Collapsed Bottom Action Icons */
           <div style={{ padding: '8px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-            <Tooltip title="Diamond League: Hạng #3 (Mục tiêu 12/15 min)" placement="right">
+            <Tooltip title="Bảng Vàng Kim Cương: Hạng #3 (Mục tiêu 12/15 phút)" placement="right">
               <button
                 className="duo-micro-btn"
                 style={{ width: 40, height: 40, padding: 0, borderRadius: 12, color: '#FFC800' }}

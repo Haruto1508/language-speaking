@@ -108,14 +108,14 @@ export const ApiKeyModal: React.FC = () => {
             </div>
           </div>
           <Tag color={apiKey ? 'green' : 'gold'} style={{ fontWeight: 800 }}>
-            {apiKey ? 'ACTIVATED' : 'DEFAULT'}
+            {apiKey ? 'ĐÃ KÍCH HOẠT' : 'MẶC ĐỊNH'}
           </Tag>
         </div>
 
         {/* Provider selection */}
         <div style={{ marginBottom: 16 }}>
           <Text style={{ fontWeight: 800, color: '#FFFFFF', display: 'block', marginBottom: 8 }}>
-            1. Chọn AI Provider:
+            1. Chọn nhà cung cấp AI:
           </Text>
           <Radio.Group
             value={provider}
@@ -186,7 +186,7 @@ export const ApiKeyModal: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <Sparkles size={18} color="#FFC800" />
             <Text style={{ fontWeight: 800, fontSize: 16, color: 'var(--duo-text-primary)' }}>
-              Tự tạo Kịch bản Giao tiếp (Communicate Generator)
+              Tự tạo Kịch bản Giao tiếp AI
             </Text>
           </div>
           <Paragraph style={{ fontSize: 13, color: 'var(--duo-text-secondary)', marginBottom: 12 }}>
