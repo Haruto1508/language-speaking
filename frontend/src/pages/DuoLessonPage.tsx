@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { X, Heart, Volume2, Mic, CheckCircle2, XCircle, ArrowRight, RotateCcw, Award, Sparkles, Sun, Moon } from 'lucide-react';
+import { X, Flame, Volume2, Mic, CheckCircle2, XCircle, ArrowRight, RotateCcw, Award, Sparkles, Sun, Moon } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAppStore } from '../stores/useAppStore';
 import { api } from '../services/api';
@@ -22,7 +22,7 @@ interface ExerciseStep {
 export const DuoLessonPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { targetLanguage, hearts, decrementHeart, themeMode, toggleTheme } = useAppStore();
+  const { targetLanguage, user, themeMode, toggleTheme } = useAppStore();
 
   const isKo = id === '2' ? false : id === '1' ? true : targetLanguage === 'KO';
 
@@ -251,7 +251,6 @@ export const DuoLessonPage: React.FC = () => {
       confetti({ particleCount: 35, spread: 50, origin: { y: 0.85 } });
     } else {
       setEvaluationState('wrong');
-      decrementHeart();
     }
   };
 
@@ -341,10 +340,10 @@ export const DuoLessonPage: React.FC = () => {
           {themeMode === 'dark' ? <Sun size={18} color="#FFC800" /> : <Moon size={18} color="#1CB0F6" />}
         </button>
 
-        {/* Hearts Life Counter */}
+        {/* Streak Counter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Heart size={22} color="#FF4B4B" fill="#FF4B4B" />
-          <span style={{ fontSize: 18, fontWeight: 900, color: '#FF4B4B' }}>{hearts}</span>
+          <Flame size={20} color="#FF9600" className="flame-bounce" />
+          <span style={{ fontSize: 18, fontWeight: 900, color: '#FF9600' }}>{user?.streakCount || 5}</span>
         </div>
       </div>
 

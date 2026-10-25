@@ -15,7 +15,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Volume2,
-  Heart,
   Key,
   Upload,
   GraduationCap,
@@ -38,8 +37,6 @@ export const MainLayout: React.FC = () => {
     targetLevel,
     openLangModal,
     user,
-    hearts,
-    gems,
     openApiKeyModal,
     openImportModal,
     apiKey,
@@ -378,21 +375,21 @@ export const MainLayout: React.FC = () => {
             <div
               className="duo-sider-card"
               style={{
-                background: 'linear-gradient(135deg, rgba(255, 200, 0, 0.06) 0%, rgba(88, 204, 2, 0.04) 100%)',
-                borderColor: 'rgba(255, 200, 0, 0.25)',
-                borderBottomColor: 'rgba(255, 200, 0, 0.4)',
+                background: 'linear-gradient(135deg, rgba(255, 150, 0, 0.06) 0%, rgba(88, 204, 2, 0.04) 100%)',
+                borderColor: 'rgba(255, 150, 0, 0.25)',
+                borderBottomColor: 'rgba(255, 150, 0, 0.4)',
               }}
             >
-              {/* League header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+              {/* Streak Card Header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ fontSize: 16 }}>💎</span>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: '#FFC800' }}>
-                    Bảng Vàng Kim Cương
+                  <Flame size={16} color="#FF9600" className="flame-bounce" />
+                  <span style={{ fontSize: 12, fontWeight: 900, color: '#FF9600' }}>
+                    Chuỗi học tập
                   </span>
                 </div>
-                <Tag color="gold" style={{ margin: 0, fontSize: 10, fontWeight: 900, borderRadius: 6, border: 'none' }}>
-                  HẠNG #3
+                <Tag color="orange" style={{ margin: 0, fontSize: 10, fontWeight: 900, borderRadius: 6, border: 'none' }}>
+                  {user?.streakCount || 5} NGÀY 🔥
                 </Tag>
               </div>
 
@@ -449,12 +446,12 @@ export const MainLayout: React.FC = () => {
         ) : (
           /* Collapsed Bottom Action Icons */
           <div style={{ padding: '8px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-            <Tooltip title="Bảng Vàng Kim Cương: Hạng #3 (Mục tiêu 12/15 phút)" placement="right">
+            <Tooltip title={`Chuỗi học tập: ${user?.streakCount || 5} ngày liên tục 🔥`} placement="right">
               <button
                 className="duo-micro-btn"
-                style={{ width: 40, height: 40, padding: 0, borderRadius: 12, color: '#FFC800' }}
+                style={{ width: 40, height: 40, padding: 0, borderRadius: 12, color: '#FF9600' }}
               >
-                💎
+                <Flame size={18} color="#FF9600" className="flame-bounce" />
               </button>
             </Tooltip>
             <Tooltip title={apiKey ? 'AI Key: Đã kết nối ✓' : 'Cài đặt API Key AI'} placement="right">
@@ -553,27 +550,11 @@ export const MainLayout: React.FC = () => {
 
           {/* Header Right Gamification & Controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-            {/* Duolingo Streak Counter */}
+            {/* Duolingo Streak Counter (Only Streak Kept) */}
             <Tooltip title="Chuỗi ngày học liên tục!">
               <div className="duo-stat-pill streak">
                 <Flame size={18} color="#FF9600" className="flame-bounce" />
                 <span>{user?.streakCount || 5}</span>
-              </div>
-            </Tooltip>
-
-            {/* Duolingo Gems Counter */}
-            <Tooltip title="Đá quý tích lũy!">
-              <div className="duo-stat-pill gems">
-                <span style={{ fontSize: 16, lineHeight: 1 }}>💎</span>
-                <span>{gems}</span>
-              </div>
-            </Tooltip>
-
-            {/* Duolingo Hearts Counter */}
-            <Tooltip title="Trái tim năng lượng!">
-              <div className="duo-stat-pill hearts">
-                <Heart size={16} color="#FF4B4B" fill="#FF4B4B" />
-                <span>{hearts}/5</span>
               </div>
             </Tooltip>
 
