@@ -20,5 +20,16 @@
     "icon": "Smile",
     "estimatedMinutes": 15,
     "orderIndex": 2
+  },
+  {
+    "id": 10,
+    "languageCode": "EN",
+    "levelCode": "BEGINNER",
+    "code": "english-restaurant",
+    "name": "Nhà hàng & Ẩm thực (Dining & Food)",
+    "description": "Từ vựng món ăn, đồ uống, cách chế biến, đồ dùng bàn ăn và cách gọi món tại nhà hàng.",
+    "icon": "Utensils",
+    "estimatedMinutes": 30,
+    "orderIndex": 3
   }
 ]
