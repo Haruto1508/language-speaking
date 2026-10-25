@@ -1,22 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Tag, Button, Progress, Typography, Space } from 'antd';
+import { Tag, Button, Input, Modal, Typography, Space, Tooltip, Progress } from 'antd';
 import {
   RotateCw,
+  RotateCcw,
   Volume2,
   CheckCircle,
-  Repeat,
-  Flame,
-  Award,
+  Check,
   ArrowRight,
+  ArrowLeft,
   Sparkles,
+  Search,
+  BookOpen,
+  Layers,
+  Award,
+  CheckCheck,
+  Eye,
+  Filter,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { api } from '../services/api';
 import { useAppStore } from '../stores/useAppStore';
-import { ReviewItem, formatStatusVietnamese, formatPartOfSpeechVietnamese } from '../types';
+import { Vocabulary, formatStatusVietnamese, formatPartOfSpeechVietnamese } from '../types';
 import { speakText } from '../utils/speech';
-
 import { localDataService } from '../services/localDataService';
 
 const { Title, Text, Paragraph } = Typography;
@@ -24,324 +30,931 @@ const { Title, Text, Paragraph } = Typography;
 export const ReviewPage: React.FC = () => {
   const navigate = useNavigate();
   const { targetLanguage } = useAppStore();
+  const isKo = targetLanguage === 'KO';
 
-  const [queue, setQueue] = useState<ReviewItem[]>([]);
+  // Navigation tab: 'flashcard' (Học thẻ) or 'all' (Tất cả từ vựng)
+  const [activeTab, setActiveTab] = useState<'flashcard' | 'all'>('flashcard');
+
+  // Master vocabulary list for current language
+  const [vocabList, setVocabList] = useState<Vocabulary[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Flashcard Queue & index
+  const [queue, setQueue] = useState<Vocabulary[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [completedCount, setCompletedCount] = useState(0);
+  const [hideMastered, setHideMastered] = useState(true);
+  const [sessionCompleted, setSessionCompleted] = useState(false);
+
+  // All Vocab Tab Search & Detail Modal
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'MASTERED' | 'LEARNING' | 'NEW'>('ALL');
+  const [selectedVocab, setSelectedVocab] = useState<Vocabulary | null>(null);
 
   useEffect(() => {
-    loadDueReviews();
+    loadVocab();
   }, [targetLanguage]);
 
-  const loadDueReviews = async () => {
+  const loadVocab = async () => {
     try {
       setLoading(true);
-      const data = await api.reviews.getDue(10);
-      if (data && data.length > 0) {
-        setQueue(data);
-      } else {
-        setQueue(localDataService.getDueReviews(targetLanguage, 10));
+      let list: Vocabulary[] = [];
+      try {
+        const data = await api.vocabulary.getAll(targetLanguage);
+        if (data && data.length > 0) {
+          list = data;
+        } else {
+          list = localDataService.getVocabulary(targetLanguage);
+        }
+      } catch {
+        list = localDataService.getVocabulary(targetLanguage);
       }
-    } catch {
-      setQueue(localDataService.getDueReviews(targetLanguage, 10));
+      setVocabList(list);
+      buildQueue(list, hideMastered);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRateCard = async (rating: number) => {
-    const current = queue[currentIndex];
-    if (!current) return;
+  const buildQueue = (allList: Vocabulary[], skipMastered: boolean) => {
+    const filtered = skipMastered ? allList.filter((v) => v.userStatus !== 'MASTERED') : allList;
+    setQueue(filtered);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setSessionCompleted(false);
+  };
 
-    try {
-      await api.reviews.submit(current.vocabularyId, rating);
-    } catch {
-      // offline rate update
-      const newStatus = rating >= 3 ? 'MASTERED' : rating === 2 ? 'LEARNING' : 'REVIEW';
-      localDataService.updateVocabStatus(current.vocabularyId, newStatus);
+  const handleToggleHideMastered = () => {
+    const nextVal = !hideMastered;
+    setHideMastered(nextVal);
+    buildQueue(vocabList, nextVal);
+  };
+
+  // Mark word as Known / Mastered ("Đã biết / Bỏ qua")
+  const handleMarkAsKnown = (vocabId?: number) => {
+    const targetId = vocabId || queue[currentIndex]?.id;
+    if (!targetId) return;
+
+    localDataService.updateVocabStatus(targetId, 'MASTERED');
+
+    // Update in-memory state
+    const updatedList = vocabList.map((v) =>
+      v.id === targetId ? { ...v, userStatus: 'MASTERED' as const } : v
+    );
+    setVocabList(updatedList);
+
+    if (selectedVocab && selectedVocab.id === targetId) {
+      setSelectedVocab({ ...selectedVocab, userStatus: 'MASTERED' });
     }
 
-    setCompletedCount((prev) => prev + 1);
-    setIsFlipped(false);
-
-    if (currentIndex + 1 < queue.length) {
-      setCurrentIndex((prev) => prev + 1);
-    } else {
-      // Finished all cards in queue!
-      confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
-      setCurrentIndex(queue.length);
+    // Advance flashcard
+    if (activeTab === 'flashcard') {
+      setIsFlipped(false);
+      if (currentIndex + 1 < queue.length) {
+        setCurrentIndex((prev) => prev + 1);
+      } else {
+        triggerSessionComplete();
+      }
     }
   };
 
-  const isKo = targetLanguage === 'KO';
+  // Mark word as Needs Review ("Cần học lại")
+  const handleMarkAsReview = (vocabId?: number) => {
+    const current = queue[currentIndex];
+    const targetId = vocabId || current?.id;
+    if (!targetId) return;
+
+    localDataService.updateVocabStatus(targetId, 'REVIEW');
+
+    const updatedList = vocabList.map((v) =>
+      v.id === targetId ? { ...v, userStatus: 'REVIEW' as const } : v
+    );
+    setVocabList(updatedList);
+
+    if (selectedVocab && selectedVocab.id === targetId) {
+      setSelectedVocab({ ...selectedVocab, userStatus: 'REVIEW' });
+    }
+
+    if (activeTab === 'flashcard' && current) {
+      // Re-insert into queue so learner sees it again in this session
+      setQueue((prev) => [...prev, current]);
+      setIsFlipped(false);
+      if (currentIndex + 1 < queue.length + 1) {
+        setCurrentIndex((prev) => prev + 1);
+      } else {
+        triggerSessionComplete();
+      }
+    }
+  };
+
+  const handleNextCard = () => {
+    setIsFlipped(false);
+    if (currentIndex + 1 < queue.length) {
+      setCurrentIndex((prev) => prev + 1);
+    } else {
+      triggerSessionComplete();
+    }
+  };
+
+  const handlePrevCard = () => {
+    if (currentIndex > 0) {
+      setIsFlipped(false);
+      setCurrentIndex((prev) => prev - 1);
+    }
+  };
+
+  const triggerSessionComplete = () => {
+    setSessionCompleted(true);
+    confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
+  };
+
   const currentItem = queue[currentIndex];
-  const isDone = currentIndex >= queue.length && queue.length > 0;
+  const masteredCount = vocabList.filter((v) => v.userStatus === 'MASTERED').length;
+  const learningCount = vocabList.filter((v) => v.userStatus !== 'MASTERED').length;
+
+  // Filtered list for "All Vocabulary" tab
+  const filteredAllVocab = vocabList.filter((v) => {
+    const matchesSearch =
+      v.word.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      v.meaning.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (v.romanization && v.romanization.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    if (!matchesSearch) return false;
+    if (statusFilter === 'MASTERED') return v.userStatus === 'MASTERED';
+    if (statusFilter === 'LEARNING') return v.userStatus === 'LEARNING' || v.userStatus === 'REVIEW';
+    if (statusFilter === 'NEW') return !v.userStatus || v.userStatus === 'NEW';
+    return true;
+  });
 
   return (
-    <div style={{ maxWidth: 760, margin: '0 auto', paddingBottom: 60 }}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+    <div style={{ maxWidth: 960, margin: '0 auto', paddingBottom: 60 }}>
+      {/* Page Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 20 }}>
         <div>
           <Title level={2} style={{ color: 'var(--duo-text-primary)', margin: 0, fontWeight: 900 }}>
-            Ôn tập Lặp lại Ngắt quãng Thông minh 🧠
+            {isKo ? 'Học & Ôn tập từ vựng tiếng Hàn 🇰🇷' : 'Học & Ôn tập từ vựng tiếng Anh 🇺🇸'}
           </Title>
           <Text style={{ color: 'var(--duo-text-secondary)', fontSize: 14 }}>
-            Thuật toán SM-2 tự động phân tích độ nhớ để kích hoạt từ vựng vào trí nhớ dài hạn.
+            Luyện flashcard ghi nhớ nhanh, đánh dấu từ đã biết và tra cứu danh sách toàn bộ từ vựng.
           </Text>
         </div>
 
-        <div className="duo-stat-pill streak">
-          <Flame size={18} color="#FF9600" className="flame-bounce" />
-          <span>5 Ngày Liên tục 🔥</span>
+        {/* Mastered Counter Badge */}
+        <div className="duo-stat-pill" style={{ background: 'rgba(88, 204, 2, 0.12)', border: '1.5px solid rgba(88, 204, 2, 0.35)', color: '#58CC02' }}>
+          <CheckCheck size={18} color="#58CC02" />
+          <span>Đã thuộc {masteredCount} / {vocabList.length} từ</span>
         </div>
       </div>
 
-      {!isDone && queue.length > 0 && (
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--duo-text-secondary)', marginBottom: 6, fontWeight: 700 }}>
-            <span>Thẻ {currentIndex + 1} trên {queue.length}</span>
-            <span style={{ color: '#58CC02' }}>{Math.round((completedCount / queue.length) * 100)}% Hoàn thành</span>
+      {/* Top Tab Bar */}
+      <div
+        style={{
+          display: 'flex',
+          gap: 10,
+          background: 'var(--duo-card-bg)',
+          padding: 6,
+          borderRadius: 16,
+          border: '1.5px solid var(--duo-border)',
+          marginBottom: 26,
+        }}
+      >
+        <button
+          onClick={() => setActiveTab('flashcard')}
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            padding: '12px 18px',
+            borderRadius: 12,
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: 800,
+            fontSize: 15,
+            transition: 'all 0.15s ease',
+            background: activeTab === 'flashcard' ? 'var(--duo-card-hover, rgba(88, 204, 2, 0.12))' : 'transparent',
+            color: activeTab === 'flashcard' ? '#58CC02' : 'var(--duo-text-secondary)',
+            boxShadow: activeTab === 'flashcard' ? '0 2px 8px rgba(88, 204, 2, 0.15)' : 'none',
+          }}
+        >
+          <BookOpen size={18} />
+          <span>Học thẻ Flashcard</span>
+          {learningCount > 0 && (
+            <span style={{ fontSize: 12, padding: '2px 8px', borderRadius: 10, background: '#FF9600', color: '#FFF' }}>
+              {learningCount} cần học
+            </span>
+          )}
+        </button>
+
+        <button
+          onClick={() => setActiveTab('all')}
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            padding: '12px 18px',
+            borderRadius: 12,
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: 800,
+            fontSize: 15,
+            transition: 'all 0.15s ease',
+            background: activeTab === 'all' ? 'var(--duo-card-hover, rgba(28, 176, 246, 0.12))' : 'transparent',
+            color: activeTab === 'all' ? '#1CB0F6' : 'var(--duo-text-secondary)',
+            boxShadow: activeTab === 'all' ? '0 2px 8px rgba(28, 176, 246, 0.15)' : 'none',
+          }}
+        >
+          <Layers size={18} />
+          <span>Tất cả từ vựng ({vocabList.length})</span>
+        </button>
+      </div>
+
+      {/* ============================================================ */}
+      {/* TAB 1: FLASHCARD QUIZ VIEW */}
+      {/* ============================================================ */}
+      {activeTab === 'flashcard' && (
+        <div style={{ maxWidth: 720, margin: '0 auto' }}>
+          {/* Controls: Skip known toggle + Progress */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
+            <button
+              onClick={handleToggleHideMastered}
+              style={{
+                background: hideMastered ? 'rgba(88, 204, 2, 0.12)' : 'var(--duo-card-bg)',
+                border: hideMastered ? '1.5px solid #58CC02' : '1.5px solid var(--duo-border)',
+                color: hideMastered ? '#58CC02' : 'var(--duo-text-secondary)',
+                borderRadius: 12,
+                padding: '6px 14px',
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              <CheckCircle size={15} />
+              <span>{hideMastered ? 'Đang bỏ qua từ đã thuộc' : 'Đang học tất cả (kể cả từ đã thuộc)'}</span>
+            </button>
+
+            {!sessionCompleted && queue.length > 0 && (
+              <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--duo-text-secondary)' }}>
+                Thẻ {currentIndex + 1} / {queue.length}
+              </span>
+            )}
           </div>
-          <div className="duo-progress-track" style={{ height: 10 }}>
-            <div className="duo-progress-fill" style={{ width: `${Math.round((completedCount / queue.length) * 100)}%` }} />
-          </div>
+
+          {/* Progress Bar */}
+          {!sessionCompleted && queue.length > 0 && (
+            <div className="duo-progress-track" style={{ height: 10, marginBottom: 20 }}>
+              <div
+                className="duo-progress-fill"
+                style={{ width: `${Math.round(((currentIndex) / queue.length) * 100)}%` }}
+              />
+            </div>
+          )}
+
+          {/* Flashcard Body */}
+          {!sessionCompleted && currentItem ? (
+            <div>
+              <div style={{ perspective: 1000, marginBottom: 24 }}>
+                <div
+                  onClick={() => setIsFlipped(!isFlipped)}
+                  className="duo-card duo-card-interactive"
+                  style={{
+                    padding: '48px 32px',
+                    minHeight: 360,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    borderRadius: 24,
+                    userSelect: 'none',
+                  }}
+                >
+                  {/* Top Tags */}
+                  <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Tag color="purple" style={{ borderRadius: 6, fontWeight: 800 }}>
+                      {formatPartOfSpeechVietnamese(currentItem.partOfSpeech)}
+                    </Tag>
+
+                    <Tag
+                      color={currentItem.userStatus === 'MASTERED' ? 'green' : currentItem.userStatus === 'REVIEW' ? 'orange' : 'blue'}
+                      style={{ borderRadius: 6, fontWeight: 800 }}
+                    >
+                      {formatStatusVietnamese(currentItem.userStatus)}
+                    </Tag>
+                  </div>
+
+                  {/* Card Center */}
+                  {!isFlipped ? (
+                    // Mặt trước: Từ vựng + Phiên âm + Nút loa
+                    <div style={{ margin: 'auto 0' }}>
+                      <div
+                        className={isKo ? 'lang-ko' : ''}
+                        style={{
+                          fontSize: 'clamp(2.4rem, 6vw, 3.4rem)',
+                          fontWeight: 900,
+                          color: 'var(--duo-text-primary)',
+                          marginBottom: 10,
+                        }}
+                      >
+                        {currentItem.word}
+                      </div>
+
+                      {currentItem.romanization && (
+                        <div style={{ fontSize: 17, color: '#1CB0F6', fontStyle: 'italic', marginBottom: 16 }}>
+                          [{currentItem.romanization}]
+                        </div>
+                      )}
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          speakText(currentItem.word, isKo ? 'KO' : 'EN', 0.9);
+                        }}
+                        className="duo-btn-outline"
+                        style={{ padding: '8px 20px', borderRadius: 20 }}
+                      >
+                        <Volume2 size={18} color="#1CB0F6" />
+                        <span>Nghe phát âm</span>
+                      </button>
+                    </div>
+                  ) : (
+                    // Mặt sau: Ý nghĩa + Ví dụ
+                    <div style={{ margin: 'auto 0', maxWidth: 540 }}>
+                      <div style={{ fontSize: 28, fontWeight: 900, color: '#58CC02', marginBottom: 8 }}>
+                        {currentItem.meaning}
+                      </div>
+
+                      {currentItem.pronunciationIpa && (
+                        <div style={{ fontSize: 14, color: '#1CB0F6', marginBottom: 12, fontWeight: 700 }}>
+                          IPA: {currentItem.pronunciationIpa}
+                        </div>
+                      )}
+
+                      {currentItem.exampleSentence && (
+                        <div
+                          style={{
+                            padding: 16,
+                            borderRadius: 14,
+                            background: 'var(--duo-bg)',
+                            border: '1.5px solid var(--duo-border)',
+                            marginTop: 12,
+                            textAlign: 'left',
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                            <div className={isKo ? 'lang-ko' : ''} style={{ fontSize: 16, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
+                              "{currentItem.exampleSentence}"
+                            </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                speakText(currentItem.exampleSentence!, isKo ? 'KO' : 'EN', 0.95);
+                              }}
+                              style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 4 }}
+                            >
+                              <Volume2 size={16} color="#1CB0F6" />
+                            </button>
+                          </div>
+                          {currentItem.translation && (
+                            <div style={{ fontSize: 14, color: 'var(--duo-text-secondary)' }}>
+                              👉 {currentItem.translation}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Bottom hint */}
+                  <div style={{ fontSize: 12, color: 'var(--duo-text-muted)', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}>
+                    <RotateCw size={14} />
+                    <span>Chạm vào thẻ để {isFlipped ? 'xem từ gốc' : 'lật xem nghĩa & câu ví dụ'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons: Tập trung vào học từ, có nút "Đã biết" để bỏ qua */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12 }}>
+                {/* Nút Quay lại */}
+                <button
+                  onClick={handlePrevCard}
+                  disabled={currentIndex === 0}
+                  className="duo-btn-outline"
+                  style={{
+                    padding: '14px 12px',
+                    borderRadius: 14,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    opacity: currentIndex === 0 ? 0.4 : 1,
+                    cursor: currentIndex === 0 ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  <ArrowLeft size={18} />
+                  <span>Từ trước</span>
+                </button>
+
+                {/* Nút Cần học lại */}
+                <button
+                  onClick={() => handleMarkAsReview()}
+                  style={{
+                    padding: '14px 12px',
+                    borderRadius: 14,
+                    background: 'rgba(255, 150, 0, 0.12)',
+                    border: '2px solid rgba(255, 150, 0, 0.4)',
+                    borderBottom: '4px solid #E58500',
+                    color: '#FF9600',
+                    cursor: 'pointer',
+                    fontWeight: 900,
+                    fontSize: 15,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <RotateCcw size={18} />
+                  <span>Cần ôn lại</span>
+                </button>
+
+                {/* Nút Tiếp theo */}
+                <button
+                  onClick={handleNextCard}
+                  style={{
+                    padding: '14px 12px',
+                    borderRadius: 14,
+                    background: 'rgba(28, 176, 246, 0.12)',
+                    border: '2px solid rgba(28, 176, 246, 0.4)',
+                    borderBottom: '4px solid #1899D6',
+                    color: '#1CB0F6',
+                    cursor: 'pointer',
+                    fontWeight: 900,
+                    fontSize: 15,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <span>Tiếp theo</span>
+                  <ArrowRight size={18} />
+                </button>
+
+                {/* Nút ĐÃ BIẾT (Để sau này tự động bỏ qua cho nhanh) */}
+                <button
+                  onClick={() => handleMarkAsKnown()}
+                  style={{
+                    padding: '14px 14px',
+                    borderRadius: 14,
+                    background: '#58CC02',
+                    border: '2px solid #58CC02',
+                    borderBottom: '4px solid #46A302',
+                    color: '#FFFFFF',
+                    cursor: 'pointer',
+                    fontWeight: 900,
+                    fontSize: 15,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    boxShadow: '0 4px 12px rgba(88, 204, 2, 0.3)',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <CheckCircle size={18} />
+                  <span>Đã biết (Bỏ qua)</span>
+                </button>
+              </div>
+            </div>
+          ) : sessionCompleted ? (
+            // Completed Session View
+            <div className="duo-card" style={{ padding: 48, textAlign: 'center' }}>
+              <div
+                style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #FFC800, #FF9600)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 20,
+                  boxShadow: '0 8px 24px rgba(255, 200, 0, 0.4)',
+                }}
+              >
+                <Award size={44} color="#131F24" />
+              </div>
+
+              <h2 style={{ fontSize: 26, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 8 }}>
+                Hoàn thành phiên học hôm nay! 🎉
+              </h2>
+              <p style={{ color: 'var(--duo-text-secondary)', fontSize: 15, maxWidth: 500, margin: '0 auto 24px', lineHeight: 1.5 }}>
+                Bạn đã lướt qua toàn bộ từ vựng cần học. Những từ bạn bấm <b>"Đã biết"</b> sẽ được lưu lại để bỏ qua cho các lần học tới!
+              </p>
+
+              <Space size="middle" wrap style={{ justifyContent: 'center' }}>
+                <button
+                  className="duo-btn-green"
+                  onClick={() => buildQueue(vocabList, hideMastered)}
+                >
+                  <RotateCcw size={18} />
+                  <span>Học lại lần nữa</span>
+                </button>
+
+                <button
+                  className="duo-btn-outline"
+                  onClick={() => setActiveTab('all')}
+                >
+                  <Layers size={18} />
+                  <span>Xem danh sách từ vựng</span>
+                </button>
+              </Space>
+            </div>
+          ) : (
+            // No words to study
+            <div className="duo-card" style={{ padding: 48, textAlign: 'center' }}>
+              <CheckCircle size={44} color="#58CC02" style={{ marginBottom: 16 }} />
+              <h3 style={{ fontSize: 22, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 8 }}>
+                Tuyệt vời! Bạn đã thuộc hết từ vựng! 🌟
+              </h3>
+              <p style={{ color: 'var(--duo-text-secondary)', fontSize: 15, maxWidth: 480, margin: '0 auto 24px' }}>
+                Không còn từ nào trong danh sách cần học. Bạn có thể bấm nút bên dưới để ôn tập lại cả những từ đã thuộc, hoặc xem danh sách tất cả từ vựng.
+              </p>
+              <Space size="middle" wrap style={{ justifyContent: 'center' }}>
+                <button
+                  className="duo-btn-outline"
+                  onClick={() => {
+                    setHideMastered(false);
+                    buildQueue(vocabList, false);
+                  }}
+                >
+                  <RotateCcw size={16} />
+                  <span>Ôn lại tất cả từ đã thuộc</span>
+                </button>
+                <button className="duo-btn-green" onClick={() => setActiveTab('all')}>
+                  <span>Xem tất cả từ vựng</span>
+                </button>
+              </Space>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Main Flashcard */}
-      {!isDone && currentItem ? (
-        <div style={{ perspective: 1000, margin: '20px 0 28px' }}>
+      {/* ============================================================ */}
+      {/* TAB 2: SHOW TOÀN BỘ TỪ VỰNG & CLICK XEM CHI TIẾT */}
+      {/* ============================================================ */}
+      {activeTab === 'all' && (
+        <div>
+          {/* Search & Filter Bar */}
           <div
-            onClick={() => setIsFlipped(!isFlipped)}
-            className="duo-card duo-card-interactive"
             style={{
-              padding: '48px 36px',
-              minHeight: 350,
               display: 'flex',
-              flexDirection: 'column',
               justifyContent: 'space-between',
               alignItems: 'center',
-              textAlign: 'center',
-              cursor: 'pointer',
-              position: 'relative',
-              borderRadius: 22,
+              flexWrap: 'wrap',
+              gap: 12,
+              marginBottom: 20,
             }}
           >
-            {/* Top Badges */}
-            <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ flex: 1, minWidth: 260 }}>
+              <Input
+                prefix={<Search size={16} color="var(--duo-text-muted)" />}
+                placeholder="Tìm kiếm từ, phiên âm hoặc ý nghĩa..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                allowClear
+                style={{
+                  background: 'var(--duo-card-bg)',
+                  borderColor: 'var(--duo-border)',
+                  color: 'var(--duo-text-primary)',
+                  borderRadius: 12,
+                  padding: '10px 14px',
+                }}
+              />
+            </div>
+
+            {/* Status Filter Buttons */}
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <button
+                onClick={() => setStatusFilter('ALL')}
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: 10,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: statusFilter === 'ALL' ? '1.5px solid #1CB0F6' : '1.5px solid var(--duo-border)',
+                  background: statusFilter === 'ALL' ? 'rgba(28, 176, 246, 0.12)' : 'var(--duo-card-bg)',
+                  color: statusFilter === 'ALL' ? '#1CB0F6' : 'var(--duo-text-secondary)',
+                }}
+              >
+                Tất cả ({vocabList.length})
+              </button>
+
+              <button
+                onClick={() => setStatusFilter('LEARNING')}
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: 10,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: statusFilter === 'LEARNING' ? '1.5px solid #FF9600' : '1.5px solid var(--duo-border)',
+                  background: statusFilter === 'LEARNING' ? 'rgba(255, 150, 0, 0.12)' : 'var(--duo-card-bg)',
+                  color: statusFilter === 'LEARNING' ? '#FF9600' : 'var(--duo-text-secondary)',
+                }}
+              >
+                Cần học ({learningCount})
+              </button>
+
+              <button
+                onClick={() => setStatusFilter('MASTERED')}
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: 10,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: statusFilter === 'MASTERED' ? '1.5px solid #58CC02' : '1.5px solid var(--duo-border)',
+                  background: statusFilter === 'MASTERED' ? 'rgba(88, 204, 2, 0.12)' : 'var(--duo-card-bg)',
+                  color: statusFilter === 'MASTERED' ? '#58CC02' : 'var(--duo-text-secondary)',
+                }}
+              >
+                Đã thuộc ({masteredCount})
+              </button>
+            </div>
+          </div>
+
+          {/* Vocabulary List Items */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
+            {filteredAllVocab.map((item) => {
+              const isMastered = item.userStatus === 'MASTERED';
+
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => setSelectedVocab(item)}
+                  className="duo-card duo-card-interactive"
+                  style={{
+                    padding: 18,
+                    cursor: 'pointer',
+                    borderRadius: 16,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: 12,
+                    border: isMastered ? '1.5px solid rgba(88, 204, 2, 0.35)' : '1.5px solid var(--duo-border)',
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                      <Tag color="purple" style={{ borderRadius: 6, fontWeight: 700, margin: 0 }}>
+                        {formatPartOfSpeechVietnamese(item.partOfSpeech)}
+                      </Tag>
+
+                      <Tag
+                        color={isMastered ? 'green' : 'orange'}
+                        style={{ borderRadius: 6, fontWeight: 700, margin: 0 }}
+                      >
+                        {isMastered ? 'ĐÃ THUỘC' : 'CẦN HỌC'}
+                      </Tag>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                      <div
+                        className={isKo ? 'lang-ko' : ''}
+                        style={{ fontSize: 20, fontWeight: 900, color: 'var(--duo-text-primary)' }}
+                      >
+                        {item.word}
+                      </div>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          speakText(item.word, isKo ? 'KO' : 'EN', 0.95);
+                        }}
+                        style={{
+                          background: 'rgba(28, 176, 246, 0.1)',
+                          border: 'none',
+                          borderRadius: 8,
+                          padding: '6px 8px',
+                          cursor: 'pointer',
+                          color: '#1CB0F6',
+                        }}
+                      >
+                        <Volume2 size={16} />
+                      </button>
+                    </div>
+
+                    {item.romanization && (
+                      <div style={{ fontSize: 13, color: '#1CB0F6', fontStyle: 'italic', marginTop: 2 }}>
+                        [{item.romanization}]
+                      </div>
+                    )}
+
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--duo-text-secondary)', marginTop: 8 }}>
+                      {item.meaning}
+                    </div>
+                  </div>
+
+                  <div style={{ fontSize: 12, color: 'var(--duo-text-muted)', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}>
+                    <Eye size={13} />
+                    <span>Bấm vào để xem phiên âm & ví dụ</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {filteredAllVocab.length === 0 && (
+            <div className="duo-card" style={{ padding: 40, textAlign: 'center', marginTop: 20 }}>
+              <p style={{ color: 'var(--duo-text-secondary)', fontSize: 15, margin: 0 }}>
+                Không tìm thấy từ vựng nào khớp với từ khóa tìm kiếm.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* MODAL CHI TIẾT TỪ VỰNG KHI CLICK VÀO TỪ */}
+      {/* ============================================================ */}
+      <Modal
+        open={!!selectedVocab}
+        onCancel={() => setSelectedVocab(null)}
+        footer={null}
+        centered
+        width={560}
+      >
+        {selectedVocab && (
+          <div style={{ padding: '12px 8px' }}>
+            {/* Modal Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
               <Tag color="purple" style={{ borderRadius: 6, fontWeight: 800 }}>
-                {formatPartOfSpeechVietnamese(currentItem.partOfSpeech)}
+                {formatPartOfSpeechVietnamese(selectedVocab.partOfSpeech)}
               </Tag>
-              <Tag color={currentItem.status === 'MASTERED' ? 'green' : 'blue'} style={{ borderRadius: 6, fontWeight: 800 }}>
-                {formatStatusVietnamese(currentItem.status)}
+
+              <Tag
+                color={selectedVocab.userStatus === 'MASTERED' ? 'green' : 'orange'}
+                style={{ borderRadius: 6, fontWeight: 800 }}
+              >
+                {selectedVocab.userStatus === 'MASTERED' ? 'ĐÃ THUỘC (BỎ QUA KHI HỌC)' : 'ĐANG HỌC'}
               </Tag>
             </div>
 
-            {/* Middle Card Content */}
-            {!isFlipped ? (
-              // FRONT OF FLASHCARD
-              <div style={{ margin: 'auto 0' }}>
-                <div
-                  className={isKo ? 'lang-ko' : ''}
-                  style={{
-                    fontSize: 'clamp(2.2rem, 5.5vw, 3.2rem)',
-                    fontWeight: 900,
-                    color: 'var(--duo-text-primary)',
-                    marginBottom: 12,
-                  }}
-                >
-                  {currentItem.word}
-                </div>
-
-                {currentItem.romanization && (
-                  <div style={{ fontSize: 16, color: '#1CB0F6', fontStyle: 'italic', marginBottom: 14 }}>
-                    [{currentItem.romanization}]
-                  </div>
-                )}
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    speakText(currentItem.word, isKo ? 'KO' : 'EN', 0.9);
-                  }}
-                  className="duo-btn-outline"
-                  style={{ padding: '8px 18px', borderRadius: 20 }}
-                >
-                  <Volume2 size={18} color="#1CB0F6" />
-                  <span>Nghe phát âm</span>
-                </button>
+            {/* Word & Pronunciation */}
+            <div style={{ textAlign: 'center', padding: '12px 0 16px' }}>
+              <div
+                className={isKo ? 'lang-ko' : ''}
+                style={{ fontSize: 34, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 6 }}
+              >
+                {selectedVocab.word}
               </div>
-            ) : (
-              // BACK OF FLASHCARD
-              <div style={{ margin: 'auto 0', maxWidth: 540 }}>
-                <div style={{ fontSize: 26, fontWeight: 900, color: '#58CC02', marginBottom: 12 }}>
-                  {currentItem.meaning}
+
+              {selectedVocab.romanization && (
+                <div style={{ fontSize: 17, color: '#1CB0F6', fontStyle: 'italic', marginBottom: 6 }}>
+                  [{selectedVocab.romanization}]
                 </div>
+              )}
 
-                {currentItem.pronunciationIpa && (
-                  <div style={{ fontSize: 14, color: '#1CB0F6', marginBottom: 12, fontWeight: 600 }}>
-                    IPA: {currentItem.pronunciationIpa}
+              {selectedVocab.pronunciationIpa && (
+                <div style={{ fontSize: 14, color: '#58CC02', fontWeight: 700, marginBottom: 12 }}>
+                  Phiên âm IPA: {selectedVocab.pronunciationIpa}
+                </div>
+              )}
+
+              <button
+                onClick={() => speakText(selectedVocab.word, isKo ? 'KO' : 'EN', 0.9)}
+                className="duo-btn-outline"
+                style={{ padding: '8px 20px', borderRadius: 20 }}
+              >
+                <Volume2 size={18} color="#1CB0F6" />
+                <span>Nghe phát âm chuẩn</span>
+              </button>
+            </div>
+
+            {/* Meaning */}
+            <div
+              style={{
+                background: 'var(--duo-bg)',
+                padding: '16px 20px',
+                borderRadius: 14,
+                border: '1.5px solid var(--duo-border)',
+                marginBottom: 16,
+              }}
+            >
+              <div style={{ fontSize: 13, color: 'var(--duo-text-muted)', fontWeight: 800, textTransform: 'uppercase', marginBottom: 4 }}>
+                Định nghĩa tiếng Việt:
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 900, color: '#58CC02' }}>
+                {selectedVocab.meaning}
+              </div>
+            </div>
+
+            {/* Example Sentence */}
+            {selectedVocab.exampleSentence && (
+              <div
+                style={{
+                  background: 'var(--duo-bg)',
+                  padding: '16px 20px',
+                  borderRadius: 14,
+                  border: '1.5px solid var(--duo-border)',
+                  marginBottom: 20,
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <div style={{ fontSize: 13, color: 'var(--duo-text-muted)', fontWeight: 800, textTransform: 'uppercase' }}>
+                    Câu ví dụ ngữ cảnh:
                   </div>
-                )}
-
-                {currentItem.exampleSentence && (
-                  <div
-                    style={{
-                      padding: 14,
-                      borderRadius: 12,
-                      background: 'var(--duo-bg)',
-                      border: '1.5px solid var(--duo-border)',
-                      marginTop: 14,
-                      textAlign: 'left',
-                    }}
+                  <button
+                    onClick={() => speakText(selectedVocab.exampleSentence!, isKo ? 'KO' : 'EN', 0.95)}
+                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 2 }}
                   >
-                    <div className={isKo ? 'lang-ko' : ''} style={{ fontSize: 15, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
-                      "{currentItem.exampleSentence}"
-                    </div>
-                    {currentItem.translation && (
-                      <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)', marginTop: 4 }}>
-                        {currentItem.translation}
-                      </div>
-                    )}
+                    <Volume2 size={16} color="#1CB0F6" />
+                  </button>
+                </div>
+                <div className={isKo ? 'lang-ko' : ''} style={{ fontSize: 16, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
+                  "{selectedVocab.exampleSentence}"
+                </div>
+                {selectedVocab.translation && (
+                  <div style={{ fontSize: 14, color: 'var(--duo-text-secondary)', marginTop: 4 }}>
+                    👉 {selectedVocab.translation}
                   </div>
                 )}
               </div>
             )}
 
-            {/* Bottom Flip Instruction */}
-            <div style={{ fontSize: 12, color: 'var(--duo-text-muted)', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}>
-              <RotateCw size={14} />
-              <span>Chạm vào thẻ để {isFlipped ? 'xem mặt trước' : 'xem nghĩa và câu ví dụ'}</span>
+            {/* Extra notes: Morphemes or pronunciation rules */}
+            {(selectedVocab.batchimRules || selectedVocab.soundChanges) && (
+              <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)', marginBottom: 16, padding: '10px 14px', borderRadius: 10, background: 'rgba(28, 176, 246, 0.08)' }}>
+                {selectedVocab.batchimRules && <div>📌 <b>Quy tắc:</b> {selectedVocab.batchimRules}</div>}
+                {selectedVocab.soundChanges && <div style={{ marginTop: 4 }}>🔊 <b>Biến âm:</b> {selectedVocab.soundChanges}</div>}
+              </div>
+            )}
+
+            {/* Modal Actions */}
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 12 }}>
+              {selectedVocab.userStatus === 'MASTERED' ? (
+                <button
+                  onClick={() => handleMarkAsReview(selectedVocab.id)}
+                  style={{
+                    padding: '12px 18px',
+                    borderRadius: 12,
+                    background: 'rgba(255, 150, 0, 0.12)',
+                    border: '1.5px solid #FF9600',
+                    color: '#FF9600',
+                    cursor: 'pointer',
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <RotateCcw size={16} />
+                  <span>Đánh dấu cần học lại</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleMarkAsKnown(selectedVocab.id)}
+                  style={{
+                    padding: '12px 18px',
+                    borderRadius: 12,
+                    background: '#58CC02',
+                    border: '1.5px solid #46A302',
+                    color: '#FFF',
+                    cursor: 'pointer',
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <CheckCircle size={16} />
+                  <span>Đánh dấu Đã biết (Bỏ qua khi học)</span>
+                </button>
+              )}
+
+              <button
+                onClick={() => setSelectedVocab(null)}
+                className="duo-btn-outline"
+                style={{ padding: '12px 18px', borderRadius: 12 }}
+              >
+                Đóng
+              </button>
             </div>
           </div>
-
-          {/* Confidence Rating Buttons */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginTop: 18 }}>
-            <button
-              onClick={() => handleRateCard(1)}
-              style={{
-                padding: '14px 10px',
-                borderRadius: 14,
-                background: 'rgba(255, 75, 75, 0.12)',
-                border: '2px solid rgba(255, 75, 75, 0.35)',
-                borderBottom: '4px solid #EA2B2B',
-                color: '#FF4B4B',
-                cursor: 'pointer',
-                textAlign: 'center',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <div style={{ fontWeight: 900, fontSize: 15 }}>Chưa nhớ (1)</div>
-              <div style={{ fontSize: 11, color: 'var(--duo-text-muted)', marginTop: 2, fontWeight: 700 }}>&lt; 10 phút</div>
-            </button>
-
-            <button
-              onClick={() => handleRateCard(2)}
-              style={{
-                padding: '14px 10px',
-                borderRadius: 14,
-                background: 'rgba(255, 150, 0, 0.12)',
-                border: '2px solid rgba(255, 150, 0, 0.35)',
-                borderBottom: '4px solid #E58500',
-                color: '#FF9600',
-                cursor: 'pointer',
-                textAlign: 'center',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <div style={{ fontWeight: 900, fontSize: 15 }}>Khá khó (2)</div>
-              <div style={{ fontSize: 11, color: 'var(--duo-text-muted)', marginTop: 2, fontWeight: 700 }}>1 Ngày</div>
-            </button>
-
-            <button
-              onClick={() => handleRateCard(3)}
-              style={{
-                padding: '14px 10px',
-                borderRadius: 14,
-                background: 'rgba(28, 176, 246, 0.12)',
-                border: '2px solid rgba(28, 176, 246, 0.35)',
-                borderBottom: '4px solid #1899D6',
-                color: '#1CB0F6',
-                cursor: 'pointer',
-                textAlign: 'center',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <div style={{ fontWeight: 900, fontSize: 15 }}>Tốt (3)</div>
-              <div style={{ fontSize: 11, color: 'var(--duo-text-muted)', marginTop: 2, fontWeight: 700 }}>3 Ngày</div>
-            </button>
-
-            <button
-              onClick={() => handleRateCard(4)}
-              style={{
-                padding: '14px 10px',
-                borderRadius: 14,
-                background: 'rgba(88, 204, 2, 0.12)',
-                border: '2px solid rgba(88, 204, 2, 0.35)',
-                borderBottom: '4px solid #46A302',
-                color: '#58CC02',
-                cursor: 'pointer',
-                textAlign: 'center',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <div style={{ fontWeight: 900, fontSize: 15 }}>Dễ dàng (4)</div>
-              <div style={{ fontSize: 11, color: 'var(--duo-text-muted)', marginTop: 2, fontWeight: 700 }}>6 Ngày</div>
-            </button>
-          </div>
-        </div>
-      ) : isDone ? (
-        // Completed View
-        <div className="duo-card" style={{ padding: 48, textAlign: 'center' }}>
-          <div
-            style={{
-              width: 80,
-              height: 80,
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #FFC800, #FF9600)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: 20,
-              boxShadow: '0 8px 24px rgba(255, 200, 0, 0.4)',
-            }}
-          >
-            <Award size={44} color="#131F24" />
-          </div>
-
-          <h2 style={{ fontSize: 28, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 8 }}>
-            Hoàn thành phiên ôn tập hôm nay! 🎉
-          </h2>
-          <p style={{ color: 'var(--duo-text-secondary)', fontSize: 15, maxWidth: 480, margin: '0 auto 24px', lineHeight: 1.5 }}>
-            Bạn đã ôn tập toàn bộ {queue.length} từ vựng mục tiêu. Khoảng thời gian lặp lại đã được thuật toán cập nhật để tối ưu khả năng ghi nhớ dài hạn.
-          </p>
-
-          <Space size="middle">
-            <button className="duo-btn-green" onClick={() => navigate('/dashboard')}>
-              <span>Về Bảng điều khiển</span>
-              <ArrowRight size={18} />
-            </button>
-            <button className="duo-btn-outline" onClick={() => navigate('/topics')}>
-              Tiếp tục học bài
-            </button>
-          </Space>
-        </div>
-      ) : (
-        <div className="duo-card" style={{ padding: 40, textAlign: 'center' }}>
-          <CheckCircle size={40} color="#58CC02" style={{ marginBottom: 12 }} />
-          <h3 style={{ fontSize: 22, fontWeight: 900, color: 'var(--duo-text-primary)' }}>
-            Không có từ nào cần ôn tập lúc này!
-          </h3>
-          <p style={{ color: 'var(--duo-text-secondary)', fontSize: 15, marginTop: 6 }}>
-            Bạn đã bắt kịp toàn bộ từ vựng trong hàng đợi lặp lại ngắt quãng thông minh. Hãy học thêm các bài học mới để mở rộng vốn từ!
-          </p>
-          <button className="duo-btn-green" onClick={() => navigate('/topics')} style={{ marginTop: 20 }}>
-            <span>Khám phá chủ đề bài học</span>
-          </button>
-        </div>
-      )}
+        )}
+      </Modal>
     </div>
   );
 };
