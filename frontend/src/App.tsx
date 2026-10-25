@@ -32,7 +32,7 @@ export const App: React.FC = () => {
           colorTextBase: isDark ? '#FFFFFF' : '#0F172A',
           colorBorder: isDark ? '#24353E' : '#E2E8F0',
           borderRadius: 14,
-          fontFamily: "'Outfit', 'Plus Jakarta Sans', 'Nunito', -apple-system, sans-serif",
+          fontFamily: "'Be Vietnam Pro', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         },
       }}
     >
