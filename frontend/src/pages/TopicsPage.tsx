@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Row, Col, Progress, Tag, Button, Space, Typography, Spin, Radio } from 'antd';
+import { Row, Col, Tag, Space, Typography, Spin } from 'antd';
 import {
   Utensils,
   Coffee,
@@ -10,15 +10,16 @@ import {
   Hand,
   Clock,
   BookOpen,
-  CheckCircle,
   PlayCircle,
   Sparkles,
 } from 'lucide-react';
 import { useAppStore } from '../stores/useAppStore';
 import { api } from '../services/api';
 import { Topic, ProficiencyLevelCode, formatLevelVietnamese } from '../types';
+import { localDataService } from '../services/localDataService';
+import owlEmptyImg from '../assets/duo-empty-owl.jpg';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   Utensils: <Utensils size={24} color="#6366F1" />,
@@ -28,8 +29,6 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   Users: <Users size={24} color="#8B5CF6" />,
   Hand: <Hand size={24} color="#EC4899" />,
 };
-
-import { localDataService } from '../services/localDataService';
 
 export const TopicsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -66,7 +65,7 @@ export const TopicsPage: React.FC = () => {
   ];
 
   return (
-    <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+    <div style={{ maxWidth: 1100, margin: '0 auto', paddingBottom: 60 }}>
       {/* Header and Level Filters */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 28 }}>
         <div>
@@ -109,8 +108,7 @@ export const TopicsPage: React.FC = () => {
                 fontSize: 14,
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
-                transition: 'all 0.15s ease',
-                userSelect: 'none',
+                transition: 'none',
               }}
             >
               {formatLevelVietnamese(lvl)}
@@ -122,6 +120,80 @@ export const TopicsPage: React.FC = () => {
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px 0' }}>
           <Spin size="large" />
+        </div>
+      ) : topics.length === 0 ? (
+        /* Empty State with Duolingo 3D Owl Mascot */
+        <div
+          className="duo-card"
+          style={{
+            padding: '48px 24px',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 24,
+            maxWidth: 640,
+            margin: '20px auto',
+            background: 'var(--duo-card-bg)',
+          }}
+        >
+          <div style={{ position: 'relative', marginBottom: 20 }}>
+            <img
+              src={owlEmptyImg}
+              alt="Chưa có chủ đề"
+              style={{
+                width: 190,
+                height: 190,
+                objectFit: 'cover',
+                borderRadius: 28,
+                boxShadow: '0 12px 32px rgba(88, 204, 2, 0.25)',
+                border: '3px solid rgba(88, 204, 2, 0.3)',
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                bottom: -8,
+                right: -8,
+                background: 'var(--duo-card-bg)',
+                borderRadius: 9999,
+                padding: '6px 12px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                border: '2px solid var(--duo-border)',
+                fontSize: 18,
+              }}
+            >
+              🔍✨
+            </div>
+          </div>
+
+          <h3 style={{ fontSize: 22, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 10 }}>
+            Chưa có chủ đề giao tiếp nào!
+          </h3>
+
+          <p style={{ fontSize: 15, color: 'var(--duo-text-secondary)', maxWidth: 460, lineHeight: 1.6, marginBottom: 26 }}>
+            Hiện tại chưa có chủ đề giao tiếp cho trình độ{' '}
+            <strong style={{ color: '#1CB0F6' }}>{formatLevelVietnamese(targetLevel)}</strong>. Bạn hãy chọn cấp độ khác như{' '}
+            <strong style={{ color: '#58CC02' }}>Sơ cấp (Beginner)</strong> hoặc chuyển đổi ngôn ngữ để tiếp tục luyện tập nhé!
+          </p>
+
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <button
+              className="duo-btn-green"
+              onClick={() => setTargetLevel('BEGINNER')}
+              style={{ padding: '12px 24px', fontSize: 14 }}
+            >
+              Chuyển về trình độ Sơ cấp
+            </button>
+            <button
+              className="duo-btn-outline"
+              onClick={() => navigate('/dashboard')}
+              style={{ padding: '12px 20px', fontSize: 14 }}
+            >
+              Về Bảng điều khiển
+            </button>
+          </div>
         </div>
       ) : (
         <Row gutter={[22, 22]}>
@@ -216,16 +288,49 @@ export const TopicsPage: React.FC = () => {
                         ))}
                       </div>
                     ) : (
-                      <button
-                        className="duo-btn-green"
-                        onClick={() => navigate(`/learn/1`)}
-                        style={{ width: '100%', padding: '14px' }}
+                      <div
+                        style={{
+                          padding: '14px 18px',
+                          borderRadius: 14,
+                          background: 'rgba(88, 204, 2, 0.05)',
+                          border: '1.5px dashed var(--duo-border)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 12,
+                        }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                          <span>Bắt đầu bài học Duolingo</span>
-                          <PlayCircle size={18} />
+                        <div
+                          style={{
+                            width: 42,
+                            height: 42,
+                            borderRadius: 12,
+                            overflow: 'hidden',
+                            flexShrink: 0,
+                            boxShadow: '0 4px 10px rgba(88, 204, 2, 0.2)',
+                          }}
+                        >
+                          <img
+                            src={owlEmptyImg}
+                            alt="Chưa có bài học"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          />
                         </div>
-                      </button>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
+                            Chưa có bài học chi tiết
+                          </div>
+                          <div style={{ fontSize: 12, color: 'var(--duo-text-secondary)', marginTop: 2 }}>
+                            Nội dung đang được biên soạn thêm
+                          </div>
+                        </div>
+                        <button
+                          className="duo-btn-outline"
+                          onClick={() => navigate('/chat')}
+                          style={{ padding: '6px 12px', fontSize: 12, whiteSpace: 'nowrap' }}
+                        >
+                          Luyện nói AI
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
