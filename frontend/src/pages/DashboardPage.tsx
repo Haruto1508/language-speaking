@@ -162,12 +162,18 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* 4 Gamified Metric Cards */}
-      <Row gutter={[18, 18]}>
+      <Row gutter={[18, 18]} style={{ display: 'flex', alignItems: 'stretch' }}>
         {/* Streak */}
-        <Col xs={12} sm={6}>
+        <Col xs={12} sm={6} style={{ display: 'flex' }}>
           <div
             className="duo-card duo-card-interactive"
             style={{
+              flex: 1,
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              alignItems: 'center',
               textAlign: 'center',
               padding: '22px 16px',
               borderColor: 'rgba(255, 150, 0, 0.35)',
@@ -192,17 +198,25 @@ export const DashboardPage: React.FC = () => {
               {dashboard?.streakCount || 5}{' '}
               <span style={{ fontSize: 14, fontWeight: 700, color: '#FF9600' }}>Ngày</span>
             </div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--duo-text-secondary)', marginTop: 4 }}>
-              Chuỗi ngày học liên tục 🔥
+            <div style={{ width: '100%', minHeight: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 6 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--duo-text-secondary)' }}>
+                Chuỗi ngày học liên tục 🔥
+              </div>
             </div>
           </div>
         </Col>
 
         {/* Daily Goal */}
-        <Col xs={12} sm={6}>
+        <Col xs={12} sm={6} style={{ display: 'flex' }}>
           <div
             className="duo-card duo-card-interactive"
             style={{
+              flex: 1,
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              alignItems: 'center',
               textAlign: 'center',
               padding: '22px 16px',
               borderColor: 'rgba(88, 204, 2, 0.35)',
@@ -227,20 +241,28 @@ export const DashboardPage: React.FC = () => {
               {minutesDone}/{minutesGoal}{' '}
               <span style={{ fontSize: 14, fontWeight: 700, color: '#58CC02' }}>phút</span>
             </div>
-            <div className="duo-progress-track" style={{ height: 8, marginTop: 10 }}>
-              <div className="duo-progress-fill" style={{ width: `${percentDone}%` }} />
-            </div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--duo-text-secondary)', marginTop: 6 }}>
-              Mục tiêu mỗi ngày
+            <div style={{ width: '100%', minHeight: 34, display: 'flex', flexDirection: 'column', justifyContent: 'center', marginTop: 6 }}>
+              <div className="duo-progress-track" style={{ height: 6, width: '80%', margin: '0 auto 6px' }}>
+                <div className="duo-progress-fill" style={{ width: `${percentDone}%` }} />
+              </div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--duo-text-secondary)' }}>
+                Mục tiêu mỗi ngày
+              </div>
             </div>
           </div>
         </Col>
 
         {/* Vocabulary Count */}
-        <Col xs={12} sm={6}>
+        <Col xs={12} sm={6} style={{ display: 'flex' }}>
           <div
             className="duo-card duo-card-interactive"
             style={{
+              flex: 1,
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              alignItems: 'center',
               textAlign: 'center',
               padding: '22px 16px',
               borderColor: 'rgba(206, 130, 255, 0.35)',
@@ -264,17 +286,25 @@ export const DashboardPage: React.FC = () => {
             <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--duo-text-primary)' }}>
               {dashboard?.vocabularyLearnedCount || 14}
             </div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--duo-text-secondary)', marginTop: 4 }}>
-              Từ vựng ({dashboard?.vocabularyMasteredCount || 6} thành thạo)
+            <div style={{ width: '100%', minHeight: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 6 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--duo-text-secondary)' }}>
+                Từ vựng ({dashboard?.vocabularyMasteredCount || 6} thành thạo)
+              </div>
             </div>
           </div>
         </Col>
 
         {/* Conversations Completed */}
-        <Col xs={12} sm={6}>
+        <Col xs={12} sm={6} style={{ display: 'flex' }}>
           <div
             className="duo-card duo-card-interactive"
             style={{
+              flex: 1,
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              alignItems: 'center',
               textAlign: 'center',
               padding: '22px 16px',
               borderColor: 'rgba(28, 176, 246, 0.35)',
@@ -298,8 +328,10 @@ export const DashboardPage: React.FC = () => {
             <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--duo-text-primary)' }}>
               {dashboard?.conversationsCompletedCount || 3}
             </div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--duo-text-secondary)', marginTop: 4 }}>
-              Hội thoại AI hoàn thành
+            <div style={{ width: '100%', minHeight: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 6 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--duo-text-secondary)' }}>
+                Hội thoại AI hoàn thành
+              </div>
             </div>
           </div>
         </Col>
