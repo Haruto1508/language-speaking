@@ -17,6 +17,8 @@ import {
   Key,
   Upload,
   GraduationCap,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useAppStore } from '../stores/useAppStore';
 import { LanguageModal } from '../components/LanguageModal';
@@ -38,6 +40,8 @@ export const MainLayout: React.FC = () => {
     openApiKeyModal,
     openImportModal,
     apiKey,
+    themeMode,
+    toggleTheme,
   } = useAppStore();
 
   const menuItems = [
@@ -104,8 +108,8 @@ export const MainLayout: React.FC = () => {
         onCollapse={setCollapsed}
         width={240}
         style={{
-          background: 'rgba(11, 15, 25, 0.96)',
-          borderRight: '1px solid var(--border-subtle)',
+          background: 'var(--duo-sider-bg)',
+          borderRight: '2px solid var(--duo-border)',
           position: 'sticky',
           top: 0,
           height: '100vh',
@@ -128,11 +132,11 @@ export const MainLayout: React.FC = () => {
               width: 38,
               height: 38,
               borderRadius: 10,
-              background: 'linear-gradient(135deg, #6366F1, #38BDF8)',
+              background: 'linear-gradient(135deg, #58CC02, #1CB0F6)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)',
+              boxShadow: '0 4px 14px rgba(88, 204, 2, 0.4)',
               flexShrink: 0,
             }}
           >
@@ -140,11 +144,11 @@ export const MainLayout: React.FC = () => {
           </div>
           {!collapsed && (
             <div>
-              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-0.02em' }}>
-                Lingua<span className="gradient-text">Talk</span>
+              <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--duo-text-primary)' }}>
+                Lingua<span style={{ color: '#58CC02' }}>Talk</span>
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                Communication AI
+              <div style={{ fontSize: 11, color: 'var(--duo-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>
+                Duolingo Edition
               </div>
             </div>
           )}
@@ -158,8 +162,8 @@ export const MainLayout: React.FC = () => {
               style={{
                 padding: '10px 12px',
                 borderRadius: 12,
-                background: 'rgba(255, 255, 255, 0.04)',
-                border: '1px solid var(--border-subtle)',
+                background: 'var(--duo-card-bg)',
+                border: '1px solid var(--duo-border)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -171,21 +175,21 @@ export const MainLayout: React.FC = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: 20 }}>{langFlag}</span>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-primary)' }}>
                     {langName}
                   </div>
-                  <div style={{ fontSize: 11, color: '#A5B4FC' }}>
+                  <div style={{ fontSize: 11, color: '#1CB0F6', fontWeight: 600 }}>
                     {targetLevel.replace('_', ' ')}
                   </div>
                 </div>
               </div>
-              <ChevronDown size={14} color="#9CA3AF" />
+              <ChevronDown size={14} color="var(--duo-text-muted)" />
             </div>
           </div>
         )}
 
         <Menu
-          theme="dark"
+          theme={themeMode === 'dark' ? 'dark' : 'light'}
           mode="inline"
           selectedKeys={[location.pathname]}
           items={menuItems}
@@ -271,9 +275,9 @@ export const MainLayout: React.FC = () => {
         {/* Top Header */}
         <Header
           style={{
-            background: 'rgba(19, 31, 36, 0.95)',
+            background: 'var(--duo-header-bg)',
             backdropFilter: 'blur(12px)',
-            borderBottom: '2px solid #202F36',
+            borderBottom: '2px solid var(--duo-border)',
             padding: '0 20px',
             height: 64,
             lineHeight: 'normal',
@@ -283,11 +287,12 @@ export const MainLayout: React.FC = () => {
             position: 'sticky',
             top: 0,
             zIndex: 90,
+            transition: 'background 0.2s ease, border-color 0.2s ease',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flexShrink: 1, marginRight: 12 }}>
-            <span style={{ fontSize: 13, color: '#84959F', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              Học <strong style={{ color: '#FFFFFF' }}>{langName}</strong> giao tiếp theo phong cách <strong style={{ color: '#58CC02' }}>Duolingo</strong>
+            <span style={{ fontSize: 13, color: 'var(--duo-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              Học <strong style={{ color: 'var(--duo-text-primary)' }}>{langName}</strong> giao tiếp theo phong cách <strong style={{ color: '#58CC02' }}>Duolingo</strong>
             </span>
           </div>
 
@@ -372,7 +377,7 @@ export const MainLayout: React.FC = () => {
                 height: 36,
                 padding: '0 10px',
                 color: apiKey ? '#58CC02' : '#1CB0F6',
-                background: 'rgba(255, 255, 255, 0.05)',
+                background: 'rgba(28, 176, 246, 0.08)',
                 border: '1px solid var(--duo-border)',
                 borderRadius: 12,
                 display: 'inline-flex',
@@ -395,7 +400,7 @@ export const MainLayout: React.FC = () => {
                 height: 36,
                 padding: '0 10px',
                 color: '#FFC800',
-                background: 'rgba(255, 255, 255, 0.05)',
+                background: 'rgba(255, 200, 0, 0.08)',
                 border: '1px solid var(--duo-border)',
                 borderRadius: 12,
                 display: 'inline-flex',
@@ -410,6 +415,28 @@ export const MainLayout: React.FC = () => {
               <span>Nạp JSON</span>
             </Button>
 
+            {/* Theme Toggle Button (Light / Dark) */}
+            <Tooltip title={themeMode === 'dark' ? 'Chuyển sang giao diện Sáng ☀️' : 'Chuyển sang giao diện Tối 🌙'}>
+              <Button
+                type="text"
+                onClick={toggleTheme}
+                style={{
+                  height: 36,
+                  width: 36,
+                  padding: 0,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: themeMode === 'dark' ? '#FFC800' : '#6366F1',
+                  background: themeMode === 'dark' ? 'rgba(255, 200, 0, 0.1)' : 'rgba(99, 102, 241, 0.1)',
+                  border: '1px solid var(--duo-border)',
+                  borderRadius: 12,
+                }}
+              >
+                {themeMode === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+              </Button>
+            </Tooltip>
+
             {/* Language Switch Button */}
             <Button
               type="text"
@@ -417,8 +444,8 @@ export const MainLayout: React.FC = () => {
               style={{
                 height: 36,
                 padding: '0 12px',
-                color: '#FFFFFF',
-                background: 'rgba(255, 255, 255, 0.05)',
+                color: 'var(--duo-text-primary)',
+                background: 'var(--duo-card-bg)',
                 border: '1px solid var(--duo-border)',
                 borderRadius: 12,
                 display: 'inline-flex',

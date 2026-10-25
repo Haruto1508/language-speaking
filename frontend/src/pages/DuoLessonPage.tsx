@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { X, Heart, Volume2, Mic, CheckCircle2, XCircle, ArrowRight, RotateCcw, Award, Sparkles } from 'lucide-react';
+import { X, Heart, Volume2, Mic, CheckCircle2, XCircle, ArrowRight, RotateCcw, Award, Sparkles, Sun, Moon } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAppStore } from '../stores/useAppStore';
 import { api } from '../services/api';
@@ -22,7 +22,7 @@ interface ExerciseStep {
 export const DuoLessonPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { targetLanguage, hearts, decrementHeart } = useAppStore();
+  const { targetLanguage, hearts, decrementHeart, themeMode, toggleTheme } = useAppStore();
 
   const isKo = id === '2' ? false : id === '1' ? true : targetLanguage === 'KO';
 
@@ -274,12 +274,14 @@ export const DuoLessonPage: React.FC = () => {
     <div
       style={{
         minHeight: '100vh',
-        background: '#131F24',
+        background: 'var(--duo-bg)',
+        color: 'var(--duo-text-primary)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         position: 'relative',
         userSelect: 'none',
+        transition: 'background-color 0.25s ease, color 0.25s ease',
       }}
     >
       {/* Top Header Bar */}
@@ -318,6 +320,27 @@ export const DuoLessonPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          style={{
+            background: 'var(--duo-card-bg)',
+            border: '2px solid var(--duo-border)',
+            color: 'var(--duo-text-secondary)',
+            cursor: 'pointer',
+            padding: '6px 10px',
+            borderRadius: 12,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 13,
+            fontWeight: 800,
+          }}
+          title={themeMode === 'dark' ? 'Chuyển sang Giao diện Sáng' : 'Chuyển sang Giao diện Tối'}
+        >
+          {themeMode === 'dark' ? <Sun size={18} color="#FFC800" /> : <Moon size={18} color="#1CB0F6" />}
+        </button>
+
         {/* Hearts Life Counter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <Heart size={22} color="#FF4B4B" fill="#FF4B4B" />
@@ -340,7 +363,7 @@ export const DuoLessonPage: React.FC = () => {
           }}
         >
           {/* Question Title & Instruction */}
-          <h2 style={{ fontSize: 24, fontWeight: 900, color: '#FFFFFF', marginBottom: 6 }}>
+          <h2 style={{ fontSize: 24, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 6 }}>
             {currentStep.title}
           </h2>
           <p style={{ fontSize: 15, color: 'var(--duo-text-secondary)', marginBottom: 24 }}>
@@ -361,7 +384,7 @@ export const DuoLessonPage: React.FC = () => {
                 justifyContent: 'center',
                 fontSize: 30,
                 flexShrink: 0,
-                border: '3px solid #37464F',
+                border: '3px solid var(--duo-border)',
               }}
             >
               🦉
@@ -395,10 +418,10 @@ export const DuoLessonPage: React.FC = () => {
                 <button
                   onClick={() => speakText(currentStep.audioText, isKo ? 'KO' : 'EN', 0.65)}
                   style={{
-                    background: '#202F36',
-                    border: '2px solid #37464F',
-                    borderBottom: '3px solid #37464F',
-                    color: '#FFFFFF',
+                    background: 'var(--duo-card-bg)',
+                    border: '2px solid var(--duo-border)',
+                    borderBottom: '3px solid var(--duo-border)',
+                    color: 'var(--duo-text-primary)',
                     width: 36,
                     height: 36,
                     borderRadius: 12,
@@ -417,12 +440,12 @@ export const DuoLessonPage: React.FC = () => {
                 <div>
                   <div
                     className={isKo ? 'lang-ko' : ''}
-                    style={{ fontSize: 20, fontWeight: 900, color: '#FFFFFF' }}
+                    style={{ fontSize: 20, fontWeight: 900, color: 'var(--duo-text-primary)' }}
                   >
                     {currentStep.prompt}
                   </div>
                   {currentStep.romanization && (
-                    <div style={{ fontSize: 13, color: '#AFAFAF', fontStyle: 'italic', marginTop: 2 }}>
+                    <div style={{ fontSize: 13, color: 'var(--duo-text-muted)', fontStyle: 'italic', marginTop: 2 }}>
                       [{currentStep.romanization}]
                     </div>
                   )}
@@ -446,7 +469,7 @@ export const DuoLessonPage: React.FC = () => {
                       key={idx}
                       className="duo-word-tile"
                       onClick={() => handleSelectedTileRemove(tile, idx)}
-                      style={{ background: '#202F36', borderColor: '#58CC02' }}
+                      style={{ background: 'var(--duo-card-bg)', borderColor: '#58CC02', color: 'var(--duo-text-primary)' }}
                     >
                       {tile}
                     </button>
@@ -492,14 +515,14 @@ export const DuoLessonPage: React.FC = () => {
                         width: 28,
                         height: 28,
                         borderRadius: 8,
-                        border: '2px solid #52656D',
+                        border: '2px solid var(--duo-border)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         fontSize: 14,
                         fontWeight: 800,
-                        color: isSelected ? '#1CB0F6' : '#90A0A7',
-                        borderColor: isSelected ? '#1CB0F6' : '#52656D',
+                        color: isSelected ? '#1CB0F6' : 'var(--duo-text-muted)',
+                        borderColor: isSelected ? '#1CB0F6' : 'var(--duo-border)',
                       }}
                     >
                       {opt.id}
@@ -551,7 +574,7 @@ export const DuoLessonPage: React.FC = () => {
                   }}
                 >
                   <div style={{ fontSize: 13, color: 'var(--duo-text-muted)' }}>Máy nhận diện được:</div>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: '#FFFFFF', margin: '4px 0' }}>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--duo-text-primary)', margin: '4px 0' }}>
                     "{spokenText}"
                   </div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: (speakScore || 0) >= 70 ? '#58CC02' : '#FFC800' }}>
@@ -580,7 +603,7 @@ export const DuoLessonPage: React.FC = () => {
                         fontSize: 16,
                         fontWeight: 800,
                         opacity: isDone ? 0.35 : 1,
-                        background: isDone ? '#182B21' : undefined,
+                        background: isDone ? (themeMode === 'dark' ? '#182B21' : '#D7FFB8') : undefined,
                         borderColor: isDone ? '#58CC02' : undefined,
                       }}
                     >
@@ -605,7 +628,7 @@ export const DuoLessonPage: React.FC = () => {
                         fontSize: 15,
                         fontWeight: 700,
                         opacity: isDone ? 0.35 : 1,
-                        background: isDone ? '#182B21' : undefined,
+                        background: isDone ? (themeMode === 'dark' ? '#182B21' : '#D7FFB8') : undefined,
                         borderColor: isDone ? '#58CC02' : undefined,
                       }}
                     >
@@ -633,7 +656,7 @@ export const DuoLessonPage: React.FC = () => {
               boxShadow: '0 8px 24px rgba(255, 200, 0, 0.4)',
             }}
           >
-            <Award size={54} color="#131F24" />
+            <Award size={54} color={themeMode === 'dark' ? '#131F24' : '#FFFFFF'} />
           </div>
 
           <h1 style={{ fontSize: 32, fontWeight: 900, color: '#FFC800', marginBottom: 8 }}>
@@ -672,12 +695,13 @@ export const DuoLessonPage: React.FC = () => {
           style={{
             borderTop: '2px solid var(--duo-border)',
             padding: '20px 32px',
-            background: '#131F24',
+            background: 'var(--duo-header-bg)',
             display: 'flex',
             justifyContent: 'flex-end',
             position: 'sticky',
             bottom: 0,
             zIndex: 100,
+            transition: 'background-color 0.25s ease, border-color 0.25s ease',
           }}
         >
           <button

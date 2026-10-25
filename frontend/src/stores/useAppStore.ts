@@ -18,6 +18,11 @@ interface AppState {
   apiProvider: 'gemini' | 'openai';
   isApiKeyModalOpen: boolean;
 
+  // Theme Mode (Dark & Light)
+  themeMode: 'dark' | 'light';
+  toggleTheme: () => void;
+  setThemeMode: (mode: 'dark' | 'light') => void;
+
   // Custom / Imported Scenarios from JSON or AI
   customScenarios: ConversationScenario[];
   isImportModalOpen: boolean;
@@ -54,6 +59,12 @@ const loadSavedScenarios = (): ConversationScenario[] => {
   }
 };
 
+// Initial theme setup
+const savedTheme = (localStorage.getItem('duo_theme') as 'dark' | 'light') || 'dark';
+if (typeof document !== 'undefined') {
+  document.documentElement.setAttribute('data-theme', savedTheme);
+}
+
 export const useAppStore = create<AppState>((set, get) => ({
   user: {
     id: 1,
@@ -72,6 +83,23 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   hearts: 5,
   gems: 450,
+
+  themeMode: savedTheme,
+  toggleTheme: () => {
+    const next = get().themeMode === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('duo_theme', next);
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', next);
+    }
+    set({ themeMode: next });
+  },
+  setThemeMode: (mode: 'dark' | 'light') => {
+    localStorage.setItem('duo_theme', mode);
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', mode);
+    }
+    set({ themeMode: mode });
+  },
 
   apiKey: localStorage.getItem('duo_api_key') || '',
   apiProvider: (localStorage.getItem('duo_api_provider') as 'gemini' | 'openai') || 'gemini',

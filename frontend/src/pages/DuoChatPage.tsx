@@ -15,6 +15,8 @@ import {
   Award,
   AlertTriangle,
   Lightbulb,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAppStore } from '../stores/useAppStore';
@@ -33,6 +35,8 @@ export const DuoChatPage: React.FC = () => {
     openApiKeyModal,
     openImportModal,
     customScenarios,
+    themeMode,
+    toggleTheme,
   } = useAppStore();
 
   const isKo = targetLanguage === 'KO';
@@ -283,9 +287,11 @@ export const DuoChatPage: React.FC = () => {
     <div
       style={{
         minHeight: '100vh',
-        background: '#131F24',
+        background: 'var(--duo-bg)',
+        color: 'var(--duo-text-primary)',
         display: 'flex',
         flexDirection: 'column',
+        transition: 'background-color 0.2s ease, color 0.2s ease',
       }}
     >
       {/* Top Header Navigation (Duolingo Style) */}
@@ -293,12 +299,14 @@ export const DuoChatPage: React.FC = () => {
         style={{
           padding: '14px 24px',
           borderBottom: '2px solid var(--duo-border)',
-          background: '#131F24',
+          background: 'var(--duo-header-bg)',
+          backdropFilter: 'blur(12px)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: 12,
+          transition: 'background-color 0.2s ease, border-color 0.2s ease',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -313,7 +321,7 @@ export const DuoChatPage: React.FC = () => {
 
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 18, fontWeight: 900, color: '#FFFFFF' }}>
+              <span style={{ fontSize: 18, fontWeight: 900, color: 'var(--duo-text-primary)' }}>
                 {selectedScenario.title}
               </span>
               <Tag color="green">{selectedScenario.levelCode}</Tag>
@@ -348,6 +356,19 @@ export const DuoChatPage: React.FC = () => {
             <span>Nạp JSON</span>
           </button>
 
+          {/* Theme Toggle Button */}
+          <button
+            className="duo-btn-outline"
+            onClick={toggleTheme}
+            style={{
+              padding: '8px 12px',
+              color: themeMode === 'dark' ? '#FFC800' : '#6366F1',
+            }}
+            title={themeMode === 'dark' ? 'Chuyển sang giao diện Sáng ☀️' : 'Chuyển sang giao diện Tối 🌙'}
+          >
+            {themeMode === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+          </button>
+
           {/* Finish Button */}
           <button
             className="duo-btn-green"
@@ -364,12 +385,13 @@ export const DuoChatPage: React.FC = () => {
       <div
         style={{
           padding: '10px 24px',
-          background: '#202F36',
+          background: 'var(--duo-card-bg)',
           borderBottom: '2px solid var(--duo-border)',
           display: 'flex',
           alignItems: 'center',
           gap: 10,
           overflowX: 'auto',
+          transition: 'background-color 0.2s ease, border-color 0.2s ease',
         }}
       >
         <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--duo-text-secondary)', whiteSpace: 'nowrap' }}>
@@ -382,7 +404,7 @@ export const DuoChatPage: React.FC = () => {
               key={sc.id}
               onClick={() => setSelectedScenario(sc)}
               style={{
-                background: isSel ? '#58CC02' : '#131F24',
+                background: isSel ? '#58CC02' : 'var(--duo-bg)',
                 color: isSel ? '#FFFFFF' : 'var(--duo-text-secondary)',
                 border: isSel ? 'none' : '2px solid var(--duo-border)',
                 borderBottom: isSel ? '3px solid #46A302' : '3px solid var(--duo-border)',
@@ -484,9 +506,9 @@ export const DuoChatPage: React.FC = () => {
                       <button
                         onClick={() => speakText(msg.content, selectedScenario.languageCode, 0.65)}
                         style={{
-                          background: '#202F36',
-                          border: '1px solid #37464F',
-                          color: '#FFFFFF',
+                          background: 'var(--duo-card-bg)',
+                          border: '1px solid var(--duo-border)',
+                          color: 'var(--duo-text-primary)',
                           padding: '4px 8px',
                           borderRadius: 8,
                           cursor: 'pointer',
@@ -551,7 +573,7 @@ export const DuoChatPage: React.FC = () => {
                   >
                     💡 <strong>Góp ý từ trợ lý AI:</strong> {msg.grammarFeedback}
                     {msg.suggestedAlternative && (
-                      <div style={{ marginTop: 4, color: '#FFFFFF' }}>
+                      <div style={{ marginTop: 4, color: 'var(--duo-text-primary)' }}>
                         Cách nói tự nhiên hơn: <strong>"{msg.suggestedAlternative}"</strong>
                       </div>
                     )}
@@ -592,8 +614,9 @@ export const DuoChatPage: React.FC = () => {
       <div
         style={{
           borderTop: '2px solid var(--duo-border)',
-          background: '#202F36',
+          background: 'var(--duo-card-bg)',
           padding: '16px 24px',
+          transition: 'background-color 0.2s ease, border-color 0.2s ease',
         }}
       >
         <div
@@ -643,14 +666,15 @@ export const DuoChatPage: React.FC = () => {
             }
             style={{
               flex: 1,
-              background: '#131F24',
+              background: 'var(--duo-bg)',
               border: '2px solid var(--duo-border)',
               borderRadius: 16,
               padding: '14px 18px',
-              color: '#FFFFFF',
+              color: 'var(--duo-text-primary)',
               fontSize: 15,
               outline: 'none',
               fontFamily: 'inherit',
+              transition: 'background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease',
             }}
           />
 
@@ -704,7 +728,7 @@ export const DuoChatPage: React.FC = () => {
 
             {/* General Feedback Summary */}
             <div className="duo-card" style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 15, color: '#FFFFFF', lineHeight: 1.6 }}>
+              <div style={{ fontSize: 15, color: 'var(--duo-text-primary)', lineHeight: 1.6 }}>
                 {feedback.feedbackSummary}
               </div>
             </div>
@@ -726,7 +750,7 @@ export const DuoChatPage: React.FC = () => {
                         background: 'rgba(88, 204, 2, 0.12)',
                         border: '1px solid rgba(88, 204, 2, 0.3)',
                         fontSize: 14,
-                        color: '#FFFFFF',
+                        color: 'var(--duo-text-primary)',
                         fontWeight: 600,
                       }}
                     >

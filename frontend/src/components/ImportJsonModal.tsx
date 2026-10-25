@@ -134,7 +134,7 @@ export const ImportJsonModal: React.FC = () => {
           showUploadList={false}
           beforeUpload={handleFileUpload}
           style={{
-            background: '#131F24',
+            background: 'var(--duo-card-bg)',
             borderColor: 'var(--duo-border)',
             borderRadius: 14,
             marginBottom: 16,
@@ -144,7 +144,7 @@ export const ImportJsonModal: React.FC = () => {
           <p style={{ margin: 0 }}>
             <UploadCloud size={28} color="#1CB0F6" />
           </p>
-          <p style={{ color: '#FFFFFF', fontWeight: 700, margin: '6px 0 2px' }}>
+          <p style={{ color: 'var(--duo-text-primary)', fontWeight: 700, margin: '6px 0 2px' }}>
             Kéo thả hoặc bấm để chọn tệp .json
           </p>
           <p style={{ color: 'var(--duo-text-muted)', fontSize: 12, margin: 0 }}>
@@ -154,7 +154,7 @@ export const ImportJsonModal: React.FC = () => {
 
         {/* JSON Editor Textarea */}
         <div style={{ marginBottom: 20 }}>
-          <Text style={{ fontWeight: 800, color: '#FFFFFF', display: 'block', marginBottom: 6 }}>
+          <Text style={{ fontWeight: 800, color: 'var(--duo-text-primary)', display: 'block', marginBottom: 6 }}>
             Nội dung JSON:
           </Text>
           <TextArea
@@ -162,10 +162,10 @@ export const ImportJsonModal: React.FC = () => {
             value={jsonText}
             onChange={(e) => setJsonText(e.target.value)}
             style={{
-              background: '#131F24',
+              background: 'var(--duo-card-bg)',
               borderColor: 'var(--duo-border)',
               borderRadius: 12,
-              color: '#58CC02',
+              color: 'var(--duo-text-primary)',
               fontFamily: 'Consolas, Monaco, monospace',
               fontSize: 12,
             }}

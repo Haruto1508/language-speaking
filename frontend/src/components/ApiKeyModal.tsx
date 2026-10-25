@@ -162,11 +162,11 @@ export const ApiKeyModal: React.FC = () => {
             onChange={(e) => setInputKey(e.target.value)}
             placeholder={provider === 'gemini' ? 'AIzaSy...' : 'sk-...'}
             style={{
-              background: '#131F24',
+              background: 'var(--duo-card-bg)',
               borderColor: 'var(--duo-border)',
               borderRadius: 12,
               padding: '10px 14px',
-              color: '#FFFFFF',
+              color: 'var(--duo-text-primary)',
             }}
           />
         </div>
@@ -185,7 +185,7 @@ export const ApiKeyModal: React.FC = () => {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <Sparkles size={18} color="#FFC800" />
-            <Text style={{ fontWeight: 800, fontSize: 16, color: '#FFFFFF' }}>
+            <Text style={{ fontWeight: 800, fontSize: 16, color: 'var(--duo-text-primary)' }}>
               Tự tạo Kịch bản Giao tiếp (Communicate Generator)
             </Text>
           </div>
@@ -199,10 +199,10 @@ export const ApiKeyModal: React.FC = () => {
             onChange={(e) => setPromptInput(e.target.value)}
             placeholder="Ví dụ: Luyện tập trả giá khi mua quần áo ở chợ Dongdaemun Seoul, hoặc Phỏng vấn xin việc vị trí Marketing..."
             style={{
-              background: '#131F24',
+              background: 'var(--duo-card-bg)',
               borderColor: 'var(--duo-border)',
               borderRadius: 12,
-              color: '#FFFFFF',
+              color: 'var(--duo-text-primary)',
               marginBottom: 14,
             }}
           />

@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Nunito:wght@600;700;800;900&display=swap');
 
-:root {
+:root, [data-theme='dark'] {
   --font-main: 'Nunito', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-korean: 'Noto Sans KR', 'Nunito', sans-serif;
 
-  /* Duolingo Signature Colors */
+  /* Duolingo Signature Brand Colors */
   --duo-green: #58CC02;
   --duo-green-shadow: #46A302;
   --duo-blue: #1CB0F6;
@@ -20,19 +20,62 @@
 
   /* Dark Theme Surfaces (Duolingo Dark) */
   --duo-bg: #131F24;
+  --duo-content-bg: #131F24;
   --duo-card-bg: #202F36;
-  --duo-card-hover: #293B43;
+  --duo-card-hover: #283840;
   --duo-border: #37464F;
   --duo-border-light: #52656D;
+  --duo-header-bg: rgba(19, 31, 36, 0.95);
+  --duo-sider-bg: #131F24;
 
   --duo-text-primary: #FFFFFF;
   --duo-text-secondary: #90A0A7;
   --duo-text-muted: #5B6E76;
 
+  --duo-bubble-ai-bg: #202F36;
+  --duo-bubble-ai-border: #37464F;
+  --duo-bubble-user-bg: rgba(88, 204, 2, 0.15);
+  --duo-bubble-user-border: rgba(88, 204, 2, 0.35);
+
+  --duo-sheet-correct-bg: #182B21;
+  --duo-sheet-correct-border: #205933;
+  --duo-sheet-correct-text: #58CC02;
+  --duo-sheet-wrong-bg: #311A20;
+  --duo-sheet-wrong-border: #63232C;
+  --duo-sheet-wrong-text: #FF4B4B;
+
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 20px;
   --radius-full: 9999px;
+}
+
+[data-theme='light'] {
+  /* Light Theme Surfaces (Duolingo Light) */
+  --duo-bg: #F7F7F7;
+  --duo-content-bg: #F7F7F7;
+  --duo-card-bg: #FFFFFF;
+  --duo-card-hover: #F0F2F5;
+  --duo-border: #E5E5E5;
+  --duo-border-light: #ECECEC;
+  --duo-header-bg: rgba(255, 255, 255, 0.96);
+  --duo-sider-bg: #FFFFFF;
+
+  --duo-text-primary: #3C3C3C;
+  --duo-text-secondary: #777777;
+  --duo-text-muted: #AFAFAF;
+
+  --duo-bubble-ai-bg: #F7F7F7;
+  --duo-bubble-ai-border: #E5E5E5;
+  --duo-bubble-user-bg: #D7FFB8;
+  --duo-bubble-user-border: #58CC02;
+
+  --duo-sheet-correct-bg: #D7FFB8;
+  --duo-sheet-correct-border: #B8F28B;
+  --duo-sheet-correct-text: #58A700;
+  --duo-sheet-wrong-bg: #FFDFE0;
+  --duo-sheet-wrong-border: #FFB8BB;
+  --duo-sheet-wrong-text: #EA2B2B;
 }
 
 * {
@@ -47,6 +90,7 @@ body {
   color: var(--duo-text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .ant-layout-header {
@@ -273,9 +317,9 @@ body {
    DUOLINGO EVALUATION SHEETS (BOTTOM POPUP)
    ======================================================== */
 .duo-sheet-correct {
-  background: #182B21;
-  border-top: 2px solid #205933;
-  color: #58CC02;
+  background: var(--duo-sheet-correct-bg);
+  border-top: 2px solid var(--duo-sheet-correct-border);
+  color: var(--duo-sheet-correct-text);
   padding: 24px 32px;
   display: flex;
   justify-content: space-between;
@@ -285,14 +329,14 @@ body {
   left: 0;
   right: 0;
   z-index: 1000;
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .duo-sheet-wrong {
-  background: #311A20;
-  border-top: 2px solid #63232C;
-  color: #FF4B4B;
+  background: var(--duo-sheet-wrong-bg);
+  border-top: 2px solid var(--duo-sheet-wrong-border);
+  color: var(--duo-sheet-wrong-text);
   padding: 24px 32px;
   display: flex;
   justify-content: space-between;
@@ -302,7 +346,7 @@ body {
   left: 0;
   right: 0;
   z-index: 1000;
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -319,13 +363,14 @@ body {
    DUOLINGO SPEECH BUBBLES
    ======================================================== */
 .duo-speech-bubble {
-  background: var(--duo-card-bg);
-  border: 2px solid var(--duo-border);
+  background: var(--duo-bubble-ai-bg);
+  border: 2px solid var(--duo-bubble-ai-border);
   border-radius: 18px;
   padding: 16px 20px;
   position: relative;
   display: inline-block;
   max-width: 80%;
+  color: var(--duo-text-primary);
 }
 
 .duo-speech-bubble::before {
@@ -337,18 +382,18 @@ body {
   height: 0;
   border-top: 8px solid transparent;
   border-bottom: 8px solid transparent;
-  border-right: 10px solid var(--duo-border);
+  border-right: 10px solid var(--duo-bubble-ai-border);
 }
 
 .duo-speech-bubble-user {
-  background: rgba(88, 204, 2, 0.15);
-  border: 2px solid rgba(88, 204, 2, 0.35);
+  background: var(--duo-bubble-user-bg);
+  border: 2px solid var(--duo-bubble-user-border);
   border-radius: 18px;
   padding: 16px 20px;
   position: relative;
   display: inline-block;
   max-width: 80%;
-  color: #FFFFFF;
+  color: var(--duo-text-primary);
 }
 
 .duo-speech-bubble-user::before {
@@ -360,7 +405,7 @@ body {
   height: 0;
   border-top: 8px solid transparent;
   border-bottom: 8px solid transparent;
-  border-left: 10px solid rgba(88, 204, 2, 0.35);
+  border-left: 10px solid var(--duo-bubble-user-border);
 }
 
 /* ========================================================
@@ -369,7 +414,7 @@ body {
 .duo-progress-track {
   width: 100%;
   height: 16px;
-  background: #37464F;
+  background: var(--duo-border);
   border-radius: var(--radius-full);
   overflow: hidden;
   position: relative;
@@ -392,6 +437,37 @@ body {
   height: 4px;
   background: rgba(255, 255, 255, 0.35);
   border-radius: var(--radius-full);
+}
+
+/* ========================================================
+   GLASS PANEL & CARDS (Adaptive Light & Dark)
+   ======================================================== */
+.glass-panel {
+  background: var(--duo-card-bg);
+  border: 2px solid var(--duo-border);
+  border-radius: var(--radius-md);
+  color: var(--duo-text-primary);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+[data-theme='light'] .glass-panel {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.glass-card-interactive {
+  background: var(--duo-card-bg);
+  border: 2px solid var(--duo-border);
+  border-radius: 14px;
+  color: var(--duo-text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.glass-card-interactive:hover {
+  background: var(--duo-card-hover);
+  border-color: var(--duo-border-light);
+  transform: translateY(-2px);
 }
 
 /* Mic pulsating ring for recording */
@@ -417,16 +493,22 @@ body {
   animation: flameBounce 1.5s infinite ease-in-out;
 }
 
-/* Ant design customizations for dark luxury Duolingo */
+/* Ant design customizations for Duolingo Light & Dark */
 .ant-layout {
   background: var(--duo-bg) !important;
+  color: var(--duo-text-primary) !important;
 }
 
 .ant-layout-sider {
-  background: #131F24 !important;
+  background: var(--duo-sider-bg) !important;
   border-right: 2px solid var(--duo-border) !important;
 }
 
+.ant-menu {
+  background: transparent !important;
+}
+
+/* Dark Menu Items */
 .ant-menu-dark {
   background: transparent !important;
 }
@@ -454,14 +536,135 @@ body {
   color: #FFFFFF !important;
 }
 
+/* Light Menu Items */
+.ant-menu-light {
+  background: transparent !important;
+}
+
+.ant-menu-light .ant-menu-item-selected {
+  background: #D7FFB8 !important;
+  color: #58A700 !important;
+  font-weight: 800 !important;
+  border: 2px solid var(--duo-green) !important;
+  border-radius: 14px !important;
+}
+
+.ant-menu-light .ant-menu-item {
+  border-radius: 14px !important;
+  margin-bottom: 6px !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  color: #4B4B4B !important;
+  letter-spacing: 0.3px !important;
+  transition: all 0.15s ease !important;
+}
+
+.ant-menu-light .ant-menu-item:hover {
+  background: #F7F7F7 !important;
+  color: #111827 !important;
+}
+
+/* Modals */
 .ant-modal-content {
-  background: #202F36 !important;
+  background: var(--duo-card-bg) !important;
   border: 2px solid var(--duo-border) !important;
   border-radius: 20px !important;
-  color: #FFFFFF !important;
+  color: var(--duo-text-primary) !important;
 }
 
 .ant-modal-title {
-  color: #FFFFFF !important;
+  color: var(--duo-text-primary) !important;
   font-weight: 800 !important;
+}
+
+/* Card titles and text helpers */
+.text-duo-primary {
+  color: var(--duo-text-primary) !important;
+}
+
+.text-duo-secondary {
+  color: var(--duo-text-secondary) !important;
+}
+
+/* Ant Card styling */
+.ant-card {
+  background: var(--duo-card-bg) !important;
+  border: 2px solid var(--duo-border) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--duo-text-primary) !important;
+}
+
+.ant-card-head {
+  border-bottom: 2px solid var(--duo-border) !important;
+  color: var(--duo-text-primary) !important;
+}
+
+.ant-card-head-title {
+  color: var(--duo-text-primary) !important;
+  font-weight: 800 !important;
+}
+
+/* Ant Typography */
+.ant-typography {
+  color: var(--duo-text-primary) !important;
+}
+
+/* Ant Radio Buttons (Duolingo Pill Style) */
+.ant-radio-button-wrapper {
+  background: var(--duo-card-bg) !important;
+  border-color: var(--duo-border) !important;
+  color: var(--duo-text-secondary) !important;
+  font-weight: 700 !important;
+}
+
+.ant-radio-button-wrapper:hover {
+  color: var(--duo-text-primary) !important;
+}
+
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+  background: rgba(88, 204, 2, 0.15) !important;
+  border-color: var(--duo-green) !important;
+  color: var(--duo-green) !important;
+  font-weight: 800 !important;
+}
+
+/* Ant Table */
+.ant-table {
+  background: transparent !important;
+  color: var(--duo-text-primary) !important;
+}
+
+.ant-table-thead > tr > th {
+  background: var(--duo-card-bg) !important;
+  border-bottom: 2px solid var(--duo-border) !important;
+  color: var(--duo-text-secondary) !important;
+  font-weight: 800 !important;
+}
+
+.ant-table-tbody > tr > td {
+  border-bottom: 1px solid var(--duo-border) !important;
+  color: var(--duo-text-primary) !important;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: var(--duo-card-hover) !important;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--duo-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--duo-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--duo-border-light);
 }

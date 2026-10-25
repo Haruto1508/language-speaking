@@ -15,18 +15,23 @@ import { GrammarPage } from './pages/GrammarPage';
 import { AdminPage } from './pages/AdminPage';
 import { ApiKeyModal } from './components/ApiKeyModal';
 import { ImportJsonModal } from './components/ImportJsonModal';
+import { useAppStore } from './stores/useAppStore';
 
 export const App: React.FC = () => {
+  const { themeMode } = useAppStore();
+  const isDark = themeMode === 'dark';
+
   return (
     <ConfigProvider
       theme={{
-        algorithm: theme.darkAlgorithm,
+        algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
         token: {
           colorPrimary: '#58CC02',
-          colorBgBase: '#131F24',
-          colorTextBase: '#FFFFFF',
+          colorBgBase: isDark ? '#131F24' : '#FFFFFF',
+          colorTextBase: isDark ? '#FFFFFF' : '#3C3C3C',
+          colorBorder: isDark ? '#37464F' : '#E5E5E5',
           borderRadius: 12,
-          fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif",
+          fontFamily: "'Nunito', 'Plus Jakarta Sans', -apple-system, sans-serif",
         },
       }}
     >
