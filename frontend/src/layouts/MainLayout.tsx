@@ -40,90 +40,130 @@ export const MainLayout: React.FC = () => {
     toggleTheme,
   } = useAppStore();
 
-  const menuItems = [
+  interface MenuItem {
+    path: string;
+    matchPath: string;
+    extraMatch?: string;
+    icon: React.ComponentType<{ size?: number; color?: string; className?: string }>;
+    label: string;
+    badge?: string;
+    badgeColor?: string;
+    accent: string;
+    accentShadow: string;
+    accentGlow: string;
+    activeBg: string;
+  }
+
+  interface MenuGroup {
+    key: string;
+    title: string;
+    items: MenuItem[];
+  }
+
+  const menuGroups: MenuGroup[] = [
     {
-      path: '/learn/1',
-      matchPath: '/learn',
-      icon: GraduationCap,
-      label: 'Học bài',
-      badge: 'MỚI',
-      badgeColor: '#58CC02',
-      accent: '#58CC02',
-      accentShadow: '#46A302',
-      accentGlow: 'rgba(88, 204, 2, 0.28)',
-      activeBg: 'rgba(88, 204, 2, 0.12)',
+      key: 'learn',
+      title: 'Học tập & Luyện nói',
+      items: [
+        {
+          path: '/dashboard',
+          matchPath: '/dashboard',
+          icon: LayoutDashboard,
+          label: 'Bảng điều khiển',
+          accent: '#CE82FF',
+          accentShadow: '#A559D8',
+          accentGlow: 'rgba(206, 130, 255, 0.28)',
+          activeBg: 'rgba(206, 130, 255, 0.12)',
+        },
+        {
+          path: '/learn/1',
+          matchPath: '/learn',
+          extraMatch: '/lesson',
+          icon: GraduationCap,
+          label: 'Học bài',
+          badge: 'MỚI',
+          badgeColor: '#58CC02',
+          accent: '#58CC02',
+          accentShadow: '#46A302',
+          accentGlow: 'rgba(88, 204, 2, 0.28)',
+          activeBg: 'rgba(88, 204, 2, 0.12)',
+        },
+        {
+          path: '/chat',
+          matchPath: '/chat',
+          extraMatch: '/conversation',
+          icon: MessageSquare,
+          label: 'Hội thoại AI',
+          badge: 'HOT',
+          badgeColor: '#1CB0F6',
+          accent: '#1CB0F6',
+          accentShadow: '#1899D6',
+          accentGlow: 'rgba(28, 176, 246, 0.28)',
+          activeBg: 'rgba(28, 176, 246, 0.12)',
+        },
+        {
+          path: '/topics',
+          matchPath: '/topics',
+          icon: BookOpen,
+          label: 'Chủ đề giao tiếp',
+          accent: '#FF9600',
+          accentShadow: '#E58500',
+          accentGlow: 'rgba(255, 150, 0, 0.28)',
+          activeBg: 'rgba(255, 150, 0, 0.12)',
+        },
+      ],
     },
     {
-      path: '/chat',
-      matchPath: '/chat',
-      icon: MessageSquare,
-      label: 'Hội thoại AI',
-      badge: 'HOT',
-      badgeColor: '#1CB0F6',
-      accent: '#1CB0F6',
-      accentShadow: '#1899D6',
-      accentGlow: 'rgba(28, 176, 246, 0.28)',
-      activeBg: 'rgba(28, 176, 246, 0.12)',
+      key: 'practice',
+      title: 'Ôn luyện & Tra cứu',
+      items: [
+        {
+          path: '/vocabulary',
+          matchPath: '/vocabulary',
+          icon: Layers,
+          label: 'Sổ từ vựng',
+          accent: '#00C9A7',
+          accentShadow: '#00967D',
+          accentGlow: 'rgba(0, 201, 167, 0.28)',
+          activeBg: 'rgba(0, 201, 167, 0.12)',
+        },
+        {
+          path: '/review',
+          matchPath: '/review',
+          icon: Repeat,
+          label: 'Luyện Flashcard',
+          accent: '#FF4B4B',
+          accentShadow: '#EA2B2B',
+          accentGlow: 'rgba(255, 75, 75, 0.28)',
+          activeBg: 'rgba(255, 75, 75, 0.12)',
+        },
+        {
+          path: '/grammar',
+          matchPath: '/grammar',
+          icon: Sparkles,
+          label: 'Mẫu câu ngữ pháp',
+          accent: '#00D2D3',
+          accentShadow: '#00A3A4',
+          accentGlow: 'rgba(0, 210, 211, 0.28)',
+          activeBg: 'rgba(0, 210, 211, 0.12)',
+        },
+      ],
     },
     {
-      path: '/dashboard',
-      matchPath: '/dashboard',
-      icon: LayoutDashboard,
-      label: 'Bảng điều khiển',
-      accent: '#CE82FF',
-      accentShadow: '#A559D8',
-      accentGlow: 'rgba(206, 130, 255, 0.28)',
-      activeBg: 'rgba(206, 130, 255, 0.12)',
-    },
-    {
-      path: '/topics',
-      matchPath: '/topics',
-      icon: BookOpen,
-      label: 'Chủ đề giao tiếp',
-      accent: '#FF9600',
-      accentShadow: '#E58500',
-      accentGlow: 'rgba(255, 150, 0, 0.28)',
-      activeBg: 'rgba(255, 150, 0, 0.12)',
-    },
-    {
-      path: '/vocabulary',
-      matchPath: '/vocabulary',
-      icon: Layers,
-      label: 'Sổ từ vựng',
-      accent: '#00C9A7',
-      accentShadow: '#00967D',
-      accentGlow: 'rgba(0, 201, 167, 0.28)',
-      activeBg: 'rgba(0, 201, 167, 0.12)',
-    },
-    {
-      path: '/review',
-      matchPath: '/review',
-      icon: Repeat,
-      label: 'Luyện Flashcard (SRS)',
-      accent: '#FF4B4B',
-      accentShadow: '#EA2B2B',
-      accentGlow: 'rgba(255, 75, 75, 0.28)',
-      activeBg: 'rgba(255, 75, 75, 0.12)',
-    },
-    {
-      path: '/grammar',
-      matchPath: '/grammar',
-      icon: Sparkles,
-      label: 'Mẫu câu ngữ pháp',
-      accent: '#00D2D3',
-      accentShadow: '#00A3A4',
-      accentGlow: 'rgba(0, 210, 211, 0.28)',
-      activeBg: 'rgba(0, 210, 211, 0.12)',
-    },
-    {
-      path: '/admin',
-      matchPath: '/admin',
-      icon: Settings,
-      label: 'Quản trị giáo trình',
-      accent: '#8E8E93',
-      accentShadow: '#636366',
-      accentGlow: 'rgba(142, 142, 147, 0.28)',
-      activeBg: 'rgba(142, 142, 147, 0.12)',
+      key: 'system',
+      title: 'Hệ thống',
+      items: [
+        {
+          path: '/admin',
+          matchPath: '/admin',
+          icon: Settings,
+          label: 'Quản trị giáo trình',
+          accent: '#8E8E93',
+          accentShadow: '#636366',
+          accentGlow: 'rgba(142, 142, 147, 0.28)',
+          activeBg: 'rgba(142, 142, 147, 0.12)',
+        },
+      ],
     },
   ];
 
@@ -146,59 +186,77 @@ export const MainLayout: React.FC = () => {
         {/* Brand Header */}
         <div
           style={{
-            padding: collapsed ? '16px 8px 12px' : '16px 14px 12px',
+            padding: collapsed ? '14px 8px 12px' : '16px 14px 14px',
             display: 'flex',
-            flexDirection: 'column',
-            alignItems: collapsed ? 'center' : 'stretch',
-            gap: 10,
+            alignItems: 'center',
+            justifyContent: collapsed ? 'center' : 'space-between',
             borderBottom: '1px solid var(--duo-border)',
             userSelect: 'none',
           }}
         >
-          {/* Logo & Collapse button row */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+          {/* Logo & Brand text */}
+          <div
+            onClick={() => navigate('/')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              cursor: 'pointer',
+            }}
+          >
             <div
-              onClick={() => navigate('/')}
+              className="float-slow"
               style={{
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                background: 'linear-gradient(135deg, #58CC02, #1CB0F6)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 10,
-                cursor: 'pointer',
+                justifyContent: 'center',
+                boxShadow: '0 6px 16px rgba(88, 204, 2, 0.35)',
+                flexShrink: 0,
+                fontSize: 20,
               }}
+              title="Về Trang chủ"
             >
-              <div
-                className="float-slow"
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 12,
-                  background: 'linear-gradient(135deg, #58CC02, #1CB0F6)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 6px 16px rgba(88, 204, 2, 0.35)',
-                  flexShrink: 0,
-                  fontSize: 20,
-                }}
-              >
-                🦉
-              </div>
-              {!collapsed && (
-                <div>
-                  <div style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--duo-text-primary)', lineHeight: 1.1 }}>
-                    Lingua<span style={{ color: '#58CC02' }}>Talk</span>
-                  </div>
-                  <div style={{ fontSize: 10, color: '#1CB0F6', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 800, marginTop: 2 }}>
-                    Duolingo 3D
-                  </div>
-                </div>
-              )}
+              🦉
             </div>
+            {!collapsed && (
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--duo-text-primary)', lineHeight: 1.1 }}>
+                  Lingua<span style={{ color: '#58CC02' }}>Talk</span>
+                </div>
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openLangModal();
+                  }}
+                  style={{
+                    fontSize: 11,
+                    color: '#1CB0F6',
+                    fontWeight: 800,
+                    marginTop: 3,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    cursor: 'pointer',
+                  }}
+                  title="Nhấn để đổi Ngôn ngữ hoặc Trình độ học"
+                >
+                  <span>{langFlag}</span>
+                  <span>{langName}</span>
+                  <span style={{ color: 'var(--duo-text-muted)' }}>• {formatLevelVietnamese(targetLevel)}</span>
+                </div>
+              </div>
+            )}
+          </div>
 
-            {/* Collapse toggle button */}
-            <Tooltip title={collapsed ? 'Mở rộng sidebar' : 'Thu gọn sidebar'} placement="right">
+          {/* Collapse toggle button (expanded mode) */}
+          {!collapsed && (
+            <Tooltip title="Thu gọn thanh bên" placement="right">
               <button
-                onClick={() => setCollapsed(!collapsed)}
+                onClick={() => setCollapsed(true)}
                 style={{
                   width: 28,
                   height: 28,
@@ -211,157 +269,188 @@ export const MainLayout: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  transition: 'all 0.15s ease',
+                  transition: 'none',
                   flexShrink: 0,
                 }}
                 className="duo-card-interactive"
               >
-                {collapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
+                <ChevronLeft size={15} />
               </button>
             </Tooltip>
-          </div>
-
-          {/* Compact Target Language Badge */}
-          {collapsed ? (
-            <Tooltip title={`Đang học: ${langName} (${formatLevelVietnamese(targetLevel)})`} placement="right">
-              <button
-                onClick={openLangModal}
-                style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: 12,
-                  background: 'var(--duo-card-bg)',
-                  border: '1.5px solid var(--duo-border)',
-                  borderBottom: '2.5px solid var(--duo-border)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 18,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
-                className="duo-card-interactive"
-              >
-                {langFlag}
-              </button>
-            </Tooltip>
-          ) : (
-            <div
-              onClick={openLangModal}
-              style={{
-                padding: '6px 10px',
-                borderRadius: 10,
-                background: 'var(--duo-card-bg)',
-                border: '1.5px solid var(--duo-border)',
-                borderBottom: '2.5px solid var(--duo-border)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-              }}
-              className="duo-card-interactive"
-              title="Nhấn để đổi Ngôn ngữ hoặc Trình độ học"
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 18, lineHeight: 1 }}>{langFlag}</span>
-                <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
-                  {langName}
-                </span>
-                <span style={{ fontSize: 11, color: '#1CB0F6', fontWeight: 700 }}>
-                  • {formatLevelVietnamese(targetLevel)}
-                </span>
-              </div>
-              <ChevronDown size={14} color="var(--duo-text-muted)" />
-            </div>
           )}
         </div>
 
-        {/* Custom Duolingo Navigation Items */}
-        <div className="duo-nav-list">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive =
-              location.pathname === item.path ||
-              (item.matchPath !== '/' && location.pathname.startsWith(item.matchPath));
-
-            if (collapsed) {
-              return (
-                <Tooltip key={item.path} title={item.label} placement="right">
-                  <button
-                    onClick={() => navigate(item.path)}
-                    className={`duo-nav-item ${isActive ? 'active' : ''}`}
-                    style={{
-                      width: 44,
-                      height: 44,
-                      padding: 0,
-                      justifyContent: 'center',
-                      margin: '0 auto',
-                      borderRadius: 12,
-                      ...(isActive
-                        ? {
-                            borderColor: item.accent,
-                            borderBottomColor: item.accentShadow,
-                            background: item.activeBg,
-                            color: item.accent,
-                            boxShadow: `0 4px 14px ${item.accentGlow}`,
-                          }
-                        : {}),
-                    }}
-                  >
-                    <Icon size={20} color={isActive ? item.accent : 'currentColor'} />
-                  </button>
-                </Tooltip>
-              );
-            }
-
-            return (
+        {/* When collapsed, a clean expand button below the logo */}
+        {collapsed && (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 4px' }}>
+            <Tooltip title="Mở rộng thanh bên" placement="right">
               <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className={`duo-nav-item ${isActive ? 'active' : ''}`}
-                style={
-                  isActive
-                    ? {
-                        borderColor: item.accent,
-                        borderBottomColor: item.accentShadow,
-                        background: item.activeBg,
-                        color: item.accent,
-                        boxShadow: `0 4px 14px ${item.accentGlow}`,
-                      }
-                    : {}
-                }
+                onClick={() => setCollapsed(false)}
+                style={{
+                  width: 34,
+                  height: 24,
+                  borderRadius: 8,
+                  background: 'var(--duo-card-bg)',
+                  border: '1.5px solid var(--duo-border)',
+                  borderBottom: '2.5px solid var(--duo-border)',
+                  color: 'var(--duo-text-secondary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'none',
+                }}
+                className="duo-card-interactive"
               >
+                <ChevronRight size={14} />
+              </button>
+            </Tooltip>
+          </div>
+        )}
+
+        {/* Custom Duolingo Navigation Groups */}
+        <div
+          className="duo-nav-list"
+          style={{
+            padding: collapsed ? '8px 6px' : '10px 12px',
+            flex: 1,
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
+        >
+          {menuGroups.map((group, groupIdx) => (
+            <div key={group.key} style={{ marginBottom: collapsed ? 8 : 12 }}>
+              {/* Group Section Header */}
+              {!collapsed ? (
                 <div
-                  className="duo-nav-icon-box"
                   style={{
-                    background: isActive ? item.activeBg : 'transparent',
-                    color: isActive ? item.accent : 'currentColor',
+                    fontSize: 10.5,
+                    fontWeight: 900,
+                    color: 'var(--duo-text-muted)',
+                    letterSpacing: '0.8px',
+                    padding: '6px 10px 4px',
+                    textTransform: 'uppercase',
+                    userSelect: 'none',
                   }}
                 >
-                  <Icon size={19} color={isActive ? item.accent : 'currentColor'} />
+                  {group.title}
                 </div>
-                <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {item.label}
-                </span>
-                {item.badge && (
-                  <span
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 900,
-                      padding: '2px 7px',
-                      borderRadius: 9999,
-                      background: item.badgeColor,
-                      color: '#FFFFFF',
-                      letterSpacing: '0.4px',
-                    }}
-                  >
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+              ) : groupIdx > 0 ? (
+                <div
+                  style={{
+                    width: 28,
+                    height: 1,
+                    background: 'var(--duo-border)',
+                    margin: '6px auto 8px',
+                    opacity: 0.6,
+                  }}
+                />
+              ) : null}
+
+              {/* Group Items */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive =
+                    location.pathname === item.path ||
+                    (item.matchPath !== '/' && location.pathname.startsWith(item.matchPath)) ||
+                    (item.extraMatch && location.pathname.startsWith(item.extraMatch));
+
+                  if (collapsed) {
+                    return (
+                      <Tooltip key={item.path} title={item.label} placement="right">
+                        <button
+                          onClick={() => navigate(item.path)}
+                          className={`duo-nav-item ${isActive ? 'active' : ''}`}
+                          style={{
+                            width: 44,
+                            height: 44,
+                            padding: 0,
+                            justifyContent: 'center',
+                            margin: '0 auto',
+                            borderRadius: 12,
+                            ...(isActive
+                              ? {
+                                  borderColor: item.accent,
+                                  borderBottomColor: item.accentShadow,
+                                  background: item.activeBg,
+                                  color: item.accent,
+                                  boxShadow: `0 4px 14px ${item.accentGlow}`,
+                                }
+                              : {
+                                  color: 'var(--duo-text-secondary)',
+                                }),
+                          }}
+                        >
+                          <Icon size={20} color={isActive ? item.accent : 'currentColor'} />
+                        </button>
+                      </Tooltip>
+                    );
+                  }
+
+                  return (
+                    <button
+                      key={item.path}
+                      onClick={() => navigate(item.path)}
+                      className={`duo-nav-item ${isActive ? 'active' : ''}`}
+                      style={{
+                        padding: '9px 12px',
+                        borderRadius: 12,
+                        ...(isActive
+                          ? {
+                              borderColor: item.accent,
+                              borderBottomColor: item.accentShadow,
+                              background: item.activeBg,
+                              color: item.accent,
+                              boxShadow: `0 4px 14px ${item.accentGlow}`,
+                            }
+                          : {}),
+                      }}
+                    >
+                      <div
+                        className="duo-nav-icon-box"
+                        style={{
+                          background: isActive ? item.activeBg : 'transparent',
+                          color: item.accent,
+                          opacity: isActive ? 1 : 0.85,
+                        }}
+                      >
+                        <Icon size={19} color={item.accent} />
+                      </div>
+                      <span
+                        style={{
+                          flex: 1,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          fontSize: 13.5,
+                        }}
+                      >
+                        {item.label}
+                      </span>
+                      {item.badge && (
+                        <span
+                          style={{
+                            fontSize: 10,
+                            fontWeight: 900,
+                            padding: '2px 7px',
+                            borderRadius: 9999,
+                            background: item.badgeColor,
+                            color: '#FFFFFF',
+                            letterSpacing: '0.4px',
+                          }}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* User Card at Bottom of Sider */}
