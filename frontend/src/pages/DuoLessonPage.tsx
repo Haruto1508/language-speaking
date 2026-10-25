@@ -329,7 +329,6 @@ export const DuoLessonPage: React.FC = () => {
         flexDirection: 'column',
         justifyContent: 'space-between',
         position: 'relative',
-        userSelect: 'none',
         transition: 'background-color 0.25s ease, color 0.25s ease',
       }}
     >

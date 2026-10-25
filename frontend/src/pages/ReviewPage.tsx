@@ -334,7 +334,6 @@ export const ReviewPage: React.FC = () => {
                     textAlign: 'center',
                     cursor: 'pointer',
                     borderRadius: 24,
-                    userSelect: 'none',
                   }}
                 >
                   {/* Top Tags */}
@@ -968,10 +967,48 @@ export const ReviewPage: React.FC = () => {
               </div>
             )}
 
+            {/* Morpheme Breakdown if available */}
+            {selectedVocab.breakdownJson && (() => {
+              let breakdownData: any = null;
+              try {
+                breakdownData = JSON.parse(selectedVocab.breakdownJson);
+              } catch (e) {}
+              if (!breakdownData) return null;
+              return (
+                <div
+                  style={{
+                    marginBottom: 16,
+                    padding: '12px 18px',
+                    borderRadius: 12,
+                    background: 'rgba(124, 58, 237, 0.08)',
+                    border: '1.5px solid rgba(124, 58, 237, 0.28)',
+                  }}
+                >
+                  <div style={{ fontSize: 13, fontWeight: 800, color: '#8B5CF6', textTransform: 'uppercase', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span>🧩</span>
+                    <span>Cấu tạo & Hình thái từ:</span>
+                  </div>
+                  {breakdownData.morphemes ? (
+                    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', fontSize: 15, lineHeight: 1.6 }}>
+                      {breakdownData.morphemes.map((m: any, i: number) => (
+                        <span key={i} style={{ color: 'var(--duo-text-primary)' }}>
+                          <strong style={{ color: '#D97706', fontSize: 16, fontWeight: 800 }}>{m.part}</strong>{' '}
+                          <span style={{ color: 'var(--duo-text-secondary)', fontWeight: 600 }}>({m.meaning})</span>
+                          {i < breakdownData.morphemes.length - 1 && (
+                            <span style={{ margin: '0 6px', color: '#8B5CF6', fontWeight: 800 }}>+</span>
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })()}
+
             {/* Extra notes: Morphemes or pronunciation rules */}
             {(selectedVocab.batchimRules || selectedVocab.soundChanges) && (
-              <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)', marginBottom: 16, padding: '10px 14px', borderRadius: 10, background: 'rgba(28, 176, 246, 0.08)' }}>
-                {selectedVocab.batchimRules && <div>📌 <b>Quy tắc:</b> {selectedVocab.batchimRules}</div>}
+              <div style={{ fontSize: 14, color: 'var(--duo-text-secondary)', marginBottom: 16, padding: '12px 16px', borderRadius: 12, background: 'rgba(28, 176, 246, 0.08)', lineHeight: 1.6 }}>
+                {selectedVocab.batchimRules && <div>📝 <b>Quy tắc:</b> {selectedVocab.batchimRules}</div>}
                 {selectedVocab.soundChanges && <div style={{ marginTop: 4 }}>🔊 <b>Biến âm:</b> {selectedVocab.soundChanges}</div>}
               </div>
             )}

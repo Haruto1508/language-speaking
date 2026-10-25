@@ -372,8 +372,14 @@ body {
   border-bottom: 5px solid var(--duo-border);
   border-radius: var(--radius-md);
   padding: 20px;
-  transition: all 0.2s ease;
+  transition: none !important;
+  transform: none !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.duo-card:hover {
+  transform: none !important;
+  transition: none !important;
 }
 
 .duo-card-interactive {
@@ -383,18 +389,26 @@ body {
   border-radius: var(--radius-md);
   padding: 18px;
   cursor: pointer;
-  transition: none;
-  user-select: none;
+  transition: none !important;
+  transform: none !important;
 }
 
 .duo-card-interactive:hover {
   background: var(--duo-card-hover);
   border-color: var(--duo-border-light);
+  transform: none !important;
+  transition: none !important;
 }
 
-.duo-card-interactive:active {
-  transform: translateY(2px);
-  border-bottom: 2px solid var(--duo-border);
+/* Card KHÔNG có hiệu ứng nhấc/lún khi active, chỉ button mới có */
+div.duo-card-interactive:active,
+div.duo-card:active {
+  transform: none !important;
+  border-bottom: 4px solid var(--duo-border) !important;
+}
+
+button.duo-card-interactive:active {
+  transform: translateY(2px) !important;
 }
 
 .duo-card-interactive.selected {
@@ -954,5 +968,47 @@ body {
 *:hover,
 *:hover * {
   transition: none !important;
+}
+
+/* ========================================================
+   ENABLE TEXT SELECTION & COPYING ACROSS THE WEBSITE
+   Cho phép người dùng thoải mái quét khối và sao chép từ vựng, ngữ pháp, bài học
+   ======================================================== */
+body,
+p,
+span,
+h1, h2, h3, h4, h5, h6,
+div,
+pre,
+code,
+strong,
+em,
+b,
+i,
+td,
+th,
+li,
+label {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+
+/* Chỉ chặn bôi đen đối với các nút bấm, biểu tượng, badge và thanh menu điều hướng */
+button,
+button *,
+.duo-btn-green,
+.duo-btn-yellow,
+.duo-btn-blue,
+.duo-btn-red,
+.duo-btn-outline,
+.duo-nav-item,
+.duo-word-tile,
+.duo-stat-pill,
+.duo-micro-btn,
+.ant-btn,
+svg,
+.lucide {
+  -webkit-user-select: none !important;
+  user-select: none !important;
 }
 
