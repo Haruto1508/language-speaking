@@ -29,37 +29,37 @@ export const GrammarPage: React.FC = () => {
         ? [
             {
               id: 1,
-              grammarPoint: 'V + -(으)세요 (Polite Imperative / Courtesy Request)',
-              explanation: 'Used to politely request or instruct someone to take an action in daily social interactions.',
-              usageGuide: '1. If verb stem ends in a vowel, attach -세요 (가다 -> 가세요).\n2. If verb stem ends in a consonant (batchim), attach -으세요 (앉다 -> 앉으세요).\n3. Irregular verbs: 듣다 -> 들으세요, 만들다 -> 만드세요.',
-              structureFormula: 'Verb Stem + -(으)세요',
-              commonMistakes: 'Do not use -(으)세요 to refer to actions you are doing yourself. It is strictly for addressing the listener.',
-              formalityLevel: '존댓말 / 해요체 (Standard Polite)',
+              grammarPoint: 'V + -(으)세요 (Đuôi câu mệnh lệnh lịch sự / Yêu cầu nhã nhặn)',
+              explanation: 'Dùng để yêu cầu, nhờ vả hoặc hướng dẫn người đối diện làm một hành động nào đó một cách lịch sự, nhã nhặn trong giao tiếp hàng ngày.',
+              usageGuide: '1. Nếu thân động từ kết thúc bằng nguyên âm, gắn -세요 (가다 -> 가세요 - Xin mời đi).\n2. Nếu thân động từ kết thúc bằng phụ âm (patchim), gắn -으세요 (앉다 -> 앉으세요 - Xin mời ngồi).\n3. Động từ bất quy tắc: 듣다 -> 들으세요 (Xin hãy lắng nghe), 만들다 -> 만드세요 (Xin hãy làm).',
+              structureFormula: 'Thân động từ + -(으)세요',
+              commonMistakes: 'Không dùng -(으)세요 để nói về hành động của chính bản thân mình. Đuôi câu này chỉ dành riêng để nói với người nghe.',
+              formalityLevel: 'Kính ngữ 존댓말 (Chuẩn lịch sự)',
               koreanPattern: 'V + -(으)세요',
-              exampleConversationsJson: '[{"speaker": "직원", "text": "편하신 자리에 앉으세요.", "translation": "Please sit in any comfortable seat."}]',
+              exampleConversationsJson: '[{"speaker": "Nhân viên", "text": "편하신 자리에 앉으세요.", "translation": "Xin mời quý khách ngồi vào bất kỳ chỗ nào thuận tiện ạ."}]',
             },
             {
               id: 2,
-              grammarPoint: 'N + 주세요 (Please give me N)',
-              explanation: 'The universal everyday request pattern for goods, items, or food in service environments.',
-              usageGuide: 'Attach directly to any noun. E.g. 물 주세요 (Water please), 메뉴판 주세요 (Menu please).',
-              structureFormula: 'Noun + 주세요',
-              commonMistakes: 'Confusing 주세요 (give me) with 드리다 (humble offering).',
-              formalityLevel: '존댓말 / 해요체',
+              grammarPoint: 'N + 주세요 (Làm ơn cho tôi N / Cho tôi xin N)',
+              explanation: 'Mẫu câu đề nghị vạn năng thường dùng nhất khi gọi món ăn, mua hàng hóa hoặc yêu cầu dịch vụ.',
+              usageGuide: 'Gắn trực tiếp vào sau bất kỳ danh từ nào. Ví dụ: 물 주세요 (Cho tôi xin nước ạ), 메뉴판 주세요 (Cho tôi xin thực đơn ạ).',
+              structureFormula: 'Danh từ (N) + 주세요',
+              commonMistakes: 'Tránh nhầm lẫn giữa 주세요 (cho tôi xin) với 드리다 (kính tặng/gửi dâng lên người bề trên).',
+              formalityLevel: 'Kính ngữ 존댓말 / 해요체',
               koreanPattern: 'N + 주세요',
-              exampleConversationsJson: '[{"speaker": "손님", "text": "물 좀 더 주세요.", "translation": "Please give me some more water."}]',
+              exampleConversationsJson: '[{"speaker": "Khách hàng", "text": "물 좀 더 주세요.", "translation": "Làm ơn cho tôi xin thêm chút nước với ạ."}]',
             },
           ]
         : [
             {
               id: 3,
-              grammarPoint: 'Polite Modal Requests: Could I please get / I would like',
-              explanation: 'In English customer service encounters, direct imperatives like "Give me a coffee" sound blunt and demanding. Native speakers use modal verbs (could, would) and polite softeners.',
-              usageGuide: 'Use "Could I please get + [Item]?" or "I would like to have + [Item], please."',
-              structureFormula: 'Could I (please) get + [Size] + [Item] + with [Customization], please?',
-              commonMistakes: 'Avoid saying "Give me" or "I want". Always soften with "Could I" and "please".',
-              formalityLevel: 'Polite Conversational Register',
-              exampleConversationsJson: '[{"speaker": "Customer", "text": "Could I get a medium flat white with oat milk, please?", "translation": "Cho mình một ly flat white với sữa yến mạch nhé?"}]',
+              grammarPoint: 'Yêu cầu lịch sự: Could I please get / I would like',
+              explanation: 'Trong tiếng Anh giao tiếp và dịch vụ, các câu mệnh lệnh trực tiếp như "Give me coffee" nghe rất thô lỗ và cộc lốc. Người bản xứ luôn dùng các trợ động từ tình thái (could, would) và từ đệm lịch sự.',
+              usageGuide: 'Dùng cấu trúc: "Could I please get + [Món]?" hoặc "I would like to have + [Món], please."',
+              structureFormula: 'Could I (please) get + [Size] + [Món] + with [Tùy chọn], please?',
+              commonMistakes: 'Tránh nói cộc lốc "Give me" hoặc "I want". Luôn làm mềm câu nói bằng "Could I" và "please".',
+              formalityLevel: 'Văn phong đàm thoại lịch sự (Polite)',
+              exampleConversationsJson: '[{"speaker": "Khách hàng", "text": "Could I get a medium flat white with oat milk, please?", "translation": "Làm ơn cho mình một ly flat white cỡ vừa với sữa yến mạch nhé?"}]',
             },
           ];
       setGrammarList(fallbackGrammar);
@@ -73,11 +73,11 @@ export const GrammarPage: React.FC = () => {
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', paddingBottom: 60 }}>
       <div style={{ marginBottom: 28 }}>
-        <Title level={2} style={{ color: 'var(--text-primary)', margin: 0 }}>
-          {isKo ? 'Korean Grammar Patterns 🇰🇷' : 'English Grammar Patterns 🇺🇸'}
+        <Title level={2} style={{ color: 'var(--duo-text-primary)', margin: 0, fontWeight: 900 }}>
+          {isKo ? 'Mẫu câu & Ngữ pháp tiếng Hàn 🇰🇷' : 'Mẫu câu & Ngữ pháp tiếng Anh 🇺🇸'}
         </Title>
-        <Text style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
-          Master communicative sentence formulas, formality levels (존댓말 vs 반말), and common usage pitfalls.
+        <Text style={{ color: 'var(--duo-text-secondary)', fontSize: 14 }}>
+          Nắm vững các công thức câu giao tiếp, cấp độ kính ngữ (존댓말 vs 반말) và các lỗi sai thường gặp.
         </Text>
       </div>
 

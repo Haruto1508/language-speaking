@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useAppStore } from '../stores/useAppStore';
 import { api } from '../services/api';
-import { DashboardSummary } from '../types';
+import { DashboardSummary, formatLevelVietnamese } from '../types';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -54,7 +54,7 @@ export const DashboardPage: React.FC = () => {
             type: 'GRAMMAR',
             originalText: '저기요! 김치찌개 주문합니다',
             correctedText: '저기요, 김치찌개 하나 주세요',
-            explanation: 'In restaurants, use N + 하나 주세요 for ordering rather than declarative 합니다.',
+            explanation: 'Khi vào nhà hàng, hãy dùng "N + 하나 주세요" để gọi món thay vì dùng câu trần thuật "합니다".',
             reviewed: false,
             createdAt: '2026-10-24T18:00:00Z',
           },
@@ -63,7 +63,7 @@ export const DashboardPage: React.FC = () => {
             type: 'VOCABULARY',
             originalText: 'Could you give me coffee?',
             correctedText: 'Could I please get an oat latte to go?',
-            explanation: 'Modal phrasing "Could I please get..." sounds significantly more polite and natural.',
+            explanation: 'Mẫu câu lịch sự "Could I please get..." nghe tự nhiên, nhã nhặn hơn nhiều so với "Give me".',
             reviewed: true,
             createdAt: '2026-10-23T14:30:00Z',
           },
@@ -71,10 +71,10 @@ export const DashboardPage: React.FC = () => {
         recommendedLesson: {
           id: 1,
           topicId: 1,
-          topicName: 'Restaurant & Dining',
-          title: targetLanguage === 'KO' ? 'Ordering at a Korean Restaurant (식당에서 주문하기)' : 'Ordering at a Specialty Coffee Shop',
-          scenario: 'Order dishes, ask for refills, and politely request the bill.',
-          description: 'Learn real-world dining expressions and polite speech.',
+          topicName: targetLanguage === 'KO' ? 'Nhà hàng & Gọi món' : 'Quán cà phê Specialty',
+          title: targetLanguage === 'KO' ? 'Gọi món tại nhà hàng Hàn Quốc (식당에서 주문하기)' : 'Gọi đồ uống tại quán Specialty Coffee',
+          scenario: 'Thực hành gọi món ăn, xin thêm món phụ/nước uống và yêu cầu thanh toán hóa đơn lịch sự.',
+          description: 'Học các mẫu câu ăn uống thực tế và cách xưng hô lịch sự.',
           difficulty: 'BEGINNER',
           status: 'PUBLISHED',
           orderIndex: 1,
@@ -126,7 +126,7 @@ export const DashboardPage: React.FC = () => {
                 </Title>
               </div>
               <Text style={{ color: 'var(--duo-text-secondary)', fontSize: 15, fontWeight: 500 }}>
-                Bạn đang chinh phục <strong>{targetLanguage === 'KO' ? 'Tiếng Hàn giao tiếp' : 'Tiếng Anh giao tiếp'}</strong> ({targetLevel.replace('_', ' ')}). Cùng tích lũy thêm điểm XP hôm nay!
+                Bạn đang chinh phục <strong>{targetLanguage === 'KO' ? 'Tiếng Hàn giao tiếp' : 'Tiếng Anh giao tiếp'}</strong> ({formatLevelVietnamese(targetLevel)}). Cùng tích lũy thêm điểm XP hôm nay!
               </Text>
             </div>
           </div>

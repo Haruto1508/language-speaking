@@ -287,3 +287,30 @@ export interface ReviewItem {
   incorrectCount: number;
   nextReviewAt: string;
 }
+
+export const LEVEL_LABELS_VI: Record<ProficiencyLevelCode, string> = {
+  BEGINNER: 'Mới bắt đầu (A1)',
+  ELEMENTARY: 'Sơ cấp (A2)',
+  INTERMEDIATE: 'Trung cấp (B1)',
+  UPPER_INTERMEDIATE: 'Trung cấp nâng cao (B2)',
+  ADVANCED: 'Cao cấp (C1)',
+};
+
+export const formatLevelVietnamese = (level?: string): string => {
+  if (!level) return '';
+  switch (level) {
+    case 'BEGINNER':
+      return 'Mới bắt đầu';
+    case 'ELEMENTARY':
+      return 'Sơ cấp';
+    case 'INTERMEDIATE':
+      return 'Trung cấp';
+    case 'UPPER_INTERMEDIATE':
+      return 'Trung cấp nâng cao';
+    case 'ADVANCED':
+      return 'Cao cấp';
+    default:
+      return level.replace('_', ' ');
+  }
+};
+

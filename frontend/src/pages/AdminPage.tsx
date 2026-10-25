@@ -29,7 +29,7 @@ import {
 import confetti from 'canvas-confetti';
 import { api } from '../services/api';
 import { useAppStore } from '../stores/useAppStore';
-import { ContentStatus, LessonDetail, LessonSummary, ProficiencyLevelCode } from '../types';
+import { ContentStatus, LessonDetail, LessonSummary, ProficiencyLevelCode, formatLevelVietnamese } from '../types';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -45,26 +45,26 @@ export const AdminPage: React.FC = () => {
 
   // Form states for Generator
   const [topicId, setTopicId] = useState<number>(1);
-  const [lessonTitle, setLessonTitle] = useState('Checking in at a Boutique Hotel');
-  const [scenario, setScenario] = useState('Check-in, request a non-smoking high-floor room, and ask for breakfast hours.');
+  const [lessonTitle, setLessonTitle] = useState('Nhận phòng tại khách sạn (Boutique Hotel Check-in)');
+  const [scenario, setScenario] = useState('Luyện tập làm thủ tục nhận phòng, yêu cầu phòng tầng cao không hút thuốc và hỏi giờ phục vụ bữa sáng.');
   const [difficulty, setDifficulty] = useState<ProficiencyLevelCode>('ELEMENTARY');
-  const [objectives, setObjectives] = useState('Master polite check-in vocabulary and room amenities requests.');
+  const [objectives, setObjectives] = useState('Làm chủ từ vựng nhận phòng khách sạn và cách đề nghị lịch sự.');
 
   // Form states for Ingestion Pipeline
-  const [ingestTopic, setIngestTopic] = useState('Medical Clinic & Pharmacy in Seoul');
+  const [ingestTopic, setIngestTopic] = useState('Phòng khám y tế & Hiệu thuốc tại Seoul (Medical Clinic & Pharmacy)');
   const [ingestLang, setIngestLang] = useState('KO');
   const [ingestLevel, setIngestLevel] = useState('BEGINNER');
-  const [rawSource, setRawSource] = useState(`Unit 4: Visiting a Clinic & Pharmacy (병원과 약국)
-Key Terms:
-- 아프다 (to be sick / hurt)
-- 감기약 (cold medicine)
-- 처방전 (prescription)
-- 열이 나다 (to have a fever)
-Grammar:
-- V + -(으)면 안 돼요 (You must not / prohibited)
-- V + -어/아야 되다 (Must / have to)
-Scenario:
-Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnosis, patient takes prescription to pharmacy.`);
+  const [rawSource, setRawSource] = useState(`Bài 4: Khám bệnh & Mua thuốc (병원과 약국)
+Từ vựng cốt lõi:
+- 아프다 (bị ốm / đau)
+- 감기약 (thuốc cảm)
+- 처방전 (đơn thuốc)
+- 열이 나다 (bị sốt)
+Ngữ pháp:
+- V + -(으)면 안 돼요 (Không được phép / cấm)
+- V + -어/아야 되다 (Phải / bắt buộc)
+Tình huống:
+Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn đoán và bệnh nhân cầm đơn thuốc ra hiệu thuốc mua.`);
 
   // Preview generated modal
   const [generatedLesson, setGeneratedLesson] = useState<LessonDetail | null>(null);
@@ -85,10 +85,10 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
         {
           id: 1,
           topicId: 1,
-          topicName: 'Restaurant & Dining',
-          title: 'Ordering at a Korean Restaurant (식당에서 주문하기)',
-          scenario: 'Order dishes, ask for refills, and politely request the bill.',
-          description: 'Polite verb endings, calling staff with 저기요, and asking for recommendations.',
+          topicName: 'Nhà hàng & Ẩm thực',
+          title: 'Gọi món tại quán ăn Hàn Quốc (식당에서 주문하기)',
+          scenario: 'Gọi món canh kim chi, xin thêm nước và gọi thanh toán hóa đơn.',
+          description: 'Làm chủ đuôi câu lịch sự -요, xưng hô 저기요 và hỏi món gợi ý.',
           difficulty: 'BEGINNER',
           status: 'PUBLISHED',
           orderIndex: 1,
@@ -99,10 +99,10 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
         {
           id: 2,
           topicId: 5,
-          topicName: 'Specialty Coffee Shop',
-          title: 'Ordering at a Specialty Coffee Shop',
-          scenario: 'Order customized coffee, inquire about bean roast profiles, and pay.',
-          description: 'Master polite modals (Could I get), roast profiles, and takeaway options.',
+          topicName: 'Quán Cà phê Specialty',
+          title: 'Gọi đồ uống tại quán Specialty Coffee',
+          scenario: 'Đặt thức uống tùy chỉnh, hỏi về hồ sơ hạt rang và thanh toán.',
+          description: 'Làm chủ các mẫu câu lịch sự (Could I get), mức rang và lựa chọn mang về.',
           difficulty: 'INTERMEDIATE',
           status: 'PUBLISHED',
           orderIndex: 1,
@@ -113,10 +113,10 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
         {
           id: 3,
           topicId: 1,
-          topicName: 'Hotel & Lodging',
-          title: 'Boutique Hotel Check-in',
-          scenario: 'Check-in, request breakfast schedule and luggage storage.',
-          description: 'AI Generated curriculum currently under review.',
+          topicName: 'Khách sạn & Lưu trú',
+          title: 'Thủ tục nhận phòng khách sạn Boutique',
+          scenario: 'Nhận phòng, hỏi giờ ăn sáng và gửi hành lý.',
+          description: 'Giáo trình do AI tạo tự động, đang chờ phê duyệt.',
           difficulty: 'ELEMENTARY',
           status: 'AI_GENERATED',
           orderIndex: 2,
@@ -203,14 +203,23 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
     ARCHIVED: 'volcano',
   };
 
+  const statusLabelMap: Record<ContentStatus, string> = {
+    DRAFT: 'Bản nháp',
+    AI_GENERATED: 'AI Tạo tự động',
+    REVIEWING: 'Đang kiểm duyệt',
+    APPROVED: 'Đã phê duyệt',
+    PUBLISHED: 'Đã xuất bản',
+    ARCHIVED: 'Đã lưu trữ',
+  };
+
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', paddingBottom: 60 }}>
       <div style={{ marginBottom: 28 }}>
-        <Title level={2} style={{ color: 'var(--text-primary)', margin: 0 }}>
-          Curriculum Management & AI Ingestion Pipeline ⚙️
+        <Title level={2} style={{ color: 'var(--duo-text-primary)', margin: 0, fontWeight: 900 }}>
+          Quản trị Giáo trình & Hệ thống Nạp AI ⚙️
         </Title>
-        <Text style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
-          Manage structured courses, review AI-generated lessons, and ingest external educational syllabi into validated learning modules.
+        <Text style={{ color: 'var(--duo-text-secondary)', fontSize: 14 }}>
+          Quản lý giáo trình chuẩn, kiểm duyệt bài học do AI tạo và tự động chuyển đổi tài liệu giáo dục thành bài học thực tế.
         </Text>
       </div>
 
@@ -220,25 +229,25 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
         style={{
           padding: '20px 24px',
           marginBottom: 24,
-          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(6, 182, 212, 0.08))',
-          border: '1px solid rgba(99, 102, 241, 0.25)',
+          background: 'linear-gradient(135deg, rgba(88, 204, 2, 0.08), rgba(28, 176, 246, 0.08))',
+          border: '1px solid rgba(88, 204, 2, 0.25)',
         }}
       >
-        <div style={{ fontSize: 13, fontWeight: 700, color: '#A5B4FC', textTransform: 'uppercase', marginBottom: 8 }}>
-          Content Ingestion Pipeline Architecture
+        <div style={{ fontSize: 13, fontWeight: 800, color: '#1CB0F6', textTransform: 'uppercase', marginBottom: 8 }}>
+          Kiến trúc Quy trình Nạp & Chuẩn hóa Nội dung
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', fontSize: 13, color: 'var(--text-primary)' }}>
-          <Tag color="geekblue" icon={<FileText size={12} style={{ marginRight: 4 }} />}>Source Document</Tag>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', fontSize: 13, color: 'var(--duo-text-primary)' }}>
+          <Tag color="geekblue" icon={<FileText size={12} style={{ marginRight: 4 }} />}>Tài liệu Nguồn</Tag>
           <span>➔</span>
-          <Tag color="cyan" icon={<Cpu size={12} style={{ marginRight: 4 }} />}>Parser & Tokenizer</Tag>
+          <Tag color="cyan" icon={<Cpu size={12} style={{ marginRight: 4 }} />}>Tách từ & Phân tích cú pháp</Tag>
           <span>➔</span>
-          <Tag color="purple" icon={<Sparkles size={12} style={{ marginRight: 4 }} />}>AI Content Processor</Tag>
+          <Tag color="purple" icon={<Sparkles size={12} style={{ marginRight: 4 }} />}>Xử lý Sư phạm AI</Tag>
           <span>➔</span>
-          <Tag color="gold" icon={<CheckCircle size={12} style={{ marginRight: 4 }} />}>Schema Validation</Tag>
+          <Tag color="gold" icon={<CheckCircle size={12} style={{ marginRight: 4 }} />}>Kiểm tra Chuẩn dữ liệu</Tag>
           <span>➔</span>
-          <Tag color="green" icon={<Database size={12} style={{ marginRight: 4 }} />}>Structured Database</Tag>
+          <Tag color="green" icon={<Database size={12} style={{ marginRight: 4 }} />}>Cơ sở dữ liệu Bài học</Tag>
           <span>➔</span>
-          <Tag color="magenta">Admin Review & Publish</Tag>
+          <Tag color="magenta">Kiểm duyệt & Xuất bản</Tag>
         </div>
       </div>
 
@@ -298,11 +307,11 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
                 onChange={(val) => setDifficulty(val)}
                 style={{ width: '100%', height: 40 }}
                 options={[
-                  { value: 'BEGINNER', label: 'Beginner (A1)' },
-                  { value: 'ELEMENTARY', label: 'Elementary (A2)' },
-                  { value: 'INTERMEDIATE', label: 'Intermediate (B1)' },
-                  { value: 'UPPER_INTERMEDIATE', label: 'Upper Intermediate (B2)' },
-                  { value: 'ADVANCED', label: 'Advanced (C1)' },
+                  { value: 'BEGINNER', label: 'Mới bắt đầu (A1)' },
+                  { value: 'ELEMENTARY', label: 'Sơ cấp (A2)' },
+                  { value: 'INTERMEDIATE', label: 'Trung cấp (B1)' },
+                  { value: 'UPPER_INTERMEDIATE', label: 'Trung cấp nâng cao (B2)' },
+                  { value: 'ADVANCED', label: 'Cao cấp (C1)' },
                 ]}
               />
             </div>
@@ -448,8 +457,8 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
                     <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
                       {lesson.title}
                     </span>
-                    <Tag color={statusColorMap[lesson.status]}>{lesson.status}</Tag>
-                    <Tag color="geekblue">{lesson.difficulty}</Tag>
+                    <Tag color={statusColorMap[lesson.status]}>{statusLabelMap[lesson.status] || lesson.status}</Tag>
+                    <Tag color="geekblue">{formatLevelVietnamese(lesson.difficulty)}</Tag>
                   </div>
                   <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
                     {lesson.scenario}
@@ -464,7 +473,7 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
                       type="dashed"
                       onClick={() => handleUpdateStatus(lesson.id, 'REVIEWING')}
                     >
-                      Start Review
+                      Bắt đầu duyệt
                     </Button>
                   )}
                   {(lesson.status === 'REVIEWING' || lesson.status === 'AI_GENERATED') && (
@@ -473,7 +482,7 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
                       style={{ background: 'rgba(99, 102, 241, 0.2)', color: '#A5B4FC' }}
                       onClick={() => handleUpdateStatus(lesson.id, 'APPROVED')}
                     >
-                      Approve
+                      Phê duyệt
                     </Button>
                   )}
                   {lesson.status !== 'PUBLISHED' && (
@@ -482,7 +491,7 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
                       type="primary"
                       onClick={() => handleUpdateStatus(lesson.id, 'PUBLISHED')}
                     >
-                      Publish
+                      Xuất bản ngay
                     </Button>
                   )}
                   {lesson.status === 'PUBLISHED' && (
@@ -491,7 +500,7 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
                       danger
                       onClick={() => handleUpdateStatus(lesson.id, 'ARCHIVED')}
                     >
-                      Archive
+                      Lưu trữ
                     </Button>
                   )}
                 </Space>
@@ -507,7 +516,7 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
           title={
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <Sparkles size={20} color="#6366F1" />
-              <span style={{ fontSize: 18, fontWeight: 700 }}>Structured Lesson Preview: {generatedLesson.title}</span>
+              <span style={{ fontSize: 18, fontWeight: 800 }}>Xem trước Giáo trình: {generatedLesson.title}</span>
             </div>
           }
           open={isPreviewOpen}
@@ -518,17 +527,17 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
         >
           <div style={{ padding: '10px 0' }}>
             <div style={{ marginBottom: 16 }}>
-              <Tag color="purple">{generatedLesson.status}</Tag>
-              <Tag color="cyan">{generatedLesson.difficulty}</Tag>
+              <Tag color="purple">{statusLabelMap[generatedLesson.status] || generatedLesson.status}</Tag>
+              <Tag color="cyan">{formatLevelVietnamese(generatedLesson.difficulty)}</Tag>
             </div>
 
             <Paragraph style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
-              <strong>Scenario:</strong> {generatedLesson.scenario}
+              <strong>Tình huống:</strong> {generatedLesson.scenario}
             </Paragraph>
 
             <div style={{ marginBottom: 16 }}>
               <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
-                Generated Vocabulary ({generatedLesson.vocabulary?.length || 0}):
+                Từ vựng được tạo ({generatedLesson.vocabulary?.length || 0}):
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
                 {generatedLesson.vocabulary?.map((v, i) => (
@@ -541,7 +550,7 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
 
             <div style={{ marginBottom: 16 }}>
               <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
-                Generated Grammar:
+                Ngữ pháp được tạo:
               </h4>
               {generatedLesson.grammar?.map((g, i) => (
                 <div key={i} style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(255, 255, 255, 0.03)', fontSize: 13, marginTop: 4 }}>
@@ -551,7 +560,7 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 24 }}>
-              <Button onClick={() => setIsPreviewOpen(false)}>Close Preview</Button>
+              <Button onClick={() => setIsPreviewOpen(false)}>Đóng xem trước</Button>
               <Button
                 type="primary"
                 onClick={() => {
@@ -559,7 +568,7 @@ Patient tells doctor symptoms (headache, fever for 2 days), doctor gives diagnos
                   setIsPreviewOpen(false);
                 }}
               >
-                Approve & Publish to Site
+                Phê duyệt & Xuất bản lên hệ thống
               </Button>
             </div>
           </div>

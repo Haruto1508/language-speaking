@@ -77,8 +77,8 @@ export const DuoLessonPage: React.FC = () => {
     : [
         {
           type: 'word-builder',
-          title: 'Translate this sentence into Vietnamese',
-          instruction: 'Tap the word tiles to assemble the correct sentence:',
+          title: 'Dịch câu này sang tiếng Việt',
+          instruction: 'Chạm vào các thẻ từ để ghép thành câu hoàn chỉnh:',
           prompt: 'Could I please get an iced oat latte?',
           audioText: 'Could I please get an iced oat latte?',
           tiles: ['Cho tôi', 'ly latte', 'sữa yến mạch đá', 'với', 'nóng', 'trà xanh', 'được không'],
@@ -86,8 +86,8 @@ export const DuoLessonPage: React.FC = () => {
         },
         {
           type: 'listen-choose',
-          title: 'Listen and select the meaning',
-          instruction: 'Listen to the barista inquire about your order:',
+          title: 'Nghe và chọn nghĩa tiếng Việt đúng',
+          instruction: 'Lắng nghe nhân viên pha chế hỏi về đơn hàng của bạn:',
           prompt: 'Will that be for here or to go?',
           audioText: 'Will that be for here or to go?',
           options: [
@@ -98,8 +98,8 @@ export const DuoLessonPage: React.FC = () => {
         },
         {
           type: 'speak',
-          title: 'Speaking practice',
-          instruction: 'Tap the mic and speak clearly:',
+          title: 'Luyện nói phát âm tiếng Anh',
+          instruction: 'Bấm vào biểu tượng mic và nói to, rõ ràng:',
           prompt: 'Make that to go, please.',
           audioText: 'Make that to go, please.',
         },

@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useAppStore } from '../stores/useAppStore';
 import { api } from '../services/api';
-import { Topic, ProficiencyLevelCode } from '../types';
+import { Topic, ProficiencyLevelCode, formatLevelVietnamese } from '../types';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -54,8 +54,8 @@ export const TopicsPage: React.FC = () => {
             languageCode: 'KO',
             levelCode: 'BEGINNER',
             code: 'korean-restaurant',
-            name: 'Restaurant & Dining',
-            description: 'Order authentic dishes, ask for side dish refills, request the bill, and interact politely with staff.',
+            name: 'Nhà hàng & Ẩm thực Hàn Quốc',
+            description: 'Thực hành gọi món truyền thống, xin thêm món phụ (banchan), yêu cầu tính tiền và giao tiếp lịch sự với nhân viên.',
             icon: 'Utensils',
             estimatedMinutes: 20,
             totalLessons: 1,
@@ -65,10 +65,10 @@ export const TopicsPage: React.FC = () => {
               {
                 id: 1,
                 topicId: 1,
-                topicName: 'Restaurant & Dining',
-                title: 'Ordering at a Korean Restaurant (식당에서 주문하기)',
-                scenario: 'Order dishes, ask for refills, and politely request the bill.',
-                description: 'Polite verb endings, calling staff with 저기요, and asking for recommendations.',
+                topicName: 'Nhà hàng & Ẩm thực Hàn Quốc',
+                title: 'Gọi món tại quán ăn Hàn Quốc (식당에서 주문하기)',
+                scenario: 'Gọi món canh kim chi, xin thêm nước và gọi thanh toán hóa đơn.',
+                description: 'Làm chủ đuôi câu lịch sự -요, xưng hô 저기요 và hỏi món gợi ý.',
                 difficulty: 'BEGINNER',
                 status: 'PUBLISHED',
                 orderIndex: 1,
@@ -84,8 +84,8 @@ export const TopicsPage: React.FC = () => {
             languageCode: 'KO',
             levelCode: 'BEGINNER',
             code: 'korean-greetings',
-            name: 'Greetings & Introductions',
-            description: 'Master honorific greetings, introduce your name and nationality, and make a warm first impression.',
+            name: 'Chào hỏi & Giới thiệu bản thân',
+            description: 'Nắm vững kính ngữ chào hỏi, giới thiệu tên và quốc tịch, tạo ấn tượng ấm áp ban đầu.',
             icon: 'Hand',
             estimatedMinutes: 15,
             totalLessons: 1,
@@ -97,8 +97,8 @@ export const TopicsPage: React.FC = () => {
             languageCode: 'KO',
             levelCode: 'BEGINNER',
             code: 'korean-cafe',
-            name: 'Cafe & Coffee Culture',
-            description: 'Navigate Seoul cafe culture: hot vs iced (아아), desserts, takeout vs dining in.',
+            name: 'Văn hóa Cà phê & Quán xá Seoul',
+            description: 'Trải nghiệm văn hóa cà phê Seoul: phân biệt nóng vs đá (아아), đồ tráng miệng, dùng tại quán vs mang đi.',
             icon: 'Coffee',
             estimatedMinutes: 20,
             totalLessons: 1,
@@ -110,8 +110,8 @@ export const TopicsPage: React.FC = () => {
             languageCode: 'KO',
             levelCode: 'BEGINNER',
             code: 'korean-travel',
-            name: 'Subway & Asking Directions',
-            description: 'Navigate Seoul metro lines, ask locals for directions, transfer stations, and purchase tickets.',
+            name: 'Tàu điện ngầm & Hỏi đường',
+            description: 'Đi tàu điện ngầm Seoul, hỏi người bản xứ hướng đi, chuyển tuyến và mua vé tàu.',
             icon: 'Compass',
             estimatedMinutes: 25,
             totalLessons: 1,
@@ -126,8 +126,8 @@ export const TopicsPage: React.FC = () => {
             languageCode: 'EN',
             levelCode: 'INTERMEDIATE',
             code: 'english-cafe',
-            name: 'Specialty Coffee Shop',
-            description: 'Custom coffee orders, roasts, milk alternatives, and natural small talk with the barista.',
+            name: 'Quán Cà phê Specialty',
+            description: 'Đặt cà phê theo khẩu vị riêng, phân biệt các mức rang hạt, sữa thực vật và trò chuyện tự nhiên với Barista.',
             icon: 'Coffee',
             estimatedMinutes: 20,
             totalLessons: 1,
@@ -137,10 +137,10 @@ export const TopicsPage: React.FC = () => {
               {
                 id: 2,
                 topicId: 5,
-                topicName: 'Specialty Coffee Shop',
-                title: 'Ordering at a Specialty Coffee Shop',
-                scenario: 'Order a customized beverage, inquire about bean roast profiles, and pay.',
-                description: 'Master polite modals (Could I get), roast profiles, and takeaway options.',
+                topicName: 'Quán Cà phê Specialty',
+                title: 'Gọi đồ uống tại quán Specialty Coffee',
+                scenario: 'Đặt thức uống tùy chỉnh, hỏi về hồ sơ hạt rang và thanh toán chạm.',
+                description: 'Làm chủ các mẫu câu lịch sự (Could I get), mức rang và lựa chọn mang về.',
                 difficulty: 'INTERMEDIATE',
                 status: 'PUBLISHED',
                 orderIndex: 1,
@@ -156,8 +156,8 @@ export const TopicsPage: React.FC = () => {
             languageCode: 'EN',
             levelCode: 'INTERMEDIATE',
             code: 'english-interview',
-            name: 'Job Interview & Career',
-            description: 'Present your experience, answer behavioral questions, and ask insightful questions to the hiring manager.',
+            name: 'Phỏng vấn Xin việc & Sự nghiệp',
+            description: 'Giới thiệu kinh nghiệm, trả lời câu hỏi hành vi và đặt câu hỏi thông minh cho nhà tuyển dụng.',
             icon: 'Briefcase',
             estimatedMinutes: 30,
             totalLessons: 1,
@@ -227,7 +227,7 @@ export const TopicsPage: React.FC = () => {
                 userSelect: 'none',
               }}
             >
-              {lvl.replace('_', ' ')}
+              {formatLevelVietnamese(lvl)}
             </button>
           );
         })}
@@ -272,7 +272,7 @@ export const TopicsPage: React.FC = () => {
                       </div>
                       <Space>
                         <Tag color="blue" style={{ borderRadius: 8, fontWeight: 800, padding: '2px 8px' }}>
-                          {topic.levelCode.replace('_', ' ')}
+                          {formatLevelVietnamese(topic.levelCode)}
                         </Tag>
                         <Tag icon={<Clock size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />} color="default" style={{ borderRadius: 8, fontWeight: 700 }}>
                           {topic.estimatedMinutes} phút
