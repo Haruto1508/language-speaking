@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Tag, Button, Input, Modal, Typography, Space, Tooltip, Progress } from 'antd';
+import { Tag, Button, Input, Modal, Typography, Space, Tooltip, Progress, Pagination } from 'antd';
 import {
   RotateCw,
   RotateCcw,
@@ -51,6 +51,9 @@ export const ReviewPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'MASTERED' | 'LEARNING' | 'NEW'>('ALL');
   const [selectedVocab, setSelectedVocab] = useState<Vocabulary | null>(null);
+  const [allVocabPage, setAllVocabPage] = useState(1);
+
+  const PAGE_SIZE_ALL = 20;
 
   useEffect(() => {
     loadVocab();
@@ -186,6 +189,19 @@ export const ReviewPage: React.FC = () => {
     if (statusFilter === 'NEW') return !v.userStatus || v.userStatus === 'NEW';
     return true;
   });
+
+  // Sort: new / learning words first, mastered words last!
+  const sortedAllVocab = [...filteredAllVocab].sort((a, b) => {
+    const aMastered = a.userStatus === 'MASTERED';
+    const bMastered = b.userStatus === 'MASTERED';
+    if (aMastered === bMastered) return 0;
+    return aMastered ? 1 : -1;
+  });
+
+  const paginatedAllVocab = sortedAllVocab.slice(
+    (allVocabPage - 1) * PAGE_SIZE_ALL,
+    allVocabPage * PAGE_SIZE_ALL
+  );
 
   return (
     <div style={{ maxWidth: 960, margin: '0 auto', paddingBottom: 60 }}>
@@ -726,7 +742,7 @@ export const ReviewPage: React.FC = () => {
 
           {/* Vocabulary List Items */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
-            {filteredAllVocab.map((item) => {
+            {paginatedAllVocab.map((item) => {
               const isMastered = item.userStatus === 'MASTERED';
 
               return (
@@ -826,7 +842,23 @@ export const ReviewPage: React.FC = () => {
             })}
           </div>
 
-          {filteredAllVocab.length === 0 && (
+          {sortedAllVocab.length > PAGE_SIZE_ALL && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 28 }}>
+              <Pagination
+                current={allVocabPage}
+                pageSize={PAGE_SIZE_ALL}
+                total={sortedAllVocab.length}
+                onChange={(page) => {
+                  setAllVocabPage(page);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                showSizeChanger={false}
+                showTotal={(total, range) => `Hiển thị ${range[0]} - ${range[1]} / ${total} từ vựng`}
+              />
+            </div>
+          )}
+
+          {sortedAllVocab.length === 0 && (
             <div className="duo-card" style={{ padding: 40, textAlign: 'center', marginTop: 20 }}>
               <p style={{ color: 'var(--duo-text-secondary)', fontSize: 15, margin: 0 }}>
                 Không tìm thấy từ vựng nào khớp với từ khóa tìm kiếm.

@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Tag, Button, Input, Space, Typography, Spin, Card, Row, Col } from 'antd';
+import { Tag, Input, Typography, Spin, Pagination } from 'antd';
 import {
   Search,
   Volume2,
-  Layers,
-  Sparkles,
-  Bookmark,
   CheckCircle,
   Turtle,
+  Check,
+  Sparkles,
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useAppStore } from '../stores/useAppStore';
 import { Vocabulary, formatStatusVietnamese, formatPartOfSpeechVietnamese } from '../types';
 import { speakText, speakSlow } from '../utils/speech';
-
 import { localDataService } from '../services/localDataService';
 
 const { Title, Text } = Typography;
@@ -24,8 +22,30 @@ export const VocabularyPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Pagination & "Known" status tracking
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filterMode, setFilterMode] = useState<'ALL' | 'NEW' | 'KNOWN'>('ALL');
+  const [knownMap, setKnownMap] = useState<Record<string | number, boolean>>({});
+
+  const PAGE_SIZE = 20;
+
   useEffect(() => {
     fetchVocab();
+  }, [targetLanguage]);
+
+  // Load known words from localStorage when language changes
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(`duo_known_vocab_${targetLanguage}`);
+      if (saved) {
+        setKnownMap(JSON.parse(saved));
+      } else {
+        setKnownMap({});
+      }
+    } catch {
+      setKnownMap({});
+    }
+    setCurrentPage(1);
   }, [targetLanguage]);
 
   const fetchVocab = async () => {
@@ -44,19 +64,57 @@ export const VocabularyPage: React.FC = () => {
     }
   };
 
-  const filtered = vocabList.filter(
+  const toggleKnown = (id: number | string) => {
+    setKnownMap((prev) => {
+      const next = { ...prev, [id]: !prev[id] };
+      try {
+        localStorage.setItem(`duo_known_vocab_${targetLanguage}`, JSON.stringify(next));
+      } catch (e) {
+        console.error('Failed to save known vocab to localStorage', e);
+      }
+      return next;
+    });
+  };
+
+  // 1. Filter by search term
+  const filteredBySearch = vocabList.filter(
     (v) =>
       v.word.toLowerCase().includes(searchTerm.toLowerCase()) ||
       v.meaning.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (v.romanization && v.romanization.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  // 2. Filter by status tab (ALL / NEW / KNOWN)
+  const filteredByStatus = filteredBySearch.filter((v) => {
+    const isKnown = !!knownMap[v.id];
+    if (filterMode === 'NEW') return !isKnown;
+    if (filterMode === 'KNOWN') return isKnown;
+    return true;
+  });
+
+  // 3. Sort: Order new words first, known words to the bottom!
+  const sortedList = [...filteredByStatus].sort((a, b) => {
+    const aKnown = !!knownMap[a.id];
+    const bKnown = !!knownMap[b.id];
+    if (aKnown === bKnown) return 0;
+    return aKnown ? 1 : -1; // Unchecked / New words appear first!
+  });
+
+  // 4. Paginate: 20 words per page
+  const totalItems = sortedList.length;
+  const paginatedList = sortedList.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  // Statistics
+  const totalCount = vocabList.length;
+  const knownCount = vocabList.filter((v) => !!knownMap[v.id]).length;
+  const newCount = totalCount - knownCount;
+
   const isKo = targetLanguage === 'KO';
 
   return (
     <div style={{ maxWidth: 1050, margin: '0 auto', paddingBottom: 60 }}>
       {/* Title & Search Bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 24 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 20 }}>
         <div>
           <Title level={2} style={{ color: 'var(--duo-text-primary)', margin: 0, fontWeight: 900 }}>
             {isKo ? 'Sổ từ vựng tiếng Hàn 🇰🇷' : 'Sổ từ vựng tiếng Anh 🇺🇸'}
@@ -71,7 +129,11 @@ export const VocabularyPage: React.FC = () => {
             prefix={<Search size={16} color="var(--duo-text-muted)" />}
             placeholder="Tìm kiếm từ, phiên âm, ý nghĩa..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
+            allowClear
             style={{
               background: 'var(--duo-card-bg)',
               borderColor: 'var(--duo-border)',
@@ -83,13 +145,103 @@ export const VocabularyPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Filter Tabs & Reordering Helper */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 12,
+          marginBottom: 20,
+          padding: '14px 18px',
+          background: 'var(--duo-card-bg)',
+          borderRadius: 14,
+          border: '1.5px solid var(--duo-border)',
+        }}
+      >
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button
+            onClick={() => {
+              setFilterMode('ALL');
+              setCurrentPage(1);
+            }}
+            style={{
+              padding: '8px 14px',
+              borderRadius: 10,
+              fontSize: 13,
+              fontWeight: 800,
+              cursor: 'pointer',
+              border: filterMode === 'ALL' ? '2px solid #1CB0F6' : '1.5px solid var(--duo-border)',
+              background: filterMode === 'ALL' ? 'rgba(28, 176, 246, 0.12)' : 'transparent',
+              color: filterMode === 'ALL' ? '#1CB0F6' : 'var(--duo-text-secondary)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            Tất cả ({totalCount})
+          </button>
+
+          <button
+            onClick={() => {
+              setFilterMode('NEW');
+              setCurrentPage(1);
+            }}
+            style={{
+              padding: '8px 14px',
+              borderRadius: 10,
+              fontSize: 13,
+              fontWeight: 800,
+              cursor: 'pointer',
+              border: filterMode === 'NEW' ? '2px solid #FF9600' : '1.5px solid var(--duo-border)',
+              background: filterMode === 'NEW' ? 'rgba(255, 150, 0, 0.12)' : 'transparent',
+              color: filterMode === 'NEW' ? '#FF9600' : 'var(--duo-text-secondary)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            🌱 Từ mới cần học ({newCount})
+          </button>
+
+          <button
+            onClick={() => {
+              setFilterMode('KNOWN');
+              setCurrentPage(1);
+            }}
+            style={{
+              padding: '8px 14px',
+              borderRadius: 10,
+              fontSize: 13,
+              fontWeight: 800,
+              cursor: 'pointer',
+              border: filterMode === 'KNOWN' ? '2px solid #58CC02' : '1.5px solid var(--duo-border)',
+              background: filterMode === 'KNOWN' ? 'rgba(88, 204, 2, 0.12)' : 'transparent',
+              color: filterMode === 'KNOWN' ? '#58CC02' : 'var(--duo-text-secondary)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            ✓ Đã biết ({knownCount})
+          </button>
+        </div>
+
+        <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)', fontWeight: 600 }}>
+          💡 <strong style={{ color: '#58CC02' }}>Quy tắc:</strong> Các từ mới luôn được tự động xếp lên đầu (20 từ/trang)
+        </div>
+      </div>
+
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px 0' }}>
           <Spin size="large" />
         </div>
+      ) : paginatedList.length === 0 ? (
+        <div className="duo-card" style={{ padding: 40, textAlign: 'center' }}>
+          <p style={{ fontSize: 16, color: 'var(--duo-text-secondary)', margin: 0 }}>
+            Không tìm thấy từ vựng nào phù hợp với bộ lọc hiện tại.
+          </p>
+        </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {filtered.map((vocab) => {
+          {paginatedList.map((vocab) => {
+            const isKnown = !!knownMap[vocab.id];
+
             let breakdownData: any = null;
             if (vocab.breakdownJson) {
               try {
@@ -101,7 +253,11 @@ export const VocabularyPage: React.FC = () => {
               <div
                 key={vocab.id}
                 className="duo-card duo-card-interactive"
-                style={{ padding: 22 }}
+                style={{
+                  padding: 22,
+                  borderColor: isKnown ? 'rgba(88, 204, 2, 0.35)' : 'var(--duo-border)',
+                  background: isKnown ? 'rgba(88, 204, 2, 0.03)' : 'var(--duo-card-bg)',
+                }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
                   <div>
@@ -125,9 +281,13 @@ export const VocabularyPage: React.FC = () => {
                       <Tag color="blue" style={{ borderRadius: 6, fontWeight: 800, fontSize: 13, padding: '2px 8px' }}>
                         {formatPartOfSpeechVietnamese(vocab.partOfSpeech)}
                       </Tag>
-                      {vocab.userStatus && (
-                        <Tag color={vocab.userStatus === 'MASTERED' ? 'green' : 'geekblue'} style={{ borderRadius: 6, fontWeight: 800, fontSize: 13, padding: '2px 8px' }}>
-                          {formatStatusVietnamese(vocab.userStatus)}
+                      {isKnown ? (
+                        <Tag color="green" style={{ borderRadius: 6, fontWeight: 800, fontSize: 13, padding: '2px 8px' }}>
+                          ✓ ĐÃ BIẾT
+                        </Tag>
+                      ) : (
+                        <Tag color="gold" style={{ borderRadius: 6, fontWeight: 800, fontSize: 13, padding: '2px 8px' }}>
+                          🌱 TỪ MỚI
                         </Tag>
                       )}
                     </div>
@@ -137,7 +297,8 @@ export const VocabularyPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  {/* Actions: Play Sound & Check Known */}
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                     <button
                       className="duo-btn-outline"
                       onClick={() => speakText(vocab.word, isKo ? 'KO' : 'EN', 0.95)}
@@ -156,6 +317,46 @@ export const VocabularyPage: React.FC = () => {
                     >
                       <Turtle size={16} color="#58CC02" />
                       <span>Chậm</span>
+                    </button>
+
+                    {/* Check / Uncheck Known Button */}
+                    <button
+                      onClick={() => toggleKnown(vocab.id)}
+                      style={{
+                        padding: '8px 14px',
+                        fontSize: 13,
+                        fontWeight: 800,
+                        borderRadius: 10,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        background: isKnown ? 'rgba(88, 204, 2, 0.16)' : 'var(--duo-card-bg)',
+                        border: isKnown ? '2px solid #58CC02' : '1.5px solid var(--duo-border)',
+                        borderBottom: isKnown ? '3.5px solid #46A302' : '3px solid var(--duo-border)',
+                        color: isKnown ? '#58CC02' : 'var(--duo-text-secondary)',
+                        transition: 'all 0.15s ease',
+                      }}
+                      title={isKnown ? 'Nhấn để đánh dấu là từ mới cần học lại' : 'Nhấn để đánh dấu đã biết (tự động xếp sau các từ mới)'}
+                    >
+                      {isKnown ? (
+                        <>
+                          <CheckCircle size={16} color="#58CC02" />
+                          <span>Đã biết ✓</span>
+                        </>
+                      ) : (
+                        <>
+                          <div
+                            style={{
+                              width: 14,
+                              height: 14,
+                              borderRadius: '50%',
+                              border: '2px solid var(--duo-text-muted)',
+                            }}
+                          />
+                          <span>Đánh dấu đã biết</span>
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -253,6 +454,23 @@ export const VocabularyPage: React.FC = () => {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Pagination - 20 items per page */}
+      {!loading && totalItems > PAGE_SIZE && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 32, paddingBottom: 20 }}>
+          <Pagination
+            current={currentPage}
+            pageSize={PAGE_SIZE}
+            total={totalItems}
+            onChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            showSizeChanger={false}
+            showTotal={(total, range) => `Hiển thị ${range[0]} - ${range[1]} trong tổng số ${total} từ vựng`}
+          />
         </div>
       )}
     </div>

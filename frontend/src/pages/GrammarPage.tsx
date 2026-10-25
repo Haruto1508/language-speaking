@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Tag, Typography, Spin, Input } from 'antd';
-import { Sparkles, AlertCircle, Volume2, Search, Turtle } from 'lucide-react';
+import { Tag, Typography, Spin, Input, Pagination } from 'antd';
+import { Sparkles, AlertCircle, Volume2, Search, Turtle, CheckCircle } from 'lucide-react';
 import { api } from '../services/api';
 import { useAppStore } from '../stores/useAppStore';
 import { Grammar } from '../types';
@@ -15,8 +15,30 @@ export const GrammarPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Pagination & "Known" status tracking
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filterMode, setFilterMode] = useState<'ALL' | 'NEW' | 'KNOWN'>('ALL');
+  const [knownMap, setKnownMap] = useState<Record<string | number, boolean>>({});
+
+  const PAGE_SIZE = 20;
+
   useEffect(() => {
     fetchGrammar();
+  }, [targetLanguage]);
+
+  // Load known grammar from localStorage when language changes
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(`duo_known_grammar_${targetLanguage}`);
+      if (saved) {
+        setKnownMap(JSON.parse(saved));
+      } else {
+        setKnownMap({});
+      }
+    } catch {
+      setKnownMap({});
+    }
+    setCurrentPage(1);
   }, [targetLanguage]);
 
   const fetchGrammar = async () => {
@@ -35,9 +57,22 @@ export const GrammarPage: React.FC = () => {
     }
   };
 
+  const toggleKnown = (id: number | string) => {
+    setKnownMap((prev) => {
+      const next = { ...prev, [id]: !prev[id] };
+      try {
+        localStorage.setItem(`duo_known_grammar_${targetLanguage}`, JSON.stringify(next));
+      } catch (e) {
+        console.error('Failed to save known grammar to localStorage', e);
+      }
+      return next;
+    });
+  };
+
   const isKo = targetLanguage === 'KO';
 
-  const filteredGrammar = grammarList.filter((gram) => {
+  // 1. Filter by search query
+  const filteredBySearch = grammarList.filter((gram) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase().trim();
     return (
@@ -53,9 +88,35 @@ export const GrammarPage: React.FC = () => {
     );
   });
 
+  // 2. Filter by status tab (ALL / NEW / KNOWN)
+  const filteredByStatus = filteredBySearch.filter((gram) => {
+    const isKnown = !!knownMap[gram.id];
+    if (filterMode === 'NEW') return !isKnown;
+    if (filterMode === 'KNOWN') return isKnown;
+    return true;
+  });
+
+  // 3. Sort: Order new structures first, known structures to the bottom!
+  const sortedList = [...filteredByStatus].sort((a, b) => {
+    const aKnown = !!knownMap[a.id];
+    const bKnown = !!knownMap[b.id];
+    if (aKnown === bKnown) return 0;
+    return aKnown ? 1 : -1; // Unchecked / New items appear first!
+  });
+
+  // 4. Paginate: 20 grammar items per page
+  const totalItems = sortedList.length;
+  const paginatedList = sortedList.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  // Statistics
+  const totalCount = grammarList.length;
+  const knownCount = grammarList.filter((g) => !!knownMap[g.id]).length;
+  const newCount = totalCount - knownCount;
+
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', paddingBottom: 60 }}>
-      <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
+      {/* Title & Search Bar */}
+      <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <Title level={2} style={{ color: 'var(--duo-text-primary)', margin: 0, fontWeight: 900 }}>
             {isKo ? 'Mẫu câu & Ngữ pháp tiếng Hàn 🇰🇷' : 'Mẫu câu & Ngữ pháp tiếng Anh 🇺🇸'}
@@ -73,7 +134,10 @@ export const GrammarPage: React.FC = () => {
             prefix={<Search size={16} color="var(--duo-text-muted)" />}
             placeholder="Tìm kiếm mẫu câu, từ khóa..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
             allowClear
             style={{
               height: 44,
@@ -87,19 +151,103 @@ export const GrammarPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Filter Tabs & Reordering Helper */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 12,
+          marginBottom: 20,
+          padding: '14px 18px',
+          background: 'var(--duo-card-bg)',
+          borderRadius: 14,
+          border: '1.5px solid var(--duo-border)',
+        }}
+      >
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button
+            onClick={() => {
+              setFilterMode('ALL');
+              setCurrentPage(1);
+            }}
+            style={{
+              padding: '8px 14px',
+              borderRadius: 10,
+              fontSize: 13,
+              fontWeight: 800,
+              cursor: 'pointer',
+              border: filterMode === 'ALL' ? '2px solid #00D2D3' : '1.5px solid var(--duo-border)',
+              background: filterMode === 'ALL' ? 'rgba(0, 210, 211, 0.12)' : 'transparent',
+              color: filterMode === 'ALL' ? '#00D2D3' : 'var(--duo-text-secondary)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            Tất cả ({totalCount})
+          </button>
+
+          <button
+            onClick={() => {
+              setFilterMode('NEW');
+              setCurrentPage(1);
+            }}
+            style={{
+              padding: '8px 14px',
+              borderRadius: 10,
+              fontSize: 13,
+              fontWeight: 800,
+              cursor: 'pointer',
+              border: filterMode === 'NEW' ? '2px solid #FF9600' : '1.5px solid var(--duo-border)',
+              background: filterMode === 'NEW' ? 'rgba(255, 150, 0, 0.12)' : 'transparent',
+              color: filterMode === 'NEW' ? '#FF9600' : 'var(--duo-text-secondary)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            🌱 Mẫu câu mới cần học ({newCount})
+          </button>
+
+          <button
+            onClick={() => {
+              setFilterMode('KNOWN');
+              setCurrentPage(1);
+            }}
+            style={{
+              padding: '8px 14px',
+              borderRadius: 10,
+              fontSize: 13,
+              fontWeight: 800,
+              cursor: 'pointer',
+              border: filterMode === 'KNOWN' ? '2px solid #58CC02' : '1.5px solid var(--duo-border)',
+              background: filterMode === 'KNOWN' ? 'rgba(88, 204, 2, 0.12)' : 'transparent',
+              color: filterMode === 'KNOWN' ? '#58CC02' : 'var(--duo-text-secondary)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            ✓ Đã biết ({knownCount})
+          </button>
+        </div>
+
+        <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)', fontWeight: 600 }}>
+          💡 <strong style={{ color: '#58CC02' }}>Quy tắc:</strong> Mẫu câu mới luôn được tự động xếp lên đầu (20 câu/trang)
+        </div>
+      </div>
+
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px 0' }}>
           <Spin size="large" />
         </div>
-      ) : filteredGrammar.length === 0 ? (
+      ) : paginatedList.length === 0 ? (
         <div className="duo-card" style={{ padding: 40, textAlign: 'center' }}>
           <p style={{ fontSize: 16, color: 'var(--duo-text-secondary)', margin: 0 }}>
-            Không tìm thấy mẫu câu nào phù hợp với từ khóa "{searchQuery}".
+            Không tìm thấy mẫu câu nào phù hợp với bộ lọc hiện tại.
           </p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {filteredGrammar.map((gram) => {
+          {paginatedList.map((gram) => {
+            const isKnown = !!knownMap[gram.id];
+
             let convExamples: any[] = [];
             if (gram.exampleConversationsJson) {
               try {
@@ -110,14 +258,71 @@ export const GrammarPage: React.FC = () => {
             const formulaText = gram.structureFormula || gram.formula;
 
             return (
-              <div key={gram.id} className="duo-card duo-card-interactive" style={{ padding: 26 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
-                  <h3 style={{ fontSize: 20, fontWeight: 900, color: 'var(--duo-text-primary)', margin: 0 }}>
-                    {gram.grammarPoint}
-                  </h3>
-                  {gram.formalityLevel && (
-                    <Tag color="magenta" style={{ borderRadius: 6, fontWeight: 800 }}>{gram.formalityLevel}</Tag>
-                  )}
+              <div
+                key={gram.id}
+                className="duo-card duo-card-interactive"
+                style={{
+                  padding: 26,
+                  borderColor: isKnown ? 'rgba(88, 204, 2, 0.35)' : 'var(--duo-border)',
+                  background: isKnown ? 'rgba(88, 204, 2, 0.03)' : 'var(--duo-card-bg)',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14, flexWrap: 'wrap', gap: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                    <h3 style={{ fontSize: 20, fontWeight: 900, color: 'var(--duo-text-primary)', margin: 0 }}>
+                      {gram.grammarPoint}
+                    </h3>
+                    {isKnown ? (
+                      <Tag color="green" style={{ borderRadius: 6, fontWeight: 800 }}>✓ ĐÃ BIẾT</Tag>
+                    ) : (
+                      <Tag color="gold" style={{ borderRadius: 6, fontWeight: 800 }}>🌱 MẪU CÂU MỚI</Tag>
+                    )}
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    {gram.formalityLevel && (
+                      <Tag color="magenta" style={{ borderRadius: 6, fontWeight: 800, margin: 0 }}>{gram.formalityLevel}</Tag>
+                    )}
+
+                    {/* Toggle Known Button */}
+                    <button
+                      onClick={() => toggleKnown(gram.id)}
+                      style={{
+                        padding: '6px 12px',
+                        fontSize: 12,
+                        fontWeight: 800,
+                        borderRadius: 8,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        background: isKnown ? 'rgba(88, 204, 2, 0.16)' : 'var(--duo-card-bg)',
+                        border: isKnown ? '1.5px solid #58CC02' : '1.5px solid var(--duo-border)',
+                        color: isKnown ? '#58CC02' : 'var(--duo-text-secondary)',
+                        transition: 'all 0.15s ease',
+                      }}
+                      title={isKnown ? 'Nhấn để đánh dấu là mẫu câu cần học lại' : 'Nhấn để đánh dấu đã biết (tự động xếp sau các câu mới)'}
+                    >
+                      {isKnown ? (
+                        <>
+                          <CheckCircle size={14} color="#58CC02" />
+                          <span>Đã biết ✓</span>
+                        </>
+                      ) : (
+                        <>
+                          <div
+                            style={{
+                              width: 12,
+                              height: 12,
+                              borderRadius: '50%',
+                              border: '1.5px solid var(--duo-text-muted)',
+                            }}
+                          />
+                          <span>Đánh dấu đã biết</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Structure Formula */}
@@ -126,12 +331,12 @@ export const GrammarPage: React.FC = () => {
                     style={{
                       padding: '12px 18px',
                       borderRadius: 12,
-                      background: 'rgba(28, 176, 246, 0.08)',
-                      border: '1.5px solid rgba(28, 176, 246, 0.3)',
+                      background: 'rgba(124, 58, 237, 0.08)',
+                      border: '1.5px solid rgba(124, 58, 237, 0.28)',
                       marginBottom: 16,
                     }}
                   >
-                    <div style={{ fontSize: 11, fontWeight: 800, color: '#1CB0F6', textTransform: 'uppercase', marginBottom: 4 }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: '#8B5CF6', textTransform: 'uppercase', marginBottom: 4 }}>
                       Công thức cấu trúc:
                     </div>
                     <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
@@ -288,6 +493,23 @@ export const GrammarPage: React.FC = () => {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Pagination - 20 items per page */}
+      {!loading && totalItems > PAGE_SIZE && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 32, paddingBottom: 20 }}>
+          <Pagination
+            current={currentPage}
+            pageSize={PAGE_SIZE}
+            total={totalItems}
+            onChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            showSizeChanger={false}
+            showTotal={(total, range) => `Hiển thị ${range[0]} - ${range[1]} trong tổng số ${total} mẫu câu`}
+          />
         </div>
       )}
     </div>
