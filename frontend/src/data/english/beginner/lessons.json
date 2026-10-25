@@ -1,0 +1,51 @@
+[
+  {
+    "id": 4,
+    "languageCode": "EN",
+    "topicCode": "english-airport",
+    "title": "Lesson: Navigating Airport & Check-in",
+    "levelCode": "BEGINNER",
+    "steps": [
+      {
+        "type": "word-builder",
+        "title": "Ghép câu làm thủ tục tại quầy vé",
+        "instruction": "Chạm vào các thẻ từ để tạo câu hoàn chỉnh:",
+        "prompt": "Here is my passport and ticket",
+        "audioText": "Here is my passport and ticket",
+        "tiles": ["Đây là", "hộ chiếu", "và vé của tôi", "cảm ơn bạn", "hành lý xách tay", "xin vui lòng"],
+        "correctTiles": ["Đây là", "hộ chiếu", "và vé của tôi"]
+      },
+      {
+        "type": "listen-choose",
+        "title": "Nghe câu hỏi của nhân viên mặt đất",
+        "instruction": "Lắng nghe nhân viên an ninh hỏi:",
+        "prompt": "Do you have any liquids or sharp items in your bag?",
+        "audioText": "Do you have any liquids or sharp items in your bag?",
+        "options": [
+          { "id": "1", "text": "Bạn có mang chất lỏng hay vật sắc nhọn trong túi không?", "correct": true },
+          { "id": "2", "text": "Bạn muốn ngồi ghế cạnh cửa sổ hay lối đi?", "correct": false },
+          { "id": "3", "text": "Chuyến bay của bạn bị hoãn 30 phút.", "correct": false }
+        ]
+      },
+      {
+        "type": "speak",
+        "title": "Luyện nói câu hỏi cổng ra máy bay",
+        "instruction": "Nhấn nút micro và nói to:",
+        "prompt": "Where can I find Gate B12?",
+        "audioText": "Where can I find Gate B12?"
+      },
+      {
+        "type": "matching",
+        "title": "Nối từ vựng sân bay thông dụng",
+        "instruction": "Ghép các cặp từ tương ứng:",
+        "prompt": "Ghép các từ sân bay:",
+        "audioText": "Passport. Boarding pass. Baggage claim.",
+        "pairs": [
+          { "id": "1", "left": "Passport", "right": "Hộ chiếu" },
+          { "id": "2", "left": "Boarding pass", "right": "Thẻ lên máy bay" },
+          { "id": "3", "left": "Baggage claim", "right": "Khu vực nhận hành lý" }
+        ]
+      }
+    ]
+  }
+]

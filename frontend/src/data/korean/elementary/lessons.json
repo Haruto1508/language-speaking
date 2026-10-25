@@ -1,0 +1,54 @@
+[
+  {
+    "id": 3,
+    "languageCode": "KO",
+    "topicCode": "korean-travel",
+    "title": "Bài học: Đi tàu điện ngầm & Đổi tuyến ở Seoul",
+    "levelCode": "ELEMENTARY",
+    "steps": [
+      {
+        "type": "word-builder",
+        "title": "Ghép câu hỏi lối ra tàu điện ngầm",
+        "instruction": "Chạm vào các thẻ từ để tạo câu hoàn chỉnh:",
+        "prompt": "강남역 2번 출구가 어디예요?",
+        "romanization": "Gangnam-yeok ibeon chulguga eodiyeyo?",
+        "audioText": "강남역 2번 출구가 어디예요?",
+        "tiles": ["ở đâu", "cửa số 2", "ga Gangnam", "cho tôi", "cảm ơn", "tuyến số 1"],
+        "correctTiles": ["ga Gangnam", "cửa số 2", "ở đâu"]
+      },
+      {
+        "type": "listen-choose",
+        "title": "Nghe thông báo trên loa tàu điện ngầm",
+        "instruction": "Lắng nghe thông báo ga dừng:",
+        "prompt": "이번 역은 강남, 강남역입니다. 내리실 문은 오른쪽입니다.",
+        "romanization": "Ibeon yeog-eun Gangnam, Gangnam-yeog-imnida.",
+        "audioText": "이번 역은 강남, 강남역입니다. 내리실 문은 오른쪽입니다.",
+        "options": [
+          { "id": "1", "text": "Ga tiếp theo là ga Gangnam, cửa ra bên phải.", "correct": true },
+          { "id": "2", "text": "Chuyến tàu sẽ kết thúc tại đây.", "correct": false },
+          { "id": "3", "text": "Xin quý khách cẩn thận bậc thang lên xuống.", "correct": false }
+        ]
+      },
+      {
+        "type": "speak",
+        "title": "Nói câu hỏi đường lịch sự",
+        "instruction": "Bấm vào mic và nói to rõ ràng:",
+        "prompt": "실례지만, 2호선 환승은 어디로 가나요?",
+        "romanization": "Sillyejiman, i-hoseon hwanseung-eun eodiro ganayo?",
+        "audioText": "실례지만, 2호선 환승은 어디로 가나요?"
+      },
+      {
+        "type": "matching",
+        "title": "Nối từ vựng giao thông tàu điện ngầm",
+        "instruction": "Nối cặp từ tương ứng:",
+        "prompt": "Ghép các cặp từ:",
+        "audioText": "지하철. 환승. 출구.",
+        "pairs": [
+          { "id": "1", "left": "지하철", "right": "Tàu điện ngầm" },
+          { "id": "2", "left": "환승", "right": "Đổi tuyến" },
+          { "id": "3", "left": "출구", "right": "Cửa ra / Lối thoát" }
+        ]
+      }
+    ]
+  }
+]

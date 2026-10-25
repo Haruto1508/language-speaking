@@ -1,0 +1,28 @@
+[
+  {
+    "id": 9,
+    "languageCode": "EN",
+    "levelCode": "BEGINNER",
+    "grammarPoint": "Where is + [Noun]? / Where can I find + [Noun]? (Hỏi vị trí địa điểm)",
+    "pattern": "Where is + [Noun]?",
+    "meaning": "[Địa điểm/Đồ vật] ở đâu vậy?",
+    "explanation": "Mẫu câu hỏi đường và vị trí đơn giản, hiệu quả nhất tại sân bay, nhà ga, trung tâm thương mại.",
+    "formula": "Where is + the + [Noun]?",
+    "exampleSentence": "Excuse me, where is Gate 14?",
+    "translation": "Xin lỗi, Cổng lên máy bay số 14 ở đâu vậy?",
+    "pitfalls": "Nếu là danh từ số nhiều thì dùng 'Where are + [Plural Noun]?' (ví dụ: Where are the restrooms?)."
+  },
+  {
+    "id": 10,
+    "languageCode": "EN",
+    "levelCode": "BEGINNER",
+    "grammarPoint": "I would like to + [Verb]... (Tôi muốn làm gì - Lịch sự)",
+    "pattern": "I would like to + [Verb]...",
+    "meaning": "Tôi muốn [Hành động] / Cho tôi xin phép...",
+    "explanation": "Dùng thay cho 'I want to' để tăng tính lịch sự và nhã nhặn khi giao dịch với nhân viên dịch vụ.",
+    "formula": "I would like to (hoặc I'd like to) + Verb nguyên thể",
+    "exampleSentence": "I would like to check in for my flight to Tokyo.",
+    "translation": "Tôi muốn làm thủ tục cho chuyến bay đi Tokyo.",
+    "pitfalls": "Người bản xứ thường nói tắt thành 'I'd like to' [aɪd laɪk tuː]."
+  }
+]

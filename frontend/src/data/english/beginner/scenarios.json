@@ -1,0 +1,26 @@
+[
+  {
+    "id": 7,
+    "topicCode": "english-airport",
+    "languageCode": "EN",
+    "levelCode": "BEGINNER",
+    "title": "Thủ tục check-in tại quầy sân bay quốc tế",
+    "description": "Xuất trình hộ chiếu, gửi hành lý ký gửi, chọn chỗ ngồi gần cửa sổ và nhận thẻ lên máy bay.",
+    "userRole": "Hành khách (Passenger)",
+    "aiRole": "Nhân viên quầy làm thủ tục (Airline Agent)",
+    "initialGreeting": "Good morning! Welcome to SkyWays Airlines. Where are you flying to today?",
+    "culturalContext": "Luôn chào lại 'Good morning' và có sẵn giấy tờ trong tay. Nếu muốn ghế gần cửa sổ hãy nói: 'Could I get a window seat, please?'."
+  },
+  {
+    "id": 8,
+    "topicCode": "english-greetings",
+    "languageCode": "EN",
+    "levelCode": "BEGINNER",
+    "title": "Giao lưu kết bạn tại sự kiện quốc tế",
+    "description": "Làm quen với một người bạn quốc tế, giới thiệu quốc tịch, công việc và sở thích bản thân.",
+    "userRole": "Người tham gia (Participant)",
+    "aiRole": "Bạn đồng hành (Networking Partner)",
+    "initialGreeting": "Hi there! Mind if I join you at this table? I'm David from Canada.",
+    "culturalContext": "Văn hóa phương Tây cởi mở khi bắt chuyện (small talk) về thời tiết, đồ uống hoặc sự kiện trước khi đi sâu vào chi tiết cá nhân."
+  }
+]

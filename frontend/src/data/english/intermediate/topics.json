@@ -20,16 +20,5 @@
     "icon": "Briefcase",
     "estimatedMinutes": 30,
     "orderIndex": 2
-  },
-  {
-    "id": 7,
-    "languageCode": "EN",
-    "levelCode": "BEGINNER",
-    "code": "english-airport",
-    "name": "Sân bay & Nhập cảnh quốc tế",
-    "description": "Làm thủ tục check-in, qua cửa an ninh, khai báo hải quan và tìm cổng lên máy bay.",
-    "icon": "Plane",
-    "estimatedMinutes": 25,
-    "orderIndex": 3
   }
 ]

@@ -31,16 +31,5 @@
     "icon": "Coffee",
     "estimatedMinutes": 20,
     "orderIndex": 3
-  },
-  {
-    "id": 4,
-    "languageCode": "KO",
-    "levelCode": "ELEMENTARY",
-    "code": "korean-travel",
-    "name": "Hỏi đường & Tàu điện ngầm",
-    "description": "Hỏi lối ra ga tàu điện ngầm Gangnam/Hongdae, bắt taxi và hỏi khoảng cách đi bộ.",
-    "icon": "Compass",
-    "estimatedMinutes": 25,
-    "orderIndex": 4
   }
 ]

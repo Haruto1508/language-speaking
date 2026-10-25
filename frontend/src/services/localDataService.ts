@@ -1,16 +1,30 @@
-// Korean Data
-import koTopics from '../data/korean/topics.json';
-import koVocab from '../data/korean/vocabulary.json';
-import koGrammar from '../data/korean/grammar.json';
-import koScenarios from '../data/korean/scenarios.json';
-import koLessons from '../data/korean/lessons.json';
+// Korean - Beginner
+import koBeginnerTopics from '../data/korean/beginner/topics.json';
+import koBeginnerVocab from '../data/korean/beginner/vocabulary.json';
+import koBeginnerGrammar from '../data/korean/beginner/grammar.json';
+import koBeginnerLessons from '../data/korean/beginner/lessons.json';
+import koBeginnerScenarios from '../data/korean/beginner/scenarios.json';
 
-// English Data
-import enTopics from '../data/english/topics.json';
-import enVocab from '../data/english/vocabulary.json';
-import enGrammar from '../data/english/grammar.json';
-import enScenarios from '../data/english/scenarios.json';
-import enLessons from '../data/english/lessons.json';
+// Korean - Elementary
+import koElemTopics from '../data/korean/elementary/topics.json';
+import koElemVocab from '../data/korean/elementary/vocabulary.json';
+import koElemGrammar from '../data/korean/elementary/grammar.json';
+import koElemLessons from '../data/korean/elementary/lessons.json';
+import koElemScenarios from '../data/korean/elementary/scenarios.json';
+
+// English - Beginner
+import enBeginnerTopics from '../data/english/beginner/topics.json';
+import enBeginnerVocab from '../data/english/beginner/vocabulary.json';
+import enBeginnerGrammar from '../data/english/beginner/grammar.json';
+import enBeginnerLessons from '../data/english/beginner/lessons.json';
+import enBeginnerScenarios from '../data/english/beginner/scenarios.json';
+
+// English - Intermediate
+import enInterTopics from '../data/english/intermediate/topics.json';
+import enInterVocab from '../data/english/intermediate/vocabulary.json';
+import enInterGrammar from '../data/english/intermediate/grammar.json';
+import enInterLessons from '../data/english/intermediate/lessons.json';
+import enInterScenarios from '../data/english/intermediate/scenarios.json';
 
 import {
   Topic,
@@ -22,6 +36,77 @@ import {
   LanguageCode,
   ProficiencyLevelCode,
 } from '../types';
+
+export interface LessonStep {
+  type: string;
+  title: string;
+  instruction: string;
+  prompt: string;
+  romanization?: string;
+  audioText?: string;
+  tiles?: string[];
+  correctTiles?: string[];
+  options?: Array<{ id: string; text: string; correct: boolean }>;
+  pairs?: Array<{ id: string; left: string; right: string }>;
+}
+
+export interface LocalLesson {
+  id: number;
+  languageCode: string;
+  topicCode: string;
+  title: string;
+  levelCode: string;
+  steps: LessonStep[];
+}
+
+interface LevelDataset {
+  topics: Topic[];
+  vocabulary: Vocabulary[];
+  grammar: Grammar[];
+  lessons: LocalLesson[];
+  scenarios: ConversationScenario[];
+}
+
+// Organized strictly by Language and Proficiency Level
+const dataset: Record<LanguageCode, Partial<Record<ProficiencyLevelCode, LevelDataset>>> = {
+  KO: {
+    BEGINNER: {
+      topics: koBeginnerTopics as unknown as Topic[],
+      vocabulary: koBeginnerVocab as unknown as Vocabulary[],
+      grammar: koBeginnerGrammar as unknown as Grammar[],
+      lessons: koBeginnerLessons as unknown as LocalLesson[],
+      scenarios: koBeginnerScenarios as unknown as ConversationScenario[],
+    },
+    ELEMENTARY: {
+      topics: koElemTopics as unknown as Topic[],
+      vocabulary: koElemVocab as unknown as Vocabulary[],
+      grammar: koElemGrammar as unknown as Grammar[],
+      lessons: koElemLessons as unknown as LocalLesson[],
+      scenarios: koElemScenarios as unknown as ConversationScenario[],
+    },
+  },
+  EN: {
+    BEGINNER: {
+      topics: enBeginnerTopics as unknown as Topic[],
+      vocabulary: enBeginnerVocab as unknown as Vocabulary[],
+      grammar: enBeginnerGrammar as unknown as Grammar[],
+      lessons: enBeginnerLessons as unknown as LocalLesson[],
+      scenarios: enBeginnerScenarios as unknown as ConversationScenario[],
+    },
+    INTERMEDIATE: {
+      topics: enInterTopics as unknown as Topic[],
+      vocabulary: enInterVocab as unknown as Vocabulary[],
+      grammar: enInterGrammar as unknown as Grammar[],
+      lessons: enInterLessons as unknown as LocalLesson[],
+      scenarios: enInterScenarios as unknown as ConversationScenario[],
+    },
+  },
+};
+
+const getLanguageLevels = (language: LanguageCode): LevelDataset[] => {
+  const langData = dataset[language] || {};
+  return Object.values(langData) as LevelDataset[];
+};
 
 const STORAGE_KEYS = {
   VOCAB_PROGRESS: 'linguatalk_vocab_progress',
@@ -50,22 +135,39 @@ const saveVocabProgress = (vocabId: number, status: string) => {
 };
 
 export const localDataService = {
-  // Topics (separated by Korean and English)
+  // Topics (separated by Language and Level)
   getTopics: (language: LanguageCode, level?: ProficiencyLevelCode): Topic[] => {
-    const source = language === 'KO' ? koTopics : enTopics;
-    return (source as unknown as Topic[]).filter((t) => (level ? t.levelCode === level : true));
+    if (level && dataset[language]?.[level]) {
+      return dataset[language][level]!.topics;
+    }
+    const levels = getLanguageLevels(language);
+    const all = levels.flatMap((l) => l.topics);
+    return level ? all.filter((t) => t.levelCode === level) : all;
   },
 
   getTopicByCode: (code: string): Topic | undefined => {
-    const all = [...(koTopics as unknown as Topic[]), ...(enTopics as unknown as Topic[])];
+    const all = [
+      ...getLanguageLevels('KO').flatMap((l) => l.topics),
+      ...getLanguageLevels('EN').flatMap((l) => l.topics),
+    ];
     return all.find((t) => t.code === code);
   },
 
-  // Vocabulary (separated by Korean and English)
-  getVocabulary: (language: LanguageCode, search?: string): Vocabulary[] => {
+  // Vocabulary (separated by Language and Level)
+  getVocabulary: (language: LanguageCode, search?: string, level?: ProficiencyLevelCode): Vocabulary[] => {
     const storedProgress = getStoredVocabProgress();
-    const source = language === 'KO' ? koVocab : enVocab;
-    let list = (source as unknown as Vocabulary[]).map((v) => ({
+    let source: Vocabulary[];
+    if (level && dataset[language]?.[level]) {
+      source = dataset[language][level]!.vocabulary;
+    } else {
+      const levels = getLanguageLevels(language);
+      source = levels.flatMap((l) => l.vocabulary);
+      if (level) {
+        source = source.filter((v) => v.levelCode === level);
+      }
+    }
+
+    let list = source.map((v) => ({
       ...v,
       userStatus: (storedProgress[v.id] || v.userStatus || 'NEW') as Vocabulary['userStatus'],
     }));
@@ -87,14 +189,18 @@ export const localDataService = {
     saveVocabProgress(id, status);
   },
 
-  // Grammar (separated by Korean and English)
-  getGrammar: (language: LanguageCode): Grammar[] => {
-    const source = language === 'KO' ? koGrammar : enGrammar;
-    return source as unknown as Grammar[];
+  // Grammar (separated by Language and Level)
+  getGrammar: (language: LanguageCode, level?: ProficiencyLevelCode): Grammar[] => {
+    if (level && dataset[language]?.[level]) {
+      return dataset[language][level]!.grammar;
+    }
+    const levels = getLanguageLevels(language);
+    const all = levels.flatMap((l) => l.grammar);
+    return level ? all.filter((g) => g.levelCode === level) : all;
   },
 
-  // Scenarios (separated by Korean and English)
-  getScenarios: (language: LanguageCode): ConversationScenario[] => {
+  // Scenarios (separated by Language and Level)
+  getScenarios: (language: LanguageCode, level?: ProficiencyLevelCode): ConversationScenario[] => {
     let custom: ConversationScenario[] = [];
     try {
       const raw = localStorage.getItem(STORAGE_KEYS.CUSTOM_SCENARIOS);
@@ -103,19 +209,36 @@ export const localDataService = {
       // ignore
     }
 
-    const defaultItems = (language === 'KO' ? koScenarios : enScenarios) as unknown as ConversationScenario[];
-    const matchingCustom = custom.filter((s) => s.languageCode === language);
+    let defaultItems: ConversationScenario[];
+    if (level && dataset[language]?.[level]) {
+      defaultItems = dataset[language][level]!.scenarios;
+    } else {
+      const levels = getLanguageLevels(language);
+      defaultItems = levels.flatMap((l) => l.scenarios);
+      if (level) {
+        defaultItems = defaultItems.filter((s) => s.levelCode === level);
+      }
+    }
+
+    const matchingCustom = custom.filter((s) => s.languageCode === language && (!level || s.levelCode === level));
     return [...matchingCustom, ...defaultItems];
   },
 
-  // Lessons (separated by Korean and English)
+  // Lessons (separated by Language and Level)
   getLessonById: (id: number) => {
-    const all = [...koLessons, ...enLessons];
-    return all.find((l) => l.id === id) || koLessons[0];
+    const all = [
+      ...getLanguageLevels('KO').flatMap((l) => l.lessons),
+      ...getLanguageLevels('EN').flatMap((l) => l.lessons),
+    ];
+    return all.find((l) => l.id === id) || all[0];
   },
 
-  getLessonsByLanguage: (language: LanguageCode) => {
-    return language === 'KO' ? koLessons : enLessons;
+  getLessonsByLanguage: (language: LanguageCode, level?: ProficiencyLevelCode) => {
+    if (level && dataset[language]?.[level]) {
+      return dataset[language][level]!.lessons;
+    }
+    const levels = getLanguageLevels(language);
+    return levels.flatMap((l) => l.lessons);
   },
 
   // Reviews

@@ -22,17 +22,5 @@
     "aiRole": "Barista (바리스타)",
     "initialGreeting": "안녕하세요! 주문 도와드리겠습니다. 드시고 가시나요?",
     "culturalContext": "Người Hàn hay gọi tắt Ice Americano là '아아'. Uống tại quán sẽ dùng ly thủy tinh, mang đi dùng ly giấy."
-  },
-  {
-    "id": 3,
-    "topicCode": "korean-travel",
-    "languageCode": "KO",
-    "levelCode": "ELEMENTARY",
-    "title": "Hỏi đường tại ga tàu điện ngầm Gangnam",
-    "description": "Hỏi đường đến lối ra số 11 và thời gian đi bộ.",
-    "userRole": "Khách du lịch (여행자)",
-    "aiRole": "Người qua đường (행인)",
-    "initialGreeting": "네, 안녕하세요! 길 찾으시나요?",
-    "culturalContext": "Mở đầu bằng '저기요, 실례지만...' khi hỏi đường người lạ ở ga tàu điện ngầm."
   }
 ]

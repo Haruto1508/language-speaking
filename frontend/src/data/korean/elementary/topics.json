@@ -1,0 +1,24 @@
+[
+  {
+    "id": 4,
+    "languageCode": "KO",
+    "levelCode": "ELEMENTARY",
+    "code": "korean-travel",
+    "name": "Giao thông & Hỏi đường du lịch",
+    "description": "Đi tàu điện ngầm Seoul, mua thẻ T-money, hỏi đường đến các địa danh nổi tiếng và gọi taxi.",
+    "icon": "MapPin",
+    "estimatedMinutes": 25,
+    "orderIndex": 1
+  },
+  {
+    "id": 8,
+    "languageCode": "KO",
+    "levelCode": "ELEMENTARY",
+    "code": "korean-shopping",
+    "name": "Mua sắm tại chợ Dongdaemun",
+    "description": "Hỏi giá, xin thử đồ, mặc cả lịch sự và hỏi về hoàn thuế du lịch (Tax Refund).",
+    "icon": "ShoppingBag",
+    "estimatedMinutes": 20,
+    "orderIndex": 2
+  }
+]

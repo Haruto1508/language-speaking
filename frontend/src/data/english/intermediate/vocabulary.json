@@ -28,7 +28,7 @@
     "pronunciationIpa": "[tə ɡoʊ / fɔːr hɪər]",
     "exampleSentence": "Will that be for here or to go? - To go, please!",
     "translation": "Bạn dùng ở đây hay mang về ạ? - Mang về giúp tôi nhé!",
-    "difficulty": "Mới bắt đầu",
+    "difficulty": "Trung cấp",
     "collocations": "Make that to-go / Have it for here",
     "hangul": "",
     "romanization": "",
@@ -55,5 +55,24 @@
     "soundChanges": "Phát âm âm r uốn lưỡi tự nhiên",
     "breakdownJson": "{\"morphemes\": [{\"part\": \"Situation\", \"meaning\": \"Hoàn cảnh\"}, {\"part\": \"Task\", \"meaning\": \"Nhiệm vụ\"}, {\"part\": \"Action\", \"meaning\": \"Hành động\"}, {\"part\": \"Result\", \"meaning\": \"Kết quả\"}]}",
     "userStatus": "NEW"
+  },
+  {
+    "id": 9,
+    "languageCode": "EN",
+    "levelCode": "INTERMEDIATE",
+    "word": "Trade-off",
+    "meaning": "Sự cân nhắc đánh đổi (giữa hiệu năng, chi phí hoặc thời gian)",
+    "partOfSpeech": "Danh từ",
+    "pronunciationIpa": "[ˈtreɪd.ɔːf]",
+    "exampleSentence": "We chose PostgreSQL over MongoDB after evaluating the trade-offs in data consistency.",
+    "translation": "Chúng tôi chọn PostgreSQL thay vì MongoDB sau khi đánh giá các yếu tố đánh đổi về tính nhất quán dữ liệu.",
+    "difficulty": "Trung cấp",
+    "collocations": "Engineering trade-off, evaluate the trade-offs",
+    "hangul": "",
+    "romanization": "",
+    "batchimRules": "",
+    "soundChanges": "Trọng âm âm tiết đầu 'trade'",
+    "breakdownJson": "{\"morphemes\": [{\"part\": \"Trade\", \"meaning\": \"trao đổi\"}, {\"part\": \"Off\", \"meaning\": \"bớt/giảm đi\"}]}",
+    "userStatus": "LEARNING"
   }
 ]

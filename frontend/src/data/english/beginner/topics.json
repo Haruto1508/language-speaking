@@ -1,0 +1,24 @@
+[
+  {
+    "id": 7,
+    "languageCode": "EN",
+    "levelCode": "BEGINNER",
+    "code": "english-airport",
+    "name": "Sân bay & Nhập cảnh quốc tế",
+    "description": "Làm thủ tục check-in, qua cửa an ninh, khai báo hải quan và tìm cổng lên máy bay.",
+    "icon": "Plane",
+    "estimatedMinutes": 25,
+    "orderIndex": 1
+  },
+  {
+    "id": 9,
+    "languageCode": "EN",
+    "levelCode": "BEGINNER",
+    "code": "english-greetings",
+    "name": "Giao tiếp hàng ngày & Kết bạn",
+    "description": "Làm quen, giới thiệu nghề nghiệp, sở thích và cách chào tạm biệt tự nhiên.",
+    "icon": "Smile",
+    "estimatedMinutes": 15,
+    "orderIndex": 2
+  }
+]

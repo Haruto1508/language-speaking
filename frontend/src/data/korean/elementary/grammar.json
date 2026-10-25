@@ -1,0 +1,41 @@
+[
+  {
+    "id": 6,
+    "languageCode": "KO",
+    "levelCode": "ELEMENTARY",
+    "grammarPoint": "V + (으)러 가다 / 오다 (Đi / Đến để làm gì)",
+    "pattern": "V + (으)러 가다 / 오다",
+    "meaning": "Đi / Đến đâu để thực hiện [Hành động]",
+    "explanation": "Cấu trúc chỉ mục đích di chuyển, thường dùng khi nói về lý do đi đến một địa điểm nào đó như mua sắm, ăn cơm, xem phim.",
+    "formula": "Gốc động từ có patchim + 으러 가다/오다; không patchim hoặc patchim ㄹ + 러 가다/오다",
+    "exampleSentence": "동대문 시장에 옷 사러 가요.",
+    "translation": "Tôi đi đến chợ Dongdaemun để mua quần áo.",
+    "pitfalls": "Cấu trúc này chỉ đi kèm với các động từ di chuyển như 가다, 오다, 다니다."
+  },
+  {
+    "id": 7,
+    "languageCode": "KO",
+    "levelCode": "ELEMENTARY",
+    "grammarPoint": "A/V + 아/어서 (Vì... nên... / Làm gì rồi liên tiếp)",
+    "pattern": "A/V + 아/어서",
+    "meaning": "Vì [Nguyên nhân] nên [Kết quả] / Làm việc gì rồi làm tiếp",
+    "explanation": "Dùng để nối hai vế câu diễn tả quan hệ nhân quả tự nhiên hoặc thứ tự hành động có liên hệ mật thiết.",
+    "formula": "Gốc từ nguyên âm ㅏ, ㅗ + 아서; nguyên âm khác + 어서; 하다 -> 해서",
+    "exampleSentence": "길이 너무 복잡해서 지하철을 탔어요.",
+    "translation": "Vì đường quá tắc nghẽn nên tôi đã đi tàu điện ngầm.",
+    "pitfalls": "Vế sau của '아/어서' tuyệt đối không dùng câu mệnh lệnh (-(으)세요) hoặc rủ rê (-(으)ㅂ시다)."
+  },
+  {
+    "id": 8,
+    "languageCode": "KO",
+    "levelCode": "ELEMENTARY",
+    "grammarPoint": "N + (으)로 가주세요 (Làm ơn cho tôi đến [Địa điểm] - Khi đi taxi)",
+    "pattern": "N + (으)로 가주세요",
+    "meaning": "Làm ơn chở tôi đến [Địa điểm]",
+    "explanation": "Mẫu câu thực tế thông dụng nhất khi bước lên xe taxi ở Hàn Quốc.",
+    "formula": "Địa điểm + (으)로 + 가주세요",
+    "exampleSentence": "기사님, 명동역 3번 출구로 가주세요.",
+    "translation": "Bác tài ơi, làm ơn cho cháu đến cửa số 3 ga Myeongdong nhé.",
+    "pitfalls": "Nếu danh từ kết thúc bằng phụ âm thêm '으로', kết thúc bằng nguyên âm hoặc 'ㄹ' thêm '로'."
+  }
+]
