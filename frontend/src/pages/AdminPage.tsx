@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Tag,
   Button,
@@ -25,17 +26,21 @@ import {
   Cpu,
   Layers,
   Settings,
+  Trash2,
+  PlayCircle,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { api } from '../services/api';
 import { useAppStore } from '../stores/useAppStore';
-import { ContentStatus, LessonDetail, LessonSummary, ProficiencyLevelCode, LanguageCode, formatLevelVietnamese } from '../types';
+import { ContentStatus, LessonDetail, LessonSummary, ProficiencyLevelCode, LanguageCode, formatLevelVietnamese, ConversationScenario } from '../types';
 import { generateFullLessonWithAi, ingestRawContentToLesson } from '../services/aiGenerator';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
 const STORAGE_KEY = 'linguatalk_admin_lessons';
+const FULL_LESSONS_KEY = 'linguatalk_full_lessons';
+
 const getStoredAdminLessons = (): LessonSummary[] => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -53,8 +58,28 @@ const saveAdminLessons = (list: LessonSummary[]) => {
   }
 };
 
+export const saveFullLessonDetail = (lesson: LessonDetail) => {
+  try {
+    const existing = JSON.parse(localStorage.getItem(FULL_LESSONS_KEY) || '{}');
+    existing[lesson.id] = lesson;
+    localStorage.setItem(FULL_LESSONS_KEY, JSON.stringify(existing));
+  } catch (e) {
+    console.error('Failed to save full lesson', e);
+  }
+};
+
+export const getFullLessonDetail = (id: number): LessonDetail | null => {
+  try {
+    const existing = JSON.parse(localStorage.getItem(FULL_LESSONS_KEY) || '{}');
+    return existing[id] || null;
+  } catch {
+    return null;
+  }
+};
+
 export const AdminPage: React.FC = () => {
-  const { targetLanguage, apiKey, apiProvider } = useAppStore();
+  const navigate = useNavigate();
+  const { targetLanguage, apiKey, apiProvider, addCustomScenario } = useAppStore();
 
   const [activeTab, setActiveTab] = useState('generate');
   const [lessons, setLessons] = useState<LessonSummary[]>([]);
@@ -99,7 +124,13 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
       setLoading(true);
       const data = await api.admin.getLessons();
       const stored = getStoredAdminLessons();
-      setLessons([...stored, ...data]);
+      const combined = [...stored];
+      for (const item of data) {
+        if (!combined.some((c) => c.id === item.id)) {
+          combined.push(item);
+        }
+      }
+      setLessons(combined);
     } catch (e) {
       console.warn('Admin load error, using stored and mock lessons list', e);
       const stored = getStoredAdminLessons();
@@ -108,6 +139,7 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
           id: 1,
           topicId: 1,
           topicName: 'Nhà hàng & Ẩm thực',
+          languageCode: 'KO',
           title: 'Gọi món tại quán ăn Hàn Quốc (식당에서 주문하기)',
           scenario: 'Gọi món canh kim chi, xin thêm nước và gọi thanh toán hóa đơn.',
           description: 'Làm chủ đuôi câu lịch sự -요, xưng hô 저기요 và hỏi món gợi ý.',
@@ -122,6 +154,7 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
           id: 2,
           topicId: 5,
           topicName: 'Quán Cà phê Specialty',
+          languageCode: 'EN',
           title: 'Gọi đồ uống tại quán Specialty Coffee',
           scenario: 'Đặt thức uống tùy chỉnh, hỏi về hồ sơ hạt rang và thanh toán.',
           description: 'Làm chủ các mẫu câu lịch sự (Could I get), mức rang và lựa chọn mang về.',
@@ -136,6 +169,7 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
           id: 3,
           topicId: 1,
           topicName: 'Khách sạn & Lưu trú',
+          languageCode: 'KO',
           title: 'Thủ tục nhận phòng khách sạn Boutique',
           scenario: 'Nhận phòng, hỏi giờ ăn sáng và gửi hành lý.',
           description: 'Giáo trình do AI tạo tự động, đang chờ phê duyệt.',
@@ -147,7 +181,13 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
           exercisesCount: 2,
         },
       ];
-      setLessons([...stored, ...defaultMock]);
+      const combined = [...stored];
+      for (const item of defaultMock) {
+        if (!combined.some((c) => c.id === item.id)) {
+          combined.push(item);
+        }
+      }
+      setLessons(combined);
     } finally {
       setLoading(false);
     }
@@ -169,6 +209,51 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
     APPROVED: 'Đã phê duyệt',
     PUBLISHED: 'Đã xuất bản',
     ARCHIVED: 'Đã lưu trữ',
+  };
+
+  const handleViewLessonDetail = (summary: LessonSummary) => {
+    const full = getFullLessonDetail(summary.id);
+    if (full) {
+      setGeneratedLesson(full);
+    } else {
+      setGeneratedLesson({
+        id: summary.id,
+        topicId: summary.topicId,
+        topicName: summary.topicName,
+        languageCode: summary.languageCode || 'EN',
+        title: summary.title,
+        scenario: summary.scenario,
+        description: summary.description,
+        difficulty: summary.difficulty,
+        status: summary.status,
+        orderIndex: summary.orderIndex,
+        vocabulary: [],
+        grammar: [],
+        dialogues: [],
+        exercises: [],
+        scenarios: [],
+      });
+    }
+    setIsPreviewOpen(true);
+  };
+
+  const handleDeleteLesson = (id: number) => {
+    setLessons((prev) => {
+      const updated = prev.filter((l) => l.id !== id);
+      saveAdminLessons(updated);
+      return updated;
+    });
+    try {
+      const existing = JSON.parse(localStorage.getItem(FULL_LESSONS_KEY) || '{}');
+      delete existing[id];
+      localStorage.setItem(FULL_LESSONS_KEY, JSON.stringify(existing));
+      const savedScenarios = JSON.parse(localStorage.getItem('duo_custom_scenarios') || '[]');
+      const filteredScenarios = savedScenarios.filter((s: any) => s.id !== id);
+      localStorage.setItem('duo_custom_scenarios', JSON.stringify(filteredScenarios));
+    } catch (e) {
+      console.error(e);
+    }
+    message.success('Đã xóa bài học khỏi danh sách');
   };
 
   const handleGenerateLesson = async () => {
@@ -202,9 +287,31 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
       }
 
       if (result) {
+        saveFullLessonDetail(result);
+
+        // Sync to customScenarios for DuoChatPage so learner can immediately practice
+        try {
+          const scenarioForChat: ConversationScenario = {
+            id: result.id,
+            lessonId: result.id,
+            topicCode: 'custom-' + result.id,
+            languageCode: result.languageCode,
+            levelCode: result.difficulty,
+            title: result.title,
+            description: result.scenario,
+            userRole: result.dialogues?.[0]?.lines?.[0]?.speakerName || (result.languageCode === 'KO' ? 'Khách hàng' : 'Shopper'),
+            aiRole: result.dialogues?.[0]?.lines?.[1]?.speakerName || (result.languageCode === 'KO' ? 'Nhân viên' : 'Staff'),
+            initialGreeting: result.dialogues?.[0]?.lines?.[1]?.textOriginal || (result.languageCode === 'KO' ? '안녕하세요! 무엇을 도와드릴까요?' : 'Hello! How can I help you today?'),
+            culturalContext: result.culturalNotes || '',
+          };
+          addCustomScenario(scenarioForChat);
+        } catch (scErr) {
+          console.warn('Could not sync scenario to store', scErr);
+        }
+
         setGeneratedLesson(result);
         setIsPreviewOpen(true);
-        message.success('Tạo giáo trình bài học bằng AI thành công!');
+        message.success('Tạo giáo trình bài học bằng AI thành công và đã lưu vào hệ thống!');
         confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
 
         const newSummary: LessonSummary = {
@@ -212,6 +319,7 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
           topicId: result.topicId,
           topicName: result.topicName,
           title: result.title,
+          languageCode: result.languageCode,
           scenario: result.scenario,
           description: result.description,
           difficulty: result.difficulty,
@@ -223,7 +331,7 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
         };
 
         setLessons((prev) => {
-          const updated = [newSummary, ...prev];
+          const updated = [newSummary, ...prev.filter((l) => l.id !== newSummary.id)];
           saveAdminLessons(updated);
           return updated;
         });
@@ -262,6 +370,28 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
       }
 
       if (result) {
+        saveFullLessonDetail(result);
+
+        // Sync to customScenarios for DuoChatPage
+        try {
+          const scenarioForChat: ConversationScenario = {
+            id: result.id,
+            lessonId: result.id,
+            topicCode: 'custom-' + result.id,
+            languageCode: result.languageCode,
+            levelCode: result.difficulty,
+            title: result.title,
+            description: result.scenario,
+            userRole: result.dialogues?.[0]?.lines?.[0]?.speakerName || (result.languageCode === 'KO' ? 'Khách hàng' : 'Learner'),
+            aiRole: result.dialogues?.[0]?.lines?.[1]?.speakerName || (result.languageCode === 'KO' ? 'Nhân viên' : 'AI Assistant'),
+            initialGreeting: result.dialogues?.[0]?.lines?.[1]?.textOriginal || (result.languageCode === 'KO' ? '안녕하세요!' : 'Hello!'),
+            culturalContext: result.culturalNotes || '',
+          };
+          addCustomScenario(scenarioForChat);
+        } catch (scErr) {
+          console.warn('Could not sync scenario to store', scErr);
+        }
+
         setGeneratedLesson(result);
         setIsPreviewOpen(true);
         message.success('Đã nạp và biên dịch giáo trình thành bài học chuẩn!');
@@ -272,6 +402,7 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
           topicId: result.topicId,
           topicName: result.topicName,
           title: result.title,
+          languageCode: result.languageCode,
           scenario: result.scenario,
           description: result.description,
           difficulty: result.difficulty,
@@ -283,7 +414,7 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
         };
 
         setLessons((prev) => {
-          const updated = [newSummary, ...prev];
+          const updated = [newSummary, ...prev.filter((l) => l.id !== newSummary.id)];
           saveAdminLessons(updated);
           return updated;
         });
@@ -311,7 +442,9 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
       });
 
       if (generatedLesson && generatedLesson.id === id) {
-        setGeneratedLesson({ ...generatedLesson, status });
+        const updatedDetail = { ...generatedLesson, status };
+        setGeneratedLesson(updatedDetail);
+        saveFullLessonDetail(updatedDetail);
       }
 
       if (status === 'PUBLISHED') {
@@ -475,6 +608,103 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
             {generating ? <Spin size="small" /> : <Sparkles size={16} />}
             <span>{generating ? 'Đang soạn thảo giáo trình...' : 'Bắt đầu Tạo bài học với AI'}</span>
           </button>
+
+          {/* LIST OF CREATED & SAVED CURRICULUMS IN TAB 1 */}
+          <div style={{ marginTop: 36, paddingTop: 24, borderTop: '1.5px solid var(--duo-border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
+              <div>
+                <h4 style={{ fontSize: 18, fontWeight: 900, color: 'var(--duo-text-primary)', margin: 0 }}>
+                  📚 Giáo trình Đã Lưu Vào Hệ thống ({lessons.length} bài)
+                </h4>
+                <span style={{ fontSize: 13, color: 'var(--duo-text-secondary)' }}>
+                  Đã tự động lưu vào bộ nhớ và đồng bộ sẵn sàng vào Phòng Luyện nói AI.
+                </span>
+              </div>
+              <Button
+                type="link"
+                onClick={() => setActiveTab('manage')}
+                style={{ fontWeight: 700, color: '#1CB0F6', padding: 0 }}
+              >
+                Chuyển sang trang Quản lý & Xét duyệt ➔
+              </Button>
+            </div>
+
+            {lessons.length === 0 ? (
+              <div style={{ padding: 28, textAlign: 'center', background: 'var(--duo-bg)', borderRadius: 16, border: '1.5px dashed var(--duo-border)' }}>
+                <p style={{ color: 'var(--duo-text-secondary)', margin: 0 }}>
+                  Chưa có giáo trình nào. Hãy điền thông tin và bấm nút "Tạo bài học với AI" ở trên!
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {lessons.map((lesson, idx) => (
+                  <div
+                    key={lesson.id}
+                    style={{
+                      padding: '16px 20px',
+                      borderRadius: 14,
+                      background: idx === 0 && generatedLesson?.id === lesson.id ? 'rgba(88, 204, 2, 0.08)' : 'var(--duo-bg)',
+                      border: idx === 0 && generatedLesson?.id === lesson.id ? '2px solid #58CC02' : '1.5px solid var(--duo-border)',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      gap: 16,
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+                    }}
+                  >
+                    <div style={{ flex: 1, minWidth: 280 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+                        <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
+                          {lesson.title}
+                        </span>
+                        <Tag color={statusColorMap[lesson.status]}>{statusLabelMap[lesson.status] || lesson.status}</Tag>
+                        <Tag color="cyan">{formatLevelVietnamese(lesson.difficulty)}</Tag>
+                        {lesson.languageCode && (
+                          <Tag color={lesson.languageCode === 'KO' ? 'blue' : 'green'}>
+                            {lesson.languageCode === 'KO' ? '🇰🇷 Tiếng Hàn' : '🇺🇸 Tiếng Anh'}
+                          </Tag>
+                        )}
+                        {idx === 0 && generatedLesson?.id === lesson.id && (
+                          <Tag color="success">Vừa tạo & Đã lưu ✨</Tag>
+                        )}
+                      </div>
+                      <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)', lineHeight: 1.5 }}>
+                        {lesson.scenario}
+                      </div>
+                      <div style={{ display: 'flex', gap: 14, marginTop: 8, fontSize: 12, color: 'var(--duo-text-secondary)' }}>
+                        <span>📖 {lesson.vocabularyCount} từ vựng</span>
+                        <span>📝 {lesson.grammarCount} điểm ngữ pháp</span>
+                        <span>💬 {lesson.exercisesCount > 0 ? `${lesson.exercisesCount} bài tập` : 'Kịch bản đối thoại thực tế'}</span>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <Button
+                        icon={<Eye size={14} />}
+                        onClick={() => handleViewLessonDetail(lesson)}
+                      >
+                        Xem kịch bản
+                      </Button>
+                      <Button
+                        type="primary"
+                        style={{ background: '#58CC02', borderColor: '#58CC02', fontWeight: 700 }}
+                        onClick={() => navigate(`/chat?scenarioId=${lesson.id}`)}
+                      >
+                        🚀 Vào Luyện nói AI
+                      </Button>
+                      <Button
+                        danger
+                        size="small"
+                        icon={<Trash2 size={13} />}
+                        onClick={() => handleDeleteLesson(lesson.id)}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -592,6 +822,20 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
 
                 {/* Workflow Transitions */}
                 <Space>
+                  <Button
+                    size="small"
+                    icon={<Eye size={12} />}
+                    onClick={() => handleViewLessonDetail(lesson)}
+                  >
+                    Xem
+                  </Button>
+                  <Button
+                    size="small"
+                    style={{ background: '#58CC02', borderColor: '#58CC02', color: '#fff', fontWeight: 700 }}
+                    onClick={() => navigate(`/chat?scenarioId=${lesson.id}`)}
+                  >
+                    Luyện nói
+                  </Button>
                   {lesson.status === 'AI_GENERATED' && (
                     <Button
                       size="small"
@@ -616,7 +860,7 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
                       type="primary"
                       onClick={() => handleUpdateStatus(lesson.id, 'PUBLISHED')}
                     >
-                      Xuất bản ngay
+                      Xuất bản
                     </Button>
                   )}
                   {lesson.status === 'PUBLISHED' && (
@@ -628,6 +872,12 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
                       Lưu trữ
                     </Button>
                   )}
+                  <Button
+                    size="small"
+                    danger
+                    icon={<Trash2 size={12} />}
+                    onClick={() => handleDeleteLesson(lesson.id)}
+                  />
                 </Space>
               </div>
             ))}
@@ -647,17 +897,31 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
           open={isPreviewOpen}
           onCancel={() => setIsPreviewOpen(false)}
           footer={
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, paddingTop: 10, borderTop: '1px solid var(--duo-border)' }}>
-              <Button onClick={() => setIsPreviewOpen(false)}>Đóng xem trước</Button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', paddingTop: 10, borderTop: '1px solid var(--duo-border)' }}>
               <Button
                 type="primary"
+                style={{ background: '#58CC02', borderColor: '#58CC02', fontWeight: 700 }}
                 onClick={() => {
                   handleUpdateStatus(generatedLesson.id, 'PUBLISHED');
                   setIsPreviewOpen(false);
+                  navigate(`/chat?scenarioId=${generatedLesson.id}`);
                 }}
               >
-                Phê duyệt & Xuất bản lên hệ thống
+                🚀 Xuất bản & Vào Luyện nói ngay
               </Button>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <Button onClick={() => setIsPreviewOpen(false)}>Đóng xem trước</Button>
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    handleUpdateStatus(generatedLesson.id, 'PUBLISHED');
+                    message.success('Đã xuất bản giáo trình! Bạn có thể xem ngay trong danh sách bên dưới.');
+                    setIsPreviewOpen(false);
+                  }}
+                >
+                  Phê duyệt & Xuất bản
+                </Button>
+              </div>
             </div>
           }
           width={680}

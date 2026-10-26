@@ -74,6 +74,7 @@ export interface LessonSummary {
   topicId: number;
   topicName: string;
   title: string;
+  languageCode?: LanguageCode;
   scenario: string;
   description: string;
   difficulty: ProficiencyLevelCode;
