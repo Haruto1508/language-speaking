@@ -23,9 +23,18 @@ export const ApiKeyModal: React.FC = () => {
   const [promptInput, setPromptInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
 
+  // Sync state with store whenever modal opens
+  React.useEffect(() => {
+    if (isApiKeyModalOpen) {
+      setInputKey(apiKey);
+      setProvider(apiProvider);
+    }
+  }, [isApiKeyModalOpen, apiKey, apiProvider]);
+
   const handleSaveKey = () => {
     setApiKey(inputKey.trim(), provider);
     message.success('Đã lưu cấu hình API Key thành công!');
+    closeApiKeyModal();
   };
 
   const handleGenerateScenario = async () => {
