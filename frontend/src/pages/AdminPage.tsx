@@ -495,7 +495,7 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
     <div style={{ maxWidth: 1100, margin: '0 auto', paddingBottom: 60 }}>
       <div style={{ marginBottom: 28 }}>
         <Title level={2} style={{ color: 'var(--duo-text-primary)', margin: 0, fontWeight: 900 }}>
-          Quản trị Giáo trình & Hệ thống Nạp AI ⚙️
+          Quản trị Giáo trình & Hệ thống Nạp AI
         </Title>
         <Text style={{ color: 'var(--duo-text-secondary)', fontSize: 14 }}>
           Quản lý giáo trình chuẩn, kiểm duyệt bài học do AI tạo và tự động chuyển đổi tài liệu giáo dục thành bài học thực tế.
@@ -650,7 +650,7 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
               <div>
                 <h4 style={{ fontSize: 18, fontWeight: 900, color: 'var(--duo-text-primary)', margin: 0 }}>
-                  📚 Giáo trình Đã Lưu Vào Hệ thống ({filteredLessons.length} bài)
+                  Giáo trình Đã Lưu Vào Hệ thống ({filteredLessons.length} bài)
                 </h4>
                 <span style={{ fontSize: 13, color: 'var(--duo-text-secondary)' }}>
                   Hiển thị theo ngôn ngữ đang chọn ({filterLang === 'KO' ? '🇰🇷 Tiếng Hàn' : '🇺🇸 Tiếng Anh'}). Đã đồng bộ sẵn sàng vào Luyện nói AI.
@@ -758,7 +758,7 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
                         style={{ background: '#58CC02', borderColor: '#58CC02', fontWeight: 700 }}
                         onClick={() => navigate(`/chat?scenarioId=${lesson.id}`)}
                       >
-                        🚀 Vào Luyện nói AI
+                        Vào Luyện nói AI
                       </Button>
                       <Button
                         danger

@@ -372,7 +372,7 @@ export const ReviewPage: React.FC = () => {
 
                   {/* Card Center */}
                   {!isFlipped ? (
-                    // Mặt trước: Từ vựng + Phiên âm + Nút loa
+                    // Mặt trước: Từ vựng + Phiên âm
                     <div style={{ margin: 'auto 0' }}>
                       <div
                         className={isKo ? 'lang-ko' : ''}
@@ -380,45 +380,17 @@ export const ReviewPage: React.FC = () => {
                           fontSize: 'clamp(2.4rem, 6vw, 3.4rem)',
                           fontWeight: 900,
                           color: 'var(--duo-text-primary)',
-                          marginBottom: 10,
+                          marginBottom: currentItem.romanization ? 10 : 0,
                         }}
                       >
                         {currentItem.word}
                       </div>
 
                       {currentItem.romanization && (
-                        <div style={{ fontSize: 17, color: '#1CB0F6', fontStyle: 'italic', marginBottom: 16 }}>
+                        <div style={{ fontSize: 17, color: '#1CB0F6', fontStyle: 'italic' }}>
                           [{currentItem.romanization}]
                         </div>
                       )}
-
-                      <div style={{ display: 'flex', gap: 10, justifyContent: 'center', alignItems: 'center' }}>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            speakText(currentItem.word, isKo ? 'KO' : 'EN', 0.95);
-                          }}
-                          className="duo-btn-outline"
-                          style={{ padding: '8px 18px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}
-                          title="Nghe phát âm bình thường (1.0x)"
-                        >
-                          <Volume2 size={18} color="#1CB0F6" />
-                          <span>Nghe</span>
-                        </button>
-
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            speakSlow(currentItem.word, isKo ? 'KO' : 'EN');
-                          }}
-                          className="duo-btn-outline"
-                          style={{ padding: '8px 16px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 6, color: '#58CC02', borderColor: 'rgba(88, 204, 2, 0.4)' }}
-                          title="Nghe phát âm chậm (chú rùa 🐢 0.6x)"
-                        >
-                          <Turtle size={18} color="#58CC02" />
-                          <span>Chậm</span>
-                        </button>
-                      </div>
                     </div>
                   ) : (
                     // Mặt sau: Ý nghĩa + Ví dụ
@@ -481,10 +453,40 @@ export const ReviewPage: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Bottom hint */}
-                  <div style={{ fontSize: 12, color: 'var(--duo-text-muted)', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, marginTop: 20 }}>
-                    <RotateCw size={14} />
-                    <span>Chạm vào thẻ để {isFlipped ? 'xem từ gốc' : 'lật xem nghĩa & câu ví dụ'}</span>
+                  {/* Bottom Area: 2 nút loa & gợi ý lật thẻ */}
+                  <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, marginTop: 24 }}>
+                    <div style={{ display: 'flex', gap: 10, justifyContent: 'center', alignItems: 'center' }}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          speakText(currentItem.word, isKo ? 'KO' : 'EN', 0.95);
+                        }}
+                        className="duo-btn-outline"
+                        style={{ padding: '8px 18px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                        title="Nghe phát âm bình thường (1.0x)"
+                      >
+                        <Volume2 size={18} color="#1CB0F6" />
+                        <span>Nghe</span>
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          speakSlow(currentItem.word, isKo ? 'KO' : 'EN');
+                        }}
+                        className="duo-btn-outline"
+                        style={{ padding: '8px 16px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 6, color: '#58CC02', borderColor: 'rgba(88, 204, 2, 0.4)' }}
+                        title="Nghe phát âm chậm (chú rùa 🐢 0.6x)"
+                      >
+                        <Turtle size={18} color="#58CC02" />
+                        <span>Chậm</span>
+                      </button>
+                    </div>
+
+                    <div style={{ fontSize: 12, color: 'var(--duo-text-muted)', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}>
+                      <RotateCw size={14} />
+                      <span>Chạm vào thẻ để {isFlipped ? 'xem từ gốc' : 'lật xem nghĩa & câu ví dụ'}</span>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -208,7 +208,7 @@ export const GrammarPage: React.FC = () => {
               transition: 'all 0.15s ease',
             }}
           >
-            🌱 Mẫu câu mới cần học ({newCount})
+            Mẫu câu mới cần học ({newCount})
           </button>
 
           <button
@@ -233,7 +233,7 @@ export const GrammarPage: React.FC = () => {
         </div>
 
         <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)', fontWeight: 600 }}>
-          💡 <strong style={{ color: '#58CC02' }}>Quy tắc:</strong> Mẫu câu mới luôn được tự động xếp lên đầu (20 câu/trang)
+          <strong style={{ color: '#58CC02' }}>Quy tắc:</strong> Mẫu câu mới luôn được tự động xếp lên đầu (20 câu/trang)
         </div>
       </div>
 
@@ -256,7 +256,7 @@ export const GrammarPage: React.FC = () => {
             if (gram.exampleConversationsJson) {
               try {
                 convExamples = JSON.parse(gram.exampleConversationsJson);
-              } catch (e) {}
+              } catch (e) { }
             }
 
             const formulaText = gram.structureFormula || gram.formula;
@@ -279,7 +279,7 @@ export const GrammarPage: React.FC = () => {
                     {isKnown ? (
                       <Tag color="green" style={{ borderRadius: 6, fontWeight: 800 }}>✓ ĐÃ BIẾT</Tag>
                     ) : (
-                      <Tag color="gold" style={{ borderRadius: 6, fontWeight: 800 }}>🌱 MẪU CÂU MỚI</Tag>
+                      <Tag color="gold" style={{ borderRadius: 6, fontWeight: 800 }}> MẪU CÂU MỚI</Tag>
                     )}
                   </div>
 
