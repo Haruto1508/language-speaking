@@ -29,13 +29,32 @@ import {
 import confetti from 'canvas-confetti';
 import { api } from '../services/api';
 import { useAppStore } from '../stores/useAppStore';
-import { ContentStatus, LessonDetail, LessonSummary, ProficiencyLevelCode, formatLevelVietnamese } from '../types';
+import { ContentStatus, LessonDetail, LessonSummary, ProficiencyLevelCode, LanguageCode, formatLevelVietnamese } from '../types';
+import { generateFullLessonWithAi, ingestRawContentToLesson } from '../services/aiGenerator';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
+const STORAGE_KEY = 'linguatalk_admin_lessons';
+const getStoredAdminLessons = (): LessonSummary[] => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveAdminLessons = (list: LessonSummary[]) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  } catch (e) {
+    console.error('Failed to save admin lessons to localStorage', e);
+  }
+};
+
 export const AdminPage: React.FC = () => {
-  const { targetLanguage } = useAppStore();
+  const { targetLanguage, apiKey, apiProvider } = useAppStore();
 
   const [activeTab, setActiveTab] = useState('generate');
   const [lessons, setLessons] = useState<LessonSummary[]>([]);
@@ -44,6 +63,7 @@ export const AdminPage: React.FC = () => {
   const [ingesting, setIngesting] = useState(false);
 
   // Form states for Generator
+  const [lessonLang, setLessonLang] = useState<LanguageCode>(targetLanguage);
   const [topicId, setTopicId] = useState<number>(1);
   const [lessonTitle, setLessonTitle] = useState('Nhận phòng tại khách sạn (Boutique Hotel Check-in)');
   const [scenario, setScenario] = useState('Luyện tập làm thủ tục nhận phòng, yêu cầu phòng tầng cao không hút thuốc và hỏi giờ phục vụ bữa sáng.');
@@ -78,10 +98,12 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
     try {
       setLoading(true);
       const data = await api.admin.getLessons();
-      setLessons(data);
+      const stored = getStoredAdminLessons();
+      setLessons([...stored, ...data]);
     } catch (e) {
-      console.warn('Admin load error, using mock lessons list', e);
-      setLessons([
+      console.warn('Admin load error, using stored and mock lessons list', e);
+      const stored = getStoredAdminLessons();
+      const defaultMock: LessonSummary[] = [
         {
           id: 1,
           topicId: 1,
@@ -124,7 +146,8 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
           grammarCount: 1,
           exercisesCount: 2,
         },
-      ]);
+      ];
+      setLessons([...stored, ...defaultMock]);
     } finally {
       setLoading(false);
     }
@@ -149,24 +172,64 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
   };
 
   const handleGenerateLesson = async () => {
-    if (!lessonTitle || !scenario) {
+    if (!lessonTitle.trim() || !scenario.trim()) {
       message.error('Vui lòng nhập tiêu đề bài học và tình huống');
       return;
     }
     setGenerating(true);
     try {
-      const result = await api.admin.generateLesson({
-        topicId,
-        title: lessonTitle,
-        scenario,
-        difficulty,
-        learningObjectives: objectives,
-      });
-      setGeneratedLesson(result);
-      setIsPreviewOpen(true);
-      message.success('Tạo bài học bằng AI thành công!');
-      loadLessons();
+      let result: LessonDetail | null = null;
+      try {
+        result = await api.admin.generateLesson({
+          topicId,
+          title: lessonTitle.trim(),
+          scenario: scenario.trim(),
+          difficulty,
+          learningObjectives: objectives.trim(),
+        });
+      } catch (apiErr) {
+        console.warn('Backend API call failed, generating with AI / Educational Engine:', apiErr);
+        result = await generateFullLessonWithAi({
+          topicId,
+          title: lessonTitle.trim(),
+          scenario: scenario.trim(),
+          difficulty,
+          learningObjectives: objectives.trim(),
+          languageCode: lessonLang,
+          apiKey,
+          provider: apiProvider,
+        });
+      }
+
+      if (result) {
+        setGeneratedLesson(result);
+        setIsPreviewOpen(true);
+        message.success('Tạo giáo trình bài học bằng AI thành công!');
+        confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+
+        const newSummary: LessonSummary = {
+          id: result.id,
+          topicId: result.topicId,
+          topicName: result.topicName,
+          title: result.title,
+          scenario: result.scenario,
+          description: result.description,
+          difficulty: result.difficulty,
+          status: result.status,
+          orderIndex: result.orderIndex,
+          vocabularyCount: result.vocabulary?.length || 0,
+          grammarCount: result.grammar?.length || 0,
+          exercisesCount: result.exercises?.length || 0,
+        };
+
+        setLessons((prev) => {
+          const updated = [newSummary, ...prev];
+          saveAdminLessons(updated);
+          return updated;
+        });
+      }
     } catch (e) {
+      console.error('Lesson generation error:', e);
       message.error('Không thể tạo bài học bằng AI');
     } finally {
       setGenerating(false);
@@ -180,16 +243,51 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
     }
     setIngesting(true);
     try {
-      const result = await api.admin.ingestContent({
-        languageCode: ingestLang,
-        levelCode: ingestLevel,
-        topicTitle: ingestTopic,
-        rawSourceText: rawSource,
-      });
-      setGeneratedLesson(result);
-      setIsPreviewOpen(true);
-      message.success('Đã nạp và biên dịch giáo trình thành bài học chuẩn!');
-      loadLessons();
+      let result: LessonDetail | null = null;
+      try {
+        result = await api.admin.ingestContent({
+          languageCode: ingestLang,
+          levelCode: ingestLevel,
+          topicTitle: ingestTopic,
+          rawSourceText: rawSource,
+        });
+      } catch (apiErr) {
+        console.warn('Backend Ingestion API failed, using client ingestion engine:', apiErr);
+        result = await ingestRawContentToLesson({
+          languageCode: ingestLang,
+          levelCode: ingestLevel,
+          topicTitle: ingestTopic,
+          rawSourceText: rawSource,
+        });
+      }
+
+      if (result) {
+        setGeneratedLesson(result);
+        setIsPreviewOpen(true);
+        message.success('Đã nạp và biên dịch giáo trình thành bài học chuẩn!');
+        confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+
+        const newSummary: LessonSummary = {
+          id: result.id,
+          topicId: result.topicId,
+          topicName: result.topicName,
+          title: result.title,
+          scenario: result.scenario,
+          description: result.description,
+          difficulty: result.difficulty,
+          status: result.status,
+          orderIndex: result.orderIndex,
+          vocabularyCount: result.vocabulary?.length || 0,
+          grammarCount: result.grammar?.length || 0,
+          exercisesCount: result.exercises?.length || 0,
+        };
+
+        setLessons((prev) => {
+          const updated = [newSummary, ...prev];
+          saveAdminLessons(updated);
+          return updated;
+        });
+      }
     } catch (e) {
       message.error('Không thể nạp nội dung');
     } finally {
@@ -199,11 +297,23 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
 
   const handleUpdateStatus = async (id: number, status: ContentStatus) => {
     try {
-      await api.admin.updateLessonStatus(id, status);
+      try {
+        await api.admin.updateLessonStatus(id, status);
+      } catch (e) {
+        console.warn('Backend updateLessonStatus failed, updating locally:', e);
+      }
+
       message.success(`Đã cập nhật trạng thái: ${statusLabelMap[status] || status}`);
-      setLessons((prev) =>
-        prev.map((l) => (l.id === id ? { ...l, status } : l))
-      );
+      setLessons((prev) => {
+        const updated = prev.map((l) => (l.id === id ? { ...l, status } : l));
+        saveAdminLessons(updated);
+        return updated;
+      });
+
+      if (generatedLesson && generatedLesson.id === id) {
+        setGeneratedLesson({ ...generatedLesson, status });
+      }
+
       if (status === 'PUBLISHED') {
         confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 } });
       }
@@ -286,15 +396,19 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
             Tạo Giáo trình Giao tiếp Tự động bằng AI Giáo dục
           </h3>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.5fr', gap: 16, marginBottom: 16 }}>
             <div>
               <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-secondary)', display: 'block', marginBottom: 6 }}>
-                Tiêu đề bài học:
+                Ngôn ngữ bài học:
               </label>
-              <Input
-                value={lessonTitle}
-                onChange={(e) => setLessonTitle(e.target.value)}
-                style={{ background: 'var(--duo-card-bg)', borderColor: 'var(--duo-border)', color: 'var(--duo-text-primary)', borderRadius: 10, padding: '8px 12px' }}
+              <Select
+                value={lessonLang}
+                onChange={(val) => setLessonLang(val)}
+                style={{ width: '100%', height: 40 }}
+                options={[
+                  { value: 'KO', label: '🇰🇷 Tiếng Hàn (Korean)' },
+                  { value: 'EN', label: '🇺🇸 Tiếng Anh (English)' },
+                ]}
               />
             </div>
 
@@ -313,6 +427,17 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
                   { value: 'UPPER_INTERMEDIATE', label: 'Trung cấp nâng cao (B2)' },
                   { value: 'ADVANCED', label: 'Cao cấp (C1)' },
                 ]}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-secondary)', display: 'block', marginBottom: 6 }}>
+                Tiêu đề bài học:
+              </label>
+              <Input
+                value={lessonTitle}
+                onChange={(e) => setLessonTitle(e.target.value)}
+                style={{ background: 'var(--duo-card-bg)', borderColor: 'var(--duo-border)', color: 'var(--duo-text-primary)', borderRadius: 10, padding: '8px 12px' }}
               />
             </div>
           </div>
@@ -549,15 +674,65 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
             </div>
 
             <div style={{ marginBottom: 16 }}>
-              <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
-                Ngữ pháp được tạo:
+              <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--duo-text-primary)' }}>
+                Ngữ pháp được tạo ({generatedLesson.grammar?.length || 0}):
               </h4>
               {generatedLesson.grammar?.map((g, i) => (
-                <div key={i} style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(255, 255, 255, 0.03)', fontSize: 13, marginTop: 4 }}>
-                  <strong style={{ color: '#38BDF8' }}>{g.grammarPoint}</strong>: {g.explanation}
+                <div key={i} style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(255, 255, 255, 0.04)', fontSize: 13, marginTop: 4, border: '1px solid var(--duo-border)' }}>
+                  <strong style={{ color: '#1CB0F6' }}>{g.grammarPoint}</strong>: {g.explanation}
+                  {g.exampleSentence && (
+                    <div style={{ color: 'var(--duo-text-secondary)', marginTop: 2, fontSize: 12 }}>
+                      Ví dụ: <em>"{g.exampleSentence}"</em> {g.translation ? `(${g.translation})` : ''}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
+
+            {/* Dialogues */}
+            {generatedLesson.dialogues && generatedLesson.dialogues.length > 0 && (
+              <div style={{ marginBottom: 16 }}>
+                <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--duo-text-primary)' }}>
+                  Hội thoại giao tiếp thực tế ({generatedLesson.dialogues[0].lines?.length || 0} lượt):
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
+                  {generatedLesson.dialogues[0].lines?.map((line, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: 8,
+                        background: line.speakerRole === 'USER' ? 'rgba(88, 204, 2, 0.08)' : 'rgba(28, 176, 246, 0.08)',
+                        borderLeft: line.speakerRole === 'USER' ? '3px solid #58CC02' : '3px solid #1CB0F6',
+                        fontSize: 13,
+                      }}
+                    >
+                      <strong style={{ color: line.speakerRole === 'USER' ? '#58CC02' : '#1CB0F6' }}>
+                        {line.speakerName}:
+                      </strong>{' '}
+                      <span>{line.textOriginal}</span>
+                      {line.textTranslation && (
+                        <div style={{ fontSize: 12, color: 'var(--duo-text-secondary)', marginTop: 2 }}>
+                          ↳ <em>{line.textTranslation}</em>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Cultural Notes */}
+            {generatedLesson.culturalNotes && (
+              <div style={{ marginBottom: 16, padding: '10px 14px', borderRadius: 10, background: 'rgba(255, 200, 0, 0.08)', border: '1px solid rgba(255, 200, 0, 0.3)' }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#FFC800', marginBottom: 2 }}>
+                  💡 Lưu ý văn hóa & Ứng xử giao tiếp:
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--duo-text-primary)' }}>
+                  {generatedLesson.culturalNotes}
+                </div>
+              </div>
+            )}
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 24 }}>
               <Button onClick={() => setIsPreviewOpen(false)}>Đóng xem trước</Button>
