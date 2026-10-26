@@ -42,6 +42,7 @@ import {
   COMPREHENSIVE_SCENARIOS,
   EnhancedScenario,
 } from '../data/conversationScenarios';
+import { LanguageSwitchTabs } from '../components/LanguageSwitchTabs';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -137,7 +138,11 @@ export const DuoChatPage: React.FC = () => {
   useEffect(() => {
     const matching = allEnhancedScenarios.filter((s) => s.languageCode === targetLanguage);
     if (matching.length > 0) {
-      setSelectedScenario(matching[0]);
+      if (selectedScenario.languageCode !== targetLanguage) {
+        setSelectedScenario(matching[0]);
+        setViewMode('LIST');
+        setSearchParams({});
+      }
     }
   }, [targetLanguage]);
 
@@ -427,8 +432,9 @@ Respond ONLY with a JSON object:
             </Text>
           </div>
 
-          {/* Quick Action Buttons */}
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          {/* Quick Action Buttons & Language Switcher */}
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+            <LanguageSwitchTabs />
             <button
               className="duo-btn-outline"
               onClick={openImportModal}

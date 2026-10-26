@@ -13,6 +13,7 @@ import { useAppStore } from '../stores/useAppStore';
 import { Vocabulary, formatStatusVietnamese, formatPartOfSpeechVietnamese } from '../types';
 import { speakText, speakSlow } from '../utils/speech';
 import { localDataService } from '../services/localDataService';
+import { LanguageSwitchTabs } from '../components/LanguageSwitchTabs';
 
 const { Title, Text } = Typography;
 
@@ -124,24 +125,27 @@ export const VocabularyPage: React.FC = () => {
           </Text>
         </div>
 
-        <div style={{ width: 320 }}>
-          <Input
-            prefix={<Search size={16} color="var(--duo-text-muted)" />}
-            placeholder="Tìm kiếm từ, phiên âm, ý nghĩa..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
-            }}
-            allowClear
-            style={{
-              background: 'var(--duo-card-bg)',
-              borderColor: 'var(--duo-border)',
-              color: 'var(--duo-text-primary)',
-              borderRadius: 12,
-              padding: '10px 14px',
-            }}
-          />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <LanguageSwitchTabs />
+          <div style={{ width: 280 }}>
+            <Input
+              prefix={<Search size={16} color="var(--duo-text-muted)" />}
+              placeholder="Tìm kiếm từ, phiên âm, ý nghĩa..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              allowClear
+              style={{
+                background: 'var(--duo-card-bg)',
+                borderColor: 'var(--duo-border)',
+                color: 'var(--duo-text-primary)',
+                borderRadius: 12,
+                padding: '9px 14px',
+              }}
+            />
+          </div>
         </div>
       </div>
 

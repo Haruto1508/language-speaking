@@ -25,6 +25,7 @@ import { useAppStore } from '../stores/useAppStore';
 import { Vocabulary, formatStatusVietnamese, formatPartOfSpeechVietnamese } from '../types';
 import { speakText, speakSlow } from '../utils/speech';
 import { localDataService } from '../services/localDataService';
+import { LanguageSwitchTabs } from '../components/LanguageSwitchTabs';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -99,7 +100,7 @@ export const ReviewPage: React.FC = () => {
     const targetId = vocabId || queue[currentIndex]?.id;
     if (!targetId) return;
 
-    localDataService.updateVocabStatus(targetId, 'MASTERED');
+    localDataService.updateVocabStatus(targetId, 'MASTERED', targetLanguage);
 
     // Update in-memory state
     const updatedList = vocabList.map((v) =>
@@ -128,7 +129,7 @@ export const ReviewPage: React.FC = () => {
     const targetId = vocabId || current?.id;
     if (!targetId) return;
 
-    localDataService.updateVocabStatus(targetId, 'REVIEW');
+    localDataService.updateVocabStatus(targetId, 'REVIEW', targetLanguage);
 
     const updatedList = vocabList.map((v) =>
       v.id === targetId ? { ...v, userStatus: 'REVIEW' as const } : v
@@ -216,10 +217,13 @@ export const ReviewPage: React.FC = () => {
           </Text>
         </div>
 
-        {/* Mastered Counter Badge */}
-        <div className="duo-stat-pill" style={{ background: 'rgba(88, 204, 2, 0.12)', border: '1.5px solid rgba(88, 204, 2, 0.35)', color: '#58CC02' }}>
-          <CheckCheck size={18} color="#58CC02" />
-          <span>Đã thuộc {masteredCount} / {vocabList.length} từ</span>
+        {/* Header Right Actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <LanguageSwitchTabs />
+          <div className="duo-stat-pill" style={{ background: 'rgba(88, 204, 2, 0.12)', border: '1.5px solid rgba(88, 204, 2, 0.35)', color: '#58CC02' }}>
+            <CheckCheck size={18} color="#58CC02" />
+            <span>Đã thuộc {masteredCount} / {vocabList.length} từ</span>
+          </div>
         </div>
       </div>
 

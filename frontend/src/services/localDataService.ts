@@ -114,21 +114,24 @@ const STORAGE_KEYS = {
   CUSTOM_SCENARIOS: 'duo_custom_scenarios',
 };
 
-// Local storage helpers
-const getStoredVocabProgress = (): Record<number, string> => {
+// Local storage helpers scoped by language
+const getStoredVocabProgress = (language: LanguageCode): Record<number, string> => {
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.VOCAB_PROGRESS);
-    return raw ? JSON.parse(raw) : {};
+    const raw = localStorage.getItem(`${STORAGE_KEYS.VOCAB_PROGRESS}_${language}`);
+    if (raw) return JSON.parse(raw);
+    // Fallback for initial legacy data
+    const legacy = localStorage.getItem(STORAGE_KEYS.VOCAB_PROGRESS);
+    return legacy ? JSON.parse(legacy) : {};
   } catch {
     return {};
   }
 };
 
-const saveVocabProgress = (vocabId: number, status: string) => {
+const saveVocabProgress = (language: LanguageCode, vocabId: number, status: string) => {
   try {
-    const current = getStoredVocabProgress();
+    const current = getStoredVocabProgress(language);
     current[vocabId] = status;
-    localStorage.setItem(STORAGE_KEYS.VOCAB_PROGRESS, JSON.stringify(current));
+    localStorage.setItem(`${STORAGE_KEYS.VOCAB_PROGRESS}_${language}`, JSON.stringify(current));
   } catch (e) {
     console.error('Failed to save vocab progress', e);
   }
@@ -182,7 +185,7 @@ export const localDataService = {
 
   // Vocabulary (separated by Language and Level)
   getVocabulary: (language: LanguageCode, search?: string, level?: ProficiencyLevelCode): Vocabulary[] => {
-    const storedProgress = getStoredVocabProgress();
+    const storedProgress = getStoredVocabProgress(language);
     let source: Vocabulary[];
     if (level && dataset[language]?.[level]) {
       source = dataset[language][level]!.vocabulary;
@@ -212,8 +215,8 @@ export const localDataService = {
     return list;
   },
 
-  updateVocabStatus: (id: number, status: string) => {
-    saveVocabProgress(id, status);
+  updateVocabStatus: (id: number, status: string, language: LanguageCode = 'KO') => {
+    saveVocabProgress(language, id, status);
   },
 
   // Grammar (separated by Language and Level)

@@ -18,6 +18,7 @@ import { api } from '../services/api';
 import { Topic, ProficiencyLevelCode, formatLevelVietnamese } from '../types';
 import { localDataService } from '../services/localDataService';
 import owlEmptyImg from '../assets/duo-empty-owl.jpg';
+import { LanguageSwitchTabs } from '../components/LanguageSwitchTabs';
 
 const { Title, Text } = Typography;
 
@@ -77,7 +78,8 @@ export const TopicsPage: React.FC = () => {
           </Text>
         </div>
 
-        <Space>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <LanguageSwitchTabs />
           <button
             className="duo-btn-blue"
             onClick={() => navigate('/chat')}
@@ -86,7 +88,7 @@ export const TopicsPage: React.FC = () => {
             <Sparkles size={16} />
             <span>Phòng Luyện nói AI (Duolingo)</span>
           </button>
-        </Space>
+        </div>
       </div>
 
       {/* Chunky Duolingo Level Filter Pills */}

@@ -6,6 +6,7 @@ import { useAppStore } from '../stores/useAppStore';
 import { Grammar } from '../types';
 import { speakText, speakSlow } from '../utils/speech';
 import { localDataService } from '../services/localDataService';
+import { LanguageSwitchTabs } from '../components/LanguageSwitchTabs';
 
 const { Title, Text } = Typography;
 
@@ -128,26 +129,29 @@ export const GrammarPage: React.FC = () => {
           </Text>
         </div>
 
-        {/* Search Bar */}
-        <div style={{ width: 320, maxWidth: '100%' }}>
-          <Input
-            prefix={<Search size={16} color="var(--duo-text-muted)" />}
-            placeholder="Tìm kiếm mẫu câu, từ khóa..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1);
-            }}
-            allowClear
-            style={{
-              height: 44,
-              borderRadius: 14,
-              fontSize: 14,
-              background: 'var(--duo-card-bg)',
-              borderColor: 'var(--duo-border)',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-            }}
-          />
+        {/* Search Bar & Language Switcher */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <LanguageSwitchTabs />
+          <div style={{ width: 280, maxWidth: '100%' }}>
+            <Input
+              prefix={<Search size={16} color="var(--duo-text-muted)" />}
+              placeholder="Tìm kiếm mẫu câu, từ khóa..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              allowClear
+              style={{
+                height: 44,
+                borderRadius: 14,
+                fontSize: 14,
+                background: 'var(--duo-card-bg)',
+                borderColor: 'var(--duo-border)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              }}
+            />
+          </div>
         </div>
       </div>
 

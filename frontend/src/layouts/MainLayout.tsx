@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { useAppStore } from '../stores/useAppStore';
 import { LanguageModal } from '../components/LanguageModal';
-import { formatLevelVietnamese } from '../types';
+import { formatLevelVietnamese, LanguageCode } from '../types';
 
 const { Header, Sider, Content } = Layout;
 
@@ -34,6 +34,7 @@ export const MainLayout: React.FC = () => {
 
   const {
     targetLanguage,
+    setTargetLanguage,
     targetLevel,
     openLangModal,
     user,
@@ -55,18 +56,22 @@ export const MainLayout: React.FC = () => {
     accentShadow: string;
     accentGlow: string;
     activeBg: string;
+    lang?: LanguageCode;
   }
 
   interface MenuGroup {
     key: string;
     title: string;
+    badge?: string;
+    badgeBg?: string;
+    badgeColor?: string;
     items: MenuItem[];
   }
 
   const menuGroups: MenuGroup[] = [
     {
-      key: 'learn',
-      title: 'Học tập & Luyện nói',
+      key: 'general',
+      title: 'Tổng quan',
       items: [
         {
           path: '/dashboard',
@@ -78,77 +83,139 @@ export const MainLayout: React.FC = () => {
           accentGlow: 'rgba(206, 130, 255, 0.28)',
           activeBg: 'rgba(206, 130, 255, 0.12)',
         },
-        {
-          path: '/learn/1',
-          matchPath: '/learn',
-          extraMatch: '/lesson',
-          icon: GraduationCap,
-          label: 'Học bài',
-          badge: 'MỚI',
-          badgeColor: '#58CC02',
-          accent: '#58CC02',
-          accentShadow: '#46A302',
-          accentGlow: 'rgba(88, 204, 2, 0.28)',
-          activeBg: 'rgba(88, 204, 2, 0.12)',
-        },
+      ],
+    },
+    {
+      key: 'korean',
+      title: '🇰🇷 Tiếng Hàn (Korean)',
+      badge: targetLanguage === 'KO' ? 'Đang chọn' : undefined,
+      badgeBg: 'rgba(88, 204, 2, 0.16)',
+      badgeColor: '#58CC02',
+      items: [
         {
           path: '/chat',
           matchPath: '/chat',
           extraMatch: '/conversation',
           icon: MessageSquare,
-          label: 'Hội thoại AI',
+          label: 'Hội thoại tiếng Hàn',
           badge: 'HOT',
           badgeColor: '#1CB0F6',
           accent: '#1CB0F6',
           accentShadow: '#1899D6',
           accentGlow: 'rgba(28, 176, 246, 0.28)',
           activeBg: 'rgba(28, 176, 246, 0.12)',
+          lang: 'KO',
         },
-        {
-          path: '/topics',
-          matchPath: '/topics',
-          icon: BookOpen,
-          label: 'Chủ đề giao tiếp',
-          accent: '#FF9600',
-          accentShadow: '#E58500',
-          accentGlow: 'rgba(255, 150, 0, 0.28)',
-          activeBg: 'rgba(255, 150, 0, 0.12)',
-        },
-      ],
-    },
-    {
-      key: 'practice',
-      title: 'Ôn luyện & Tra cứu',
-      items: [
         {
           path: '/vocabulary',
           matchPath: '/vocabulary',
           icon: Layers,
-          label: 'Sổ từ vựng',
+          label: 'Sổ từ vựng tiếng Hàn',
           accent: '#00C9A7',
           accentShadow: '#00967D',
           accentGlow: 'rgba(0, 201, 167, 0.28)',
           activeBg: 'rgba(0, 201, 167, 0.12)',
-        },
-        {
-          path: '/review',
-          matchPath: '/review',
-          icon: Repeat,
-          label: 'Luyện Flashcard',
-          accent: '#FF4B4B',
-          accentShadow: '#EA2B2B',
-          accentGlow: 'rgba(255, 75, 75, 0.28)',
-          activeBg: 'rgba(255, 75, 75, 0.12)',
+          lang: 'KO',
         },
         {
           path: '/grammar',
           matchPath: '/grammar',
           icon: Sparkles,
-          label: 'Mẫu câu ngữ pháp',
+          label: 'Cấu trúc & Ngữ pháp Hàn',
           accent: '#00D2D3',
           accentShadow: '#00A3A4',
           accentGlow: 'rgba(0, 210, 211, 0.28)',
           activeBg: 'rgba(0, 210, 211, 0.12)',
+          lang: 'KO',
+        },
+        {
+          path: '/review',
+          matchPath: '/review',
+          icon: Repeat,
+          label: 'Luyện Flashcard Hàn',
+          accent: '#FF4B4B',
+          accentShadow: '#EA2B2B',
+          accentGlow: 'rgba(255, 75, 75, 0.28)',
+          activeBg: 'rgba(255, 75, 75, 0.12)',
+          lang: 'KO',
+        },
+        {
+          path: '/topics',
+          matchPath: '/topics',
+          icon: BookOpen,
+          label: 'Chủ đề giao tiếp Hàn',
+          accent: '#FF9600',
+          accentShadow: '#E58500',
+          accentGlow: 'rgba(255, 150, 0, 0.28)',
+          activeBg: 'rgba(255, 150, 0, 0.12)',
+          lang: 'KO',
+        },
+      ],
+    },
+    {
+      key: 'english',
+      title: '🇺🇸 Tiếng Anh (English)',
+      badge: targetLanguage === 'EN' ? 'Đang chọn' : undefined,
+      badgeBg: 'rgba(28, 176, 246, 0.16)',
+      badgeColor: '#1CB0F6',
+      items: [
+        {
+          path: '/chat',
+          matchPath: '/chat',
+          extraMatch: '/conversation',
+          icon: MessageSquare,
+          label: 'Hội thoại tiếng Anh',
+          badge: 'HOT',
+          badgeColor: '#1CB0F6',
+          accent: '#1CB0F6',
+          accentShadow: '#1899D6',
+          accentGlow: 'rgba(28, 176, 246, 0.28)',
+          activeBg: 'rgba(28, 176, 246, 0.12)',
+          lang: 'EN',
+        },
+        {
+          path: '/vocabulary',
+          matchPath: '/vocabulary',
+          icon: Layers,
+          label: 'Sổ từ vựng tiếng Anh',
+          accent: '#00C9A7',
+          accentShadow: '#00967D',
+          accentGlow: 'rgba(0, 201, 167, 0.28)',
+          activeBg: 'rgba(0, 201, 167, 0.12)',
+          lang: 'EN',
+        },
+        {
+          path: '/grammar',
+          matchPath: '/grammar',
+          icon: Sparkles,
+          label: 'Cấu trúc & Ngữ pháp Anh',
+          accent: '#00D2D3',
+          accentShadow: '#00A3A4',
+          accentGlow: 'rgba(0, 210, 211, 0.28)',
+          activeBg: 'rgba(0, 210, 211, 0.12)',
+          lang: 'EN',
+        },
+        {
+          path: '/review',
+          matchPath: '/review',
+          icon: Repeat,
+          label: 'Luyện Flashcard Anh',
+          accent: '#FF4B4B',
+          accentShadow: '#EA2B2B',
+          accentGlow: 'rgba(255, 75, 75, 0.28)',
+          activeBg: 'rgba(255, 75, 75, 0.12)',
+          lang: 'EN',
+        },
+        {
+          path: '/topics',
+          matchPath: '/topics',
+          icon: BookOpen,
+          label: 'Chủ đề giao tiếp Anh',
+          accent: '#FF9600',
+          accentShadow: '#E58500',
+          accentGlow: 'rgba(255, 150, 0, 0.28)',
+          activeBg: 'rgba(255, 150, 0, 0.12)',
+          lang: 'EN',
         },
       ],
     },
@@ -279,16 +346,39 @@ export const MainLayout: React.FC = () => {
               {!collapsed ? (
                 <div
                   style={{
-                    fontSize: 10.5,
-                    fontWeight: 900,
-                    color: 'var(--duo-text-muted)',
-                    letterSpacing: '0.8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
                     padding: '6px 10px 4px',
-                    textTransform: 'uppercase',
                     userSelect: 'none',
                   }}
                 >
-                  {group.title}
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 900,
+                      color: 'var(--duo-text-muted)',
+                      letterSpacing: '0.6px',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {group.title}
+                  </span>
+                  {group.badge && (
+                    <span
+                      style={{
+                        fontSize: 9.5,
+                        fontWeight: 900,
+                        padding: '1px 7px',
+                        borderRadius: 6,
+                        background: group.badgeBg || 'rgba(88, 204, 2, 0.16)',
+                        color: group.badgeColor || '#58CC02',
+                        letterSpacing: '0.4px',
+                      }}
+                    >
+                      {group.badge}
+                    </span>
+                  )}
                 </div>
               ) : groupIdx > 0 ? (
                 <div
@@ -306,16 +396,24 @@ export const MainLayout: React.FC = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {group.items.map((item) => {
                   const Icon = item.icon;
-                  const isActive =
+                  const isPathMatch =
                     location.pathname === item.path ||
                     (item.matchPath !== '/' && location.pathname.startsWith(item.matchPath)) ||
                     (item.extraMatch && location.pathname.startsWith(item.extraMatch));
+                  const isActive = isPathMatch && (!item.lang || item.lang === targetLanguage);
+
+                  const handleNavClick = () => {
+                    if (item.lang && item.lang !== targetLanguage) {
+                      setTargetLanguage(item.lang);
+                    }
+                    navigate(item.path);
+                  };
 
                   if (collapsed) {
                     return (
-                      <Tooltip key={item.path} title={item.label} placement="right">
+                      <Tooltip key={`${group.key}-${item.path}`} title={item.label} placement="right">
                         <button
-                          onClick={() => navigate(item.path)}
+                          onClick={handleNavClick}
                           className={`duo-nav-item ${isActive ? 'active' : ''}`}
                           style={{
                             width: 44,
@@ -345,8 +443,8 @@ export const MainLayout: React.FC = () => {
 
                   return (
                     <button
-                      key={item.path}
-                      onClick={() => navigate(item.path)}
+                      key={`${group.key}-${item.path}`}
+                      onClick={handleNavClick}
                       className={`duo-nav-item ${isActive ? 'active' : ''}`}
                       style={{
                         padding: '9px 12px',
