@@ -419,12 +419,6 @@ Respond ONLY with a JSON object:
         {/* Top Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24 }}>
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '4px 12px', borderRadius: 20, background: 'rgba(28, 176, 246, 0.12)', border: '1.5px solid rgba(28, 176, 246, 0.3)', marginBottom: 10 }}>
-              <Sparkles size={14} color="#1CB0F6" />
-              <span style={{ fontSize: 12, fontWeight: 800, color: '#1CB0F6' }}>
-                Trung tâm Luyện nói & Phản xạ Giao tiếp AI 3D 🚀
-              </span>
-            </div>
             <Title level={2} style={{ color: 'var(--duo-text-primary)', margin: 0, fontWeight: 900 }}>
               {isKo ? 'Hội thoại Giao tiếp Thực chiến Tiếng Hàn 🇰🇷' : 'Hội thoại Giao tiếp Thực chiến Tiếng Anh 🇺🇸'}
             </Title>
