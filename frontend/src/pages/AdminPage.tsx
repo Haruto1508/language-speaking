@@ -13,6 +13,7 @@ import {
   message,
   Spin,
   Alert,
+  Pagination,
 } from 'antd';
 import {
   Sparkles,
@@ -114,6 +115,37 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
   // Preview generated modal
   const [generatedLesson, setGeneratedLesson] = useState<LessonDetail | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  // Language filter & Pagination (10 items per page)
+  const [filterLang, setFilterLang] = useState<LanguageCode>(targetLanguage);
+  const [tab1Page, setTab1Page] = useState(1);
+  const [tab3Page, setTab3Page] = useState(1);
+  const PAGE_SIZE = 10;
+
+  // Sync with global targetLanguage when it changes
+  useEffect(() => {
+    setFilterLang(targetLanguage);
+    setTab1Page(1);
+    setTab3Page(1);
+  }, [targetLanguage]);
+
+  // Count per language
+  const koreanCount = lessons.filter(
+    (l) => (l.languageCode || (/[가-힣]/.test(l.title + l.scenario) ? 'KO' : 'EN')) === 'KO'
+  ).length;
+
+  const englishCount = lessons.filter(
+    (l) => (l.languageCode || (/[가-힣]/.test(l.title + l.scenario) ? 'KO' : 'EN')) === 'EN'
+  ).length;
+
+  // Filter lessons by language
+  const filteredLessons = lessons.filter((lesson) => {
+    const lang = lesson.languageCode || (/[가-힣]/.test(lesson.title + lesson.scenario) ? 'KO' : 'EN');
+    return lang === filterLang;
+  });
+
+  const tab1PaginatedLessons = filteredLessons.slice((tab1Page - 1) * PAGE_SIZE, tab1Page * PAGE_SIZE);
+  const tab3PaginatedLessons = filteredLessons.slice((tab3Page - 1) * PAGE_SIZE, tab3Page * PAGE_SIZE);
 
   useEffect(() => {
     loadLessons();
@@ -335,6 +367,8 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
           saveAdminLessons(updated);
           return updated;
         });
+        setFilterLang(result.languageCode);
+        setTab1Page(1);
       }
     } catch (e) {
       console.error('Lesson generation error:', e);
@@ -418,6 +452,8 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
           saveAdminLessons(updated);
           return updated;
         });
+        setFilterLang(result.languageCode as LanguageCode);
+        setTab1Page(1);
       }
     } catch (e) {
       message.error('Không thể nạp nội dung');
@@ -518,7 +554,7 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
           style={{ padding: '10px 20px', fontSize: 14 }}
         >
           <Layers size={16} />
-          <span>Quản lý & Duyệt bài ({lessons.length})</span>
+          <span>Quản lý & Duyệt bài ({filteredLessons.length})</span>
         </button>
       </div>
 
@@ -611,33 +647,64 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
 
           {/* LIST OF CREATED & SAVED CURRICULUMS IN TAB 1 */}
           <div style={{ marginTop: 36, paddingTop: 24, borderTop: '1.5px solid var(--duo-border)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
               <div>
                 <h4 style={{ fontSize: 18, fontWeight: 900, color: 'var(--duo-text-primary)', margin: 0 }}>
-                  📚 Giáo trình Đã Lưu Vào Hệ thống ({lessons.length} bài)
+                  📚 Giáo trình Đã Lưu Vào Hệ thống ({filteredLessons.length} bài)
                 </h4>
                 <span style={{ fontSize: 13, color: 'var(--duo-text-secondary)' }}>
-                  Đã tự động lưu vào bộ nhớ và đồng bộ sẵn sàng vào Phòng Luyện nói AI.
+                  Hiển thị theo ngôn ngữ đang chọn ({filterLang === 'KO' ? '🇰🇷 Tiếng Hàn' : '🇺🇸 Tiếng Anh'}). Đã đồng bộ sẵn sàng vào Luyện nói AI.
                 </span>
               </div>
-              <Button
-                type="link"
-                onClick={() => setActiveTab('manage')}
-                style={{ fontWeight: 700, color: '#1CB0F6', padding: 0 }}
-              >
-                Chuyển sang trang Quản lý & Xét duyệt ➔
-              </Button>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                {/* Language Toggle Pills */}
+                <div style={{ display: 'flex', gap: 6, background: 'var(--duo-bg)', padding: 4, borderRadius: 12, border: '1px solid var(--duo-border)' }}>
+                  <Button
+                    size="small"
+                    type={filterLang === 'KO' ? 'primary' : 'text'}
+                    onClick={() => { setFilterLang('KO'); setTab1Page(1); }}
+                    style={{
+                      fontWeight: 700,
+                      borderRadius: 8,
+                      background: filterLang === 'KO' ? '#6366F1' : 'transparent',
+                    }}
+                  >
+                    🇰🇷 Tiếng Hàn ({koreanCount})
+                  </Button>
+                  <Button
+                    size="small"
+                    type={filterLang === 'EN' ? 'primary' : 'text'}
+                    onClick={() => { setFilterLang('EN'); setTab1Page(1); }}
+                    style={{
+                      fontWeight: 700,
+                      borderRadius: 8,
+                      background: filterLang === 'EN' ? '#1CB0F6' : 'transparent',
+                    }}
+                  >
+                    🇺🇸 Tiếng Anh ({englishCount})
+                  </Button>
+                </div>
+
+                <Button
+                  type="link"
+                  onClick={() => setActiveTab('manage')}
+                  style={{ fontWeight: 700, color: '#1CB0F6', padding: 0 }}
+                >
+                  Chuyển sang trang Quản lý & Xét duyệt ➔
+                </Button>
+              </div>
             </div>
 
-            {lessons.length === 0 ? (
+            {filteredLessons.length === 0 ? (
               <div style={{ padding: 28, textAlign: 'center', background: 'var(--duo-bg)', borderRadius: 16, border: '1.5px dashed var(--duo-border)' }}>
                 <p style={{ color: 'var(--duo-text-secondary)', margin: 0 }}>
-                  Chưa có giáo trình nào. Hãy điền thông tin và bấm nút "Tạo bài học với AI" ở trên!
+                  Chưa có giáo trình nào cho {filterLang === 'KO' ? 'Tiếng Hàn' : 'Tiếng Anh'}. Hãy điền thông tin và bấm nút "Bắt đầu Tạo bài học với AI" ở trên!
                 </p>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {lessons.map((lesson, idx) => (
+                {tab1PaginatedLessons.map((lesson, idx) => (
                   <div
                     key={lesson.id}
                     style={{
@@ -702,6 +769,19 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {filteredLessons.length > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
+                <Pagination
+                  current={tab1Page}
+                  pageSize={PAGE_SIZE}
+                  total={filteredLessons.length}
+                  onChange={(page) => setTab1Page(page)}
+                  showSizeChanger={false}
+                  showTotal={(total, range) => `${range[0]}-${range[1]} trên tổng số ${total} giáo trình (${filterLang === 'KO' ? 'Tiếng Hàn' : 'Tiếng Anh'})`}
+                />
               </div>
             )}
           </div>
@@ -787,101 +867,166 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
       {/* TAB 3: LESSON APPROVAL WORKFLOW */}
       {activeTab === 'manage' && (
         <div className="duo-card" style={{ padding: 24 }}>
-          <h3 style={{ fontSize: 20, fontWeight: 900, color: 'var(--duo-text-primary)', marginBottom: 16 }}>
-            Quy trình Xét duyệt & Xuất bản Giáo trình
-          </h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <h3 style={{ fontSize: 20, fontWeight: 900, color: 'var(--duo-text-primary)', margin: 0 }}>
+                Quy trình Xét duyệt & Xuất bản Giáo trình ({filteredLessons.length} bài)
+              </h3>
+              <p style={{ margin: 0, fontSize: 13, color: 'var(--duo-text-secondary)', marginTop: 4 }}>
+                Quản lý vòng đời giáo trình {filterLang === 'KO' ? '🇰🇷 Tiếng Hàn' : '🇺🇸 Tiếng Anh'}: AI tạo ➔ Duyệt nội dung ➔ Xuất bản cho học viên
+              </p>
+            </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {lessons.map((lesson) => (
-              <div
-                key={lesson.id}
+            {/* Language filter buttons */}
+            <div style={{ display: 'flex', gap: 6, background: 'var(--duo-bg)', padding: 4, borderRadius: 12, border: '1px solid var(--duo-border)' }}>
+              <Button
+                size="small"
+                type={filterLang === 'KO' ? 'primary' : 'text'}
+                onClick={() => { setFilterLang('KO'); setTab3Page(1); }}
                 style={{
-                  padding: 16,
-                  borderRadius: 14,
-                  background: 'var(--duo-bg)',
-                  border: '1.5px solid var(--duo-border)',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: 12,
+                  fontWeight: 700,
+                  borderRadius: 8,
+                  background: filterLang === 'KO' ? '#6366F1' : 'transparent',
                 }}
               >
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
-                      {lesson.title}
-                    </span>
-                    <Tag color={statusColorMap[lesson.status]}>{statusLabelMap[lesson.status] || lesson.status}</Tag>
-                    <Tag color="geekblue">{formatLevelVietnamese(lesson.difficulty)}</Tag>
-                  </div>
-                  <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
-                    {lesson.scenario}
-                  </div>
-                </div>
+                🇰🇷 Tiếng Hàn ({koreanCount})
+              </Button>
+              <Button
+                size="small"
+                type={filterLang === 'EN' ? 'primary' : 'text'}
+                onClick={() => { setFilterLang('EN'); setTab3Page(1); }}
+                style={{
+                  fontWeight: 700,
+                  borderRadius: 8,
+                  background: filterLang === 'EN' ? '#1CB0F6' : 'transparent',
+                }}
+              >
+                🇺🇸 Tiếng Anh ({englishCount})
+              </Button>
+            </div>
+          </div>
 
-                {/* Workflow Transitions */}
-                <Space>
-                  <Button
-                    size="small"
-                    icon={<Eye size={12} />}
-                    onClick={() => handleViewLessonDetail(lesson)}
-                  >
-                    Xem
-                  </Button>
-                  <Button
-                    size="small"
-                    style={{ background: '#58CC02', borderColor: '#58CC02', color: '#fff', fontWeight: 700 }}
-                    onClick={() => navigate(`/chat?scenarioId=${lesson.id}`)}
-                  >
-                    Luyện nói
-                  </Button>
-                  {lesson.status === 'AI_GENERATED' && (
+          {filteredLessons.length === 0 ? (
+            <div style={{ padding: 28, textAlign: 'center', background: 'var(--duo-bg)', borderRadius: 16, border: '1.5px dashed var(--duo-border)' }}>
+              <p style={{ color: 'var(--duo-text-secondary)', margin: 0 }}>
+                Không có giáo trình nào thuộc {filterLang === 'KO' ? 'Tiếng Hàn' : 'Tiếng Anh'} cần xét duyệt.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {tab3PaginatedLessons.map((lesson) => (
+                <div
+                  key={lesson.id}
+                  style={{
+                    padding: 16,
+                    borderRadius: 14,
+                    background: 'var(--duo-bg)',
+                    border: '1.5px solid var(--duo-border)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: 12,
+                  }}
+                >
+                  <div style={{ flex: 1, minWidth: 260 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--duo-text-primary)' }}>
+                        {lesson.title}
+                      </span>
+                      <Tag color={statusColorMap[lesson.status]}>{statusLabelMap[lesson.status] || lesson.status}</Tag>
+                      <Tag color="geekblue">{formatLevelVietnamese(lesson.difficulty)}</Tag>
+                      {lesson.languageCode && (
+                        <Tag color={lesson.languageCode === 'KO' ? 'blue' : 'green'}>
+                          {lesson.languageCode === 'KO' ? '🇰🇷 Tiếng Hàn' : '🇺🇸 Tiếng Anh'}
+                        </Tag>
+                      )}
+                    </div>
+                    <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
+                      {lesson.scenario}
+                    </div>
+                    <div style={{ display: 'flex', gap: 14, marginTop: 6, fontSize: 12, color: 'var(--duo-text-secondary)' }}>
+                      <span>📖 {lesson.vocabularyCount} từ vựng</span>
+                      <span>📝 {lesson.grammarCount} ngữ pháp</span>
+                    </div>
+                  </div>
+
+                  {/* Workflow Transitions */}
+                  <Space wrap>
                     <Button
                       size="small"
-                      type="dashed"
-                      onClick={() => handleUpdateStatus(lesson.id, 'REVIEWING')}
+                      icon={<Eye size={12} />}
+                      onClick={() => handleViewLessonDetail(lesson)}
                     >
-                      Bắt đầu duyệt
+                      Xem
                     </Button>
-                  )}
-                  {(lesson.status === 'REVIEWING' || lesson.status === 'AI_GENERATED') && (
                     <Button
                       size="small"
-                      style={{ background: 'rgba(99, 102, 241, 0.2)', color: '#A5B4FC' }}
-                      onClick={() => handleUpdateStatus(lesson.id, 'APPROVED')}
+                      style={{ background: '#58CC02', borderColor: '#58CC02', color: '#fff', fontWeight: 700 }}
+                      onClick={() => navigate(`/chat?scenarioId=${lesson.id}`)}
                     >
-                      Phê duyệt
+                      Luyện nói
                     </Button>
-                  )}
-                  {lesson.status !== 'PUBLISHED' && (
-                    <Button
-                      size="small"
-                      type="primary"
-                      onClick={() => handleUpdateStatus(lesson.id, 'PUBLISHED')}
-                    >
-                      Xuất bản
-                    </Button>
-                  )}
-                  {lesson.status === 'PUBLISHED' && (
+                    {lesson.status === 'AI_GENERATED' && (
+                      <Button
+                        size="small"
+                        type="dashed"
+                        onClick={() => handleUpdateStatus(lesson.id, 'REVIEWING')}
+                      >
+                        Bắt đầu duyệt
+                      </Button>
+                    )}
+                    {(lesson.status === 'REVIEWING' || lesson.status === 'AI_GENERATED') && (
+                      <Button
+                        size="small"
+                        style={{ background: 'rgba(99, 102, 241, 0.2)', color: '#A5B4FC' }}
+                        onClick={() => handleUpdateStatus(lesson.id, 'APPROVED')}
+                      >
+                        Phê duyệt
+                      </Button>
+                    )}
+                    {lesson.status !== 'PUBLISHED' && (
+                      <Button
+                        size="small"
+                        type="primary"
+                        onClick={() => handleUpdateStatus(lesson.id, 'PUBLISHED')}
+                      >
+                        Xuất bản
+                      </Button>
+                    )}
+                    {lesson.status === 'PUBLISHED' && (
+                      <Button
+                        size="small"
+                        danger
+                        onClick={() => handleUpdateStatus(lesson.id, 'ARCHIVED')}
+                      >
+                        Lưu trữ
+                      </Button>
+                    )}
                     <Button
                       size="small"
                       danger
-                      onClick={() => handleUpdateStatus(lesson.id, 'ARCHIVED')}
-                    >
-                      Lưu trữ
-                    </Button>
-                  )}
-                  <Button
-                    size="small"
-                    danger
-                    icon={<Trash2 size={12} />}
-                    onClick={() => handleDeleteLesson(lesson.id)}
-                  />
-                </Space>
-              </div>
-            ))}
-          </div>
+                      icon={<Trash2 size={12} />}
+                      onClick={() => handleDeleteLesson(lesson.id)}
+                    />
+                  </Space>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {filteredLessons.length > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
+              <Pagination
+                current={tab3Page}
+                pageSize={PAGE_SIZE}
+                total={filteredLessons.length}
+                onChange={(page) => setTab3Page(page)}
+                showSizeChanger={false}
+                showTotal={(total, range) => `${range[0]}-${range[1]} trên tổng số ${total} giáo trình (${filterLang === 'KO' ? 'Tiếng Hàn' : 'Tiếng Anh'})`}
+              />
+            </div>
+          )}
         </div>
       )}
 
