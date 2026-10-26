@@ -641,100 +641,13 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
           title={
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <Sparkles size={20} color="#6366F1" />
-              <span style={{ fontSize: 18, fontWeight: 800 }}>Xem trước Giáo trình: {generatedLesson.title}</span>
+              <span style={{ fontSize: 17, fontWeight: 800 }}>Xem trước Giáo trình: {generatedLesson.title}</span>
             </div>
           }
           open={isPreviewOpen}
           onCancel={() => setIsPreviewOpen(false)}
-          footer={null}
-          width={720}
-          centered
-        >
-          <div style={{ padding: '10px 0' }}>
-            <div style={{ marginBottom: 16 }}>
-              <Tag color="purple">{statusLabelMap[generatedLesson.status] || generatedLesson.status}</Tag>
-              <Tag color="cyan">{formatLevelVietnamese(generatedLesson.difficulty)}</Tag>
-            </div>
-
-            <Paragraph style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
-              <strong>Tình huống:</strong> {generatedLesson.scenario}
-            </Paragraph>
-
-            <div style={{ marginBottom: 16 }}>
-              <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
-                Từ vựng được tạo ({generatedLesson.vocabulary?.length || 0}):
-              </h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
-                {generatedLesson.vocabulary?.map((v, i) => (
-                  <div key={i} style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(255, 255, 255, 0.03)', fontSize: 13 }}>
-                    <strong style={{ color: '#A5B4FC' }}>{v.word}</strong>: {v.meaning} ({v.partOfSpeech})
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ marginBottom: 16 }}>
-              <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--duo-text-primary)' }}>
-                Ngữ pháp được tạo ({generatedLesson.grammar?.length || 0}):
-              </h4>
-              {generatedLesson.grammar?.map((g, i) => (
-                <div key={i} style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(255, 255, 255, 0.04)', fontSize: 13, marginTop: 4, border: '1px solid var(--duo-border)' }}>
-                  <strong style={{ color: '#1CB0F6' }}>{g.grammarPoint}</strong>: {g.explanation}
-                  {g.exampleSentence && (
-                    <div style={{ color: 'var(--duo-text-secondary)', marginTop: 2, fontSize: 12 }}>
-                      Ví dụ: <em>"{g.exampleSentence}"</em> {g.translation ? `(${g.translation})` : ''}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* Dialogues */}
-            {generatedLesson.dialogues && generatedLesson.dialogues.length > 0 && (
-              <div style={{ marginBottom: 16 }}>
-                <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--duo-text-primary)' }}>
-                  Hội thoại giao tiếp thực tế ({generatedLesson.dialogues[0].lines?.length || 0} lượt):
-                </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
-                  {generatedLesson.dialogues[0].lines?.map((line, idx) => (
-                    <div
-                      key={idx}
-                      style={{
-                        padding: '8px 12px',
-                        borderRadius: 8,
-                        background: line.speakerRole === 'USER' ? 'rgba(88, 204, 2, 0.08)' : 'rgba(28, 176, 246, 0.08)',
-                        borderLeft: line.speakerRole === 'USER' ? '3px solid #58CC02' : '3px solid #1CB0F6',
-                        fontSize: 13,
-                      }}
-                    >
-                      <strong style={{ color: line.speakerRole === 'USER' ? '#58CC02' : '#1CB0F6' }}>
-                        {line.speakerName}:
-                      </strong>{' '}
-                      <span>{line.textOriginal}</span>
-                      {line.textTranslation && (
-                        <div style={{ fontSize: 12, color: 'var(--duo-text-secondary)', marginTop: 2 }}>
-                          ↳ <em>{line.textTranslation}</em>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Cultural Notes */}
-            {generatedLesson.culturalNotes && (
-              <div style={{ marginBottom: 16, padding: '10px 14px', borderRadius: 10, background: 'rgba(255, 200, 0, 0.08)', border: '1px solid rgba(255, 200, 0, 0.3)' }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: '#FFC800', marginBottom: 2 }}>
-                  💡 Lưu ý văn hóa & Ứng xử giao tiếp:
-                </div>
-                <div style={{ fontSize: 13, color: 'var(--duo-text-primary)' }}>
-                  {generatedLesson.culturalNotes}
-                </div>
-              </div>
-            )}
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 24 }}>
+          footer={
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, paddingTop: 10, borderTop: '1px solid var(--duo-border)' }}>
               <Button onClick={() => setIsPreviewOpen(false)}>Đóng xem trước</Button>
               <Button
                 type="primary"
@@ -746,6 +659,130 @@ Bệnh nhân nói triệu chứng (đau đầu, sốt 2 ngày), bác sĩ chẩn 
                 Phê duyệt & Xuất bản lên hệ thống
               </Button>
             </div>
+          }
+          width={680}
+          centered
+        >
+          <div
+            style={{
+              maxHeight: '48vh',
+              overflowY: 'auto',
+              paddingRight: 8,
+              paddingTop: 6,
+              paddingBottom: 6,
+            }}
+          >
+            <div style={{ marginBottom: 12, display: 'flex', gap: 8, alignItems: 'center' }}>
+              <Tag color="purple">{statusLabelMap[generatedLesson.status] || generatedLesson.status}</Tag>
+              <Tag color="cyan">{formatLevelVietnamese(generatedLesson.difficulty)}</Tag>
+              {generatedLesson.languageCode && (
+                <Tag color={generatedLesson.languageCode === 'KO' ? 'blue' : 'green'}>
+                  {generatedLesson.languageCode === 'KO' ? '🇰🇷 Tiếng Hàn' : '🇺🇸 Tiếng Anh'}
+                </Tag>
+              )}
+            </div>
+
+            <Paragraph style={{ color: 'var(--duo-text-secondary)', fontSize: 13, marginBottom: 14 }}>
+              <strong>Tình huống:</strong> {generatedLesson.scenario}
+            </Paragraph>
+
+            {/* Cultural Notes */}
+            {generatedLesson.culturalNotes && (
+              <div style={{ marginBottom: 14, padding: '8px 12px', borderRadius: 8, background: 'rgba(255, 200, 0, 0.08)', border: '1px solid rgba(255, 200, 0, 0.25)' }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: '#FFC800', marginBottom: 2 }}>
+                  💡 Lưu ý văn hóa & Ứng xử:
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--duo-text-primary)' }}>
+                  {generatedLesson.culturalNotes}
+                </div>
+              </div>
+            )}
+
+            {/* Vocabulary Grid */}
+            <div style={{ marginBottom: 14 }}>
+              <h4 style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-primary)', marginBottom: 6 }}>
+                Từ vựng trọng tâm ({generatedLesson.vocabulary?.length || 0}):
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 6 }}>
+                {generatedLesson.vocabulary?.map((v, i) => (
+                  <div key={i} style={{ padding: '6px 10px', borderRadius: 8, background: 'rgba(255, 255, 255, 0.03)', fontSize: 12, border: '1px solid var(--duo-border)' }}>
+                    <strong style={{ color: '#A5B4FC' }}>{v.word}</strong>: {v.meaning}{' '}
+                    <span style={{ opacity: 0.6, fontSize: 11 }}>({v.partOfSpeech})</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Grammar */}
+            <div style={{ marginBottom: 14 }}>
+              <h4 style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-primary)', marginBottom: 6 }}>
+                Ngữ pháp & Cấu trúc ({generatedLesson.grammar?.length || 0}):
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {generatedLesson.grammar?.map((g, i) => (
+                  <div key={i} style={{ padding: '6px 10px', borderRadius: 8, background: 'rgba(255, 255, 255, 0.03)', fontSize: 12, border: '1px solid var(--duo-border)' }}>
+                    <strong style={{ color: '#1CB0F6' }}>{g.grammarPoint}</strong>: {g.explanation}
+                    {g.exampleSentence && (
+                      <div style={{ color: 'var(--duo-text-secondary)', marginTop: 2, fontSize: 11 }}>
+                        Ví dụ: <em>"{g.exampleSentence}"</em> {g.translation ? `(${g.translation})` : ''}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Dialogues */}
+            {generatedLesson.dialogues && generatedLesson.dialogues.length > 0 && (
+              <div style={{ marginBottom: 14 }}>
+                <h4 style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-primary)', marginBottom: 6 }}>
+                  Hội thoại đối đáp mẫu ({generatedLesson.dialogues[0].lines?.length || 0} lượt):
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                  {generatedLesson.dialogues[0].lines?.map((line, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        padding: '6px 10px',
+                        borderRadius: 8,
+                        background: line.speakerRole === 'USER' ? 'rgba(88, 204, 2, 0.08)' : 'rgba(28, 176, 246, 0.08)',
+                        borderLeft: line.speakerRole === 'USER' ? '3px solid #58CC02' : '3px solid #1CB0F6',
+                        fontSize: 12,
+                      }}
+                    >
+                      <strong style={{ color: line.speakerRole === 'USER' ? '#58CC02' : '#1CB0F6' }}>
+                        {line.speakerName}:
+                      </strong>{' '}
+                      <span>{line.textOriginal}</span>
+                      {line.textTranslation && (
+                        <div style={{ fontSize: 11, color: 'var(--duo-text-secondary)', marginTop: 2 }}>
+                          ↳ <em>{line.textTranslation}</em>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Exercises if present */}
+            {generatedLesson.exercises && generatedLesson.exercises.length > 0 && generatedLesson.exercises[0]?.questions && (
+              <div style={{ marginBottom: 10 }}>
+                <h4 style={{ fontSize: 13, fontWeight: 700, color: 'var(--duo-text-primary)', marginBottom: 6 }}>
+                  Bài tập củng cố ({generatedLesson.exercises[0].questions.length} câu hỏi trắc nghiệm):
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {generatedLesson.exercises[0].questions.map((q, idx) => (
+                    <div key={idx} style={{ padding: '6px 10px', borderRadius: 8, background: 'rgba(255, 255, 255, 0.02)', fontSize: 12, border: '1px solid var(--duo-border)' }}>
+                      <div style={{ fontWeight: 600 }}>Câu {idx + 1}: {q.prompt}</div>
+                      <div style={{ fontSize: 11, color: '#58CC02', marginTop: 2 }}>
+                        ✓ Đáp án: {q.correctAnswer} {q.explanation ? `(${q.explanation})` : ''}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </Modal>
       )}
