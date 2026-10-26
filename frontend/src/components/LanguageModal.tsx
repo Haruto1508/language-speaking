@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Space, Tag, Typography } from 'antd';
 import { useAppStore } from '../stores/useAppStore';
 import { LanguageCode, ProficiencyLevelCode } from '../types';
@@ -41,6 +41,33 @@ export const LanguageModal: React.FC = () => {
     setTargetLevel,
   } = useAppStore();
 
+  // Temporary draft state - only committed when user clicks "Xác nhận & Bắt đầu luyện tập"
+  const [tempLanguage, setTempLanguage] = useState<LanguageCode>(targetLanguage);
+  const [tempLevel, setTempLevel] = useState<ProficiencyLevelCode>(targetLevel);
+
+  useEffect(() => {
+    if (isLangModalOpen) {
+      setTempLanguage(targetLanguage);
+      setTempLevel(targetLevel);
+    }
+  }, [isLangModalOpen, targetLanguage, targetLevel]);
+
+  const handleCancel = () => {
+    setTempLanguage(targetLanguage);
+    setTempLevel(targetLevel);
+    closeLangModal();
+  };
+
+  const handleConfirm = () => {
+    if (tempLanguage !== targetLanguage) {
+      setTargetLanguage(tempLanguage);
+    }
+    if (tempLevel !== targetLevel) {
+      setTargetLevel(tempLevel);
+    }
+    closeLangModal();
+  };
+
   return (
     <Modal
       title={
@@ -63,7 +90,7 @@ export const LanguageModal: React.FC = () => {
         </div>
       }
       open={isLangModalOpen}
-      onCancel={closeLangModal}
+      onCancel={handleCancel}
       footer={null}
       width={680}
       centered
@@ -103,11 +130,11 @@ export const LanguageModal: React.FC = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {LANGUAGES.map((lang) => {
-                const isSelected = targetLanguage === lang.code;
+                const isSelected = tempLanguage === lang.code;
                 return (
                   <div
                     key={lang.code}
-                    onClick={() => setTargetLanguage(lang.code)}
+                    onClick={() => setTempLanguage(lang.code)}
                     style={{
                       padding: '12px 14px',
                       borderRadius: 14,
@@ -164,11 +191,11 @@ export const LanguageModal: React.FC = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {LEVELS.map((lvl) => {
-                const isSelected = targetLevel === lvl.code;
+                const isSelected = tempLevel === lvl.code;
                 return (
                   <div
                     key={lvl.code}
-                    onClick={() => setTargetLevel(lvl.code)}
+                    onClick={() => setTempLevel(lvl.code)}
                     style={{
                       padding: '8px 12px',
                       borderRadius: 10,
@@ -202,7 +229,7 @@ export const LanguageModal: React.FC = () => {
                       >
                         {lvl.cefr}
                       </Tag>
-                      {targetLanguage === 'KO' && (
+                      {tempLanguage === 'KO' && (
                         <Tag
                           color={isSelected ? 'purple' : 'default'}
                           style={{ fontWeight: 800, borderRadius: 5, fontSize: 11, margin: 0 }}
@@ -223,8 +250,8 @@ export const LanguageModal: React.FC = () => {
         <div style={{ marginTop: 18 }}>
           <button
             className="duo-btn-green"
-            onClick={closeLangModal}
-            style={{ width: '100%', padding: '11px', fontSize: 14 }}
+            onClick={handleConfirm}
+            style={{ width: '100%', padding: '12px', fontSize: 14 }}
           >
             <span>Xác nhận & Bắt đầu luyện tập</span>
           </button>
