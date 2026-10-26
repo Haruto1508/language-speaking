@@ -41,6 +41,7 @@ import { translateToVietnamese } from '../services/translator';
 import {
   COMPREHENSIVE_SCENARIOS,
   EnhancedScenario,
+  SampleDialogueStep,
 } from '../data/conversationScenarios';
 import { LanguageSwitchTabs } from '../components/LanguageSwitchTabs';
 
@@ -98,6 +99,83 @@ export const DuoChatPage: React.FC = () => {
   const [inputText, setInputText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [sending, setSending] = useState(false);
+  const [sampleTurnIndex, setSampleTurnIndex] = useState(0);
+
+  // Group sample dialogues into conversational turns: [User says -> AI responds]
+  const sampleDialogues = selectedScenario.sampleDialogues || [];
+  const sampleTurns: Array<{
+    userStep: SampleDialogueStep;
+    aiStep?: SampleDialogueStep;
+  }> = [];
+
+  for (let i = 0; i < sampleDialogues.length; i += 2) {
+    const userStep = sampleDialogues[i];
+    const aiStep = sampleDialogues[i + 1];
+    if (userStep) {
+      sampleTurns.push({ userStep, aiStep });
+    }
+  }
+
+  const hasSampleTurns = sampleTurns.length > 0;
+  const currentSampleTurn = sampleTurns[sampleTurnIndex];
+  const isSampleCompleted = hasSampleTurns && sampleTurnIndex >= sampleTurns.length;
+
+  // Handle NEXT button: plays scripted user turn, then automatically replies with AI's scripted turn
+  const handleNextSampleTurn = () => {
+    if (!currentSampleTurn || sending) return;
+
+    const { userStep, aiStep } = currentSampleTurn;
+
+    // 1. Add User's scripted dialogue line
+    const userMsgId = Date.now();
+    const userMsg: ConversationMessage = {
+      id: userMsgId,
+      senderRole: 'USER',
+      content: userStep.text,
+      timestamp: new Date().toISOString(),
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+    speakText(userStep.text, selectedScenario.languageCode, 0.95);
+
+    if (userStep.translation) {
+      setTranslations((prev) => ({ ...prev, [userMsgId]: userStep.translation }));
+      setShowTranslations((prev) => ({ ...prev, [userMsgId]: true }));
+    }
+
+    setSending(true);
+
+    // 2. Automatically reply with AI's scripted dialogue turn after a natural pause
+    if (aiStep) {
+      setTimeout(() => {
+        const aiMsgId = Date.now() + 1;
+        const aiMsg: ConversationMessage = {
+          id: aiMsgId,
+          senderRole: 'AI',
+          content: aiStep.text,
+          timestamp: new Date().toISOString(),
+        };
+
+        setMessages((prev) => [...prev, aiMsg]);
+        speakText(aiStep.text, selectedScenario.languageCode, 0.95);
+
+        if (aiStep.translation) {
+          setTranslations((prev) => ({ ...prev, [aiMsgId]: aiStep.translation }));
+          setShowTranslations((prev) => ({ ...prev, [aiMsgId]: true }));
+        }
+
+        setSending(false);
+        setSampleTurnIndex((prev) => prev + 1);
+
+        if (sampleTurnIndex + 1 >= sampleTurns.length) {
+          confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+        }
+      }, 750);
+    } else {
+      setSending(false);
+      setSampleTurnIndex((prev) => prev + 1);
+    }
+  };
 
   // Translations
   const [showTranslations, setShowTranslations] = useState<Record<string | number, boolean>>({});
@@ -146,11 +224,12 @@ export const DuoChatPage: React.FC = () => {
     }
   }, [targetLanguage]);
 
-  // When selectedScenario changes, reset messages and greeting
+  // When selectedScenario changes, reset messages, greeting and sample index
   const startChatWithScenario = (scenario: EnhancedScenario) => {
     setSelectedScenario(scenario);
     setViewMode('CHAT');
     setSearchParams({ scenarioId: String(scenario.id) });
+    setSampleTurnIndex(0);
 
     const initial: ConversationMessage = {
       id: 1,
@@ -523,11 +602,29 @@ Respond ONLY with a JSON object:
                 <div>
                   {/* Top Badges */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                       <span style={{ fontSize: 24 }}>{sc.categoryIcon}</span>
                       <Tag color="cyan" style={{ borderRadius: 6, fontWeight: 800, margin: 0 }}>
                         {sc.categoryLabel}
                       </Tag>
+                      {sc.sampleDialogues && sc.sampleDialogues.length > 0 && (
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 800,
+                            color: '#58CC02',
+                            background: 'rgba(88,204,2,0.12)',
+                            padding: '2px 8px',
+                            borderRadius: 6,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                          }}
+                        >
+                          <Sparkles size={11} />
+                          <span>Có mẫu sẵn</span>
+                        </span>
+                      )}
                     </div>
 
                     <Tag color="blue" style={{ borderRadius: 6, fontWeight: 800, margin: 0 }}>
@@ -603,7 +700,7 @@ Respond ONLY with a JSON object:
                   style={{ width: '100%', padding: '10px 16px', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
                 >
                   <MessageSquare size={16} />
-                  <span>{isFree ? 'Bắt đầu chat tự do ➔' : 'Vào luyện nói hội thoại ➔'}</span>
+                  <span>{isFree ? 'Bắt đầu chat tự do ➔' : (sc.sampleDialogues?.length ? 'Luyện theo mẫu (Bấm Next) ➔' : 'Vào luyện nói hội thoại ➔')}</span>
                 </button>
               </div>
             );
@@ -916,6 +1013,139 @@ Respond ONLY with a JSON object:
         })}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Sample Dialogue NEXT Automation Bar */}
+      {hasSampleTurns && !isSampleCompleted && currentSampleTurn && (
+        <div style={{ maxWidth: 820, width: '100%', margin: '0 auto', padding: '0 20px 10px' }}>
+          <div
+            style={{
+              background: 'var(--duo-card-bg)',
+              border: '2px solid #58CC02',
+              borderBottom: '4px solid #46A302',
+              borderRadius: 20,
+              padding: '14px 18px',
+              boxShadow: '0 4px 16px rgba(88, 204, 2, 0.12)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 10,
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 900,
+                    color: '#58CC02',
+                    background: 'rgba(88, 204, 2, 0.12)',
+                    padding: '3px 10px',
+                    borderRadius: 8,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 5,
+                  }}
+                >
+                  <Sparkles size={13} color="#58CC02" />
+                  <span>Hội thoại mẫu (Lượt {sampleTurnIndex + 1}/{sampleTurns.length})</span>
+                </span>
+                <span style={{ fontSize: 12, color: 'var(--duo-text-secondary)', fontWeight: 700 }}>
+                  Chỉ cần nhấn Next để tự động trả lời mẫu:
+                </span>
+              </div>
+              <span style={{ fontSize: 11, color: '#1CB0F6', fontWeight: 800 }}>
+                🤖 AI sẽ tự động đáp lại theo kịch bản
+              </span>
+            </div>
+
+            {/* Scripted line preview */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+              <div style={{ flex: 1, minWidth: 260 }}>
+                <div
+                  style={{ fontSize: 16, fontWeight: 800, color: 'var(--duo-text-primary)' }}
+                  className={isKo ? 'lang-ko' : ''}
+                >
+                  🗣️ "{currentSampleTurn.userStep.text}"
+                </div>
+                {currentSampleTurn.userStep.translation && (
+                  <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)', marginTop: 2, fontWeight: 600 }}>
+                    ↳ Dịch nghĩa: <em>{currentSampleTurn.userStep.translation}</em>
+                  </div>
+                )}
+              </div>
+
+              {/* NEXT BUTTON */}
+              <button
+                onClick={handleNextSampleTurn}
+                disabled={sending}
+                className="duo-btn-green"
+                style={{
+                  padding: '12px 24px',
+                  fontSize: 15,
+                  fontWeight: 900,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  boxShadow: '0 4px 12px rgba(88, 204, 2, 0.35)',
+                  whiteSpace: 'nowrap',
+                  cursor: sending ? 'wait' : 'pointer',
+                }}
+              >
+                <span>{sending ? 'Đang trả lời mẫu... ⏳' : 'Tiếp theo (Next) ➔'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sample Dialogue Completion Banner */}
+      {hasSampleTurns && isSampleCompleted && (
+        <div style={{ maxWidth: 820, width: '100%', margin: '0 auto', padding: '0 20px 10px' }}>
+          <div
+            style={{
+              background: 'rgba(88, 204, 2, 0.1)',
+              border: '2px solid #58CC02',
+              borderRadius: 18,
+              padding: '14px 20px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: 12,
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 900, color: '#58CC02' }}>
+                🎉 Bạn đã hoàn thành toàn bộ các câu thoại mẫu trong kịch bản này!
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--duo-text-secondary)', marginTop: 2 }}>
+                Bạn có thể nhấn xem đánh giá tổng kết, luyện lại từ đầu hoặc tiếp tục gõ chat tự do.
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                className="duo-btn-outline"
+                onClick={() => {
+                  setSampleTurnIndex(0);
+                  startChatWithScenario(selectedScenario);
+                }}
+                style={{ padding: '8px 16px', fontSize: 13, fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <RotateCcw size={15} />
+                <span>Luyện lại từ đầu</span>
+              </button>
+              <button
+                className="duo-btn-green"
+                onClick={handleFinish}
+                style={{ padding: '8px 18px', fontSize: 13, fontWeight: 900, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <CheckCircle size={15} />
+                <span>Nhận đánh giá 🏆</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Quick Replies Chips */}
       {selectedScenario.quickReplies && selectedScenario.quickReplies.length > 0 && (

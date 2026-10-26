@@ -1,11 +1,18 @@
 import { ConversationScenario } from '../../types';
 
+export interface SampleDialogueStep {
+  speaker: string;
+  role: 'USER' | 'AI';
+  text: string;
+  translation: string;
+}
+
 export interface EnhancedScenario extends ConversationScenario {
   category: 'DIRECTIONS' | 'SELF_INTRO' | 'FOOD_ORDER' | 'FREE_CHAT';
   categoryLabel: string;
   categoryIcon: string;
   quickReplies: string[];
-  sampleDialogues?: Array<{ speaker: string; text: string; translation: string }>;
+  sampleDialogues?: SampleDialogueStep[];
 }
 
 export const KOREAN_SCENARIOS: EnhancedScenario[] = [
@@ -33,10 +40,12 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '감사합니다, 좋은 하루 보내세요!',
     ],
     sampleDialogues: [
-      { speaker: '여행자', text: '저기요, 실례지만 강남역 11번 출구가 어디예요?', translation: 'Xin lỗi, cho tôi hỏi lối ra số 11 ga Gangnam ở đâu vậy ạ?' },
-      { speaker: '행인', text: '아, 저쪽 편의점 골목으로 곧장 가시면 바로 보여요.', translation: 'À, bạn đi thẳng vào ngõ có cửa hàng tiện lợi đằng kia là thấy ngay.' },
-      { speaker: '여행자', text: '여기서 걸어서 얼마나 걸려요?', translation: 'Từ đây đi bộ mất bao lâu ạ?' },
-      { speaker: '행인', text: '걸어서 3분 정도밖에 안 걸려요.', translation: 'Chỉ mất khoảng 3 phút đi bộ thôi.' },
+      { speaker: 'Khách du lịch', role: 'USER', text: '저기요, 실례지만 강남역 11번 출구가 어디예요?', translation: 'Xin lỗi, cho tôi hỏi lối ra số 11 ga Gangnam ở đâu vậy ạ?' },
+      { speaker: 'Người qua đường', role: 'AI', text: '아, 저쪽 편의점 골목으로 곧장 가시면 바로 보여요.', translation: 'À, bạn đi thẳng vào con ngõ cạnh cửa hàng tiện lợi đằng kia là thấy ngay.' },
+      { speaker: 'Khách du lịch', role: 'USER', text: '여기서 걸어서 얼마나 걸려요?', translation: 'Từ đây đi bộ mất bao lâu ạ?' },
+      { speaker: 'Người qua đường', role: 'AI', text: '걸어서 3분 정도밖에 안 걸려요. 금방 가실 수 있어요.', translation: 'Chỉ mất khoảng 3 phút đi bộ thôi. Đi là tới liền đấy.' },
+      { speaker: 'Khách du lịch', role: 'USER', text: '친절하게 알려주셔서 정말 감사합니다!', translation: 'Cảm ơn bạn rất nhiều vì đã chỉ đường nhiệt tình!' },
+      { speaker: 'Người qua đường', role: 'AI', text: '별말씀을요. 조심히 가시고 좋은 하루 보내세요!', translation: 'Không có chi đâu. Bạn đi cẩn thận và chúc một ngày tốt lành nhé!' },
     ],
   },
   {
@@ -60,8 +69,12 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '친절하게 알려주셔서 감사합니다!',
     ],
     sampleDialogues: [
-      { speaker: '관광객', text: '남산타워에 가려면 몇 번 버스를 타야 하나요?', translation: 'Muốn lên tháp Namsan thì phải bắt xe buýt số mấy ạ?' },
-      { speaker: '안내원', text: '앞 정류장에서 01A번 순환버스를 타시면 타워 바로 앞까지 갑니다.', translation: 'Bạn bắt xe buýt tuần hoàn 01A ở trạm phía trước là lên tận chân tháp nhé.' },
+      { speaker: 'Khách tham quan', role: 'USER', text: '남산타워에 가려면 몇 번 버스를 타야 하나요?', translation: 'Muốn lên tháp Namsan thì phải bắt xe buýt số mấy vậy ạ?' },
+      { speaker: 'Nhân viên hướng dẫn', role: 'AI', text: '앞 정류장에서 01A번 순환버스를 타시면 타워 바로 앞까지 편하게 올라가실 수 있어요.', translation: 'Bạn bắt xe buýt tuần hoàn 01A ở trạm ngay phía trước là lên tận chân tháp nhé.' },
+      { speaker: 'Khách tham quan', role: 'USER', text: '케이블카 타는 곳은 여기서 먼가요?', translation: 'Thế chỗ đi cáp treo có xa đây không ạ?' },
+      { speaker: 'Nhân viên hướng dẫn', role: 'AI', text: '명동역 쪽으로 10분 정도 걸어가시면 케이블카 탑승장이 나와요.', translation: 'Bạn đi bộ về phía ga Myeongdong khoảng 10 phút là tới ga cáp treo nhé.' },
+      { speaker: 'Khách tham quan', role: 'USER', text: '자세히 설명해 주셔서 감사합니다!', translation: 'Cảm ơn bạn đã giải thích rất chi tiết ạ!' },
+      { speaker: 'Nhân viên hướng dẫn', role: 'AI', text: '네, 서울에서 즐거운 여행 되세요!', translation: 'Vâng, chúc bạn có một chuyến du lịch Seoul thật vui vẻ!' },
     ],
   },
   {
@@ -84,6 +97,14 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '오른쪽으로 돌아서 가면 되나요?',
       '도와주셔서 정말 감사합니다!',
     ],
+    sampleDialogues: [
+      { speaker: 'Khách cần mua thuốc', role: 'USER', text: '실례지만, 이 근처에 약국이나 편의점이 있나요?', translation: 'Xin lỗi bác, quanh đây có hiệu thuốc hay cửa hàng tiện lợi nào không ạ?' },
+      { speaker: 'Bác bảo vệ', role: 'AI', text: '이 건물 코너 돌아서 50미터만 직진하면 GS25 편의점과 약국이 나란히 있어요.', translation: 'Cháu rẽ qua góc tòa nhà này đi thẳng 50m là có cửa hàng tiện lợi GS25 và hiệu thuốc ngay cạnh nhau.' },
+      { speaker: 'Khách cần mua thuốc', role: 'USER', text: '속이 안 좋아서 소화제 하나 사려고 해요.', translation: 'Cháu đang bị đau bụng nên muốn mua liều thuốc tiêu hóa ạ.' },
+      { speaker: 'Bác bảo vệ', role: 'AI', text: '약국 문 닫았으면 편의점에서도 안전상비의약품으로 소화제 팔고 있으니 가 봐요.', translation: 'Nếu hiệu thuốc đóng cửa thì trong cửa hàng tiện lợi cũng có bán thuốc tiêu hóa thông thường đấy, cháu ghé xem nhé.' },
+      { speaker: 'Khách cần mua thuốc', role: 'USER', text: '친절하게 알려주셔서 정말 감사합니다!', translation: 'Bác chỉ dẫn nhiệt tình quá, cháu cảm ơn bác nhiều ạ!' },
+      { speaker: 'Bác bảo vệ', role: 'AI', text: '그래요, 얼른 가서 약 먹고 몸 잘 챙겨요.', translation: 'Được rồi, mau qua mua thuốc uống rồi nghỉ ngơi cho khỏe nhé cháu.' },
+    ],
   },
   {
     id: 104,
@@ -104,6 +125,14 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '어느 쪽 승강장에서 타야 돼요?',
       '몇 정거장 더 가야 해요?',
       '알려주셔서 감사합니다!',
+    ],
+    sampleDialogues: [
+      { speaker: 'Sinh viên du lịch', role: 'USER', text: '홍대입구역에 가려면 2호선으로 갈아타야 하나요?', translation: 'Muốn đến ga Đại học Hongik (Hongdae) thì tôi phải đổi sang line 2 đúng không ạ?' },
+      { speaker: 'Nhân viên nhà ga', role: 'AI', text: '네 맞습니다. 저기 초록색 안내 표지판을 따라 계단 아래로 내려가시면 됩니다.', translation: 'Vâng đúng rồi. Bạn đi theo biển chỉ dẫn màu xanh lá cây xuống cầu thang kia nhé.' },
+      { speaker: 'Sinh viên du lịch', role: 'USER', text: '거기서 타면 몇 정거장 더 가야 해요?', translation: 'Lên tàu ở đó thì phải đi thêm mấy ga nữa ạ?' },
+      { speaker: 'Nhân viên nhà ga', role: 'AI', text: '신촌 방면으로 딱 3정거장만 더 가시면 홍대입구역이에요.', translation: 'Bạn đi hướng Sinchon đúng 3 ga nữa là tới ga Hongik University rồi.' },
+      { speaker: 'Sinh viên du lịch', role: 'USER', text: '알려주셔서 정말 감사합니다!', translation: 'Cảm ơn anh/chị đã hướng dẫn ạ!' },
+      { speaker: 'Nhân viên nhà ga', role: 'AI', text: '네, 조심히 다녀오세요!', translation: 'Vâng, chúc bạn đi lại an toàn và thuận lợi!' },
     ],
   },
   {
@@ -127,9 +156,12 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '티머니 카드로 결제할게요. 감사합니다!',
     ],
     sampleDialogues: [
-      { speaker: '승객', text: '기사님, 명동 롯데호텔로 가 주세요.', translation: 'Bác tài ơi, chở cháu đến khách sạn Lotte Myeongdong nhé ạ.' },
-      { speaker: '기사님', text: '네, 알겠습니다. 지금 퇴근 시간이라 조금 막힐 수 있어요.', translation: 'Vâng, được rồi. Giờ tan tầm nên có thể hơi kẹt xe một chút nhé.' },
-      { speaker: '승객', text: '네 괜찮습니다. 도착하면 티머니 카드로 결제할게요.', translation: 'Vâng không sao ạ. Đến nơi cháu sẽ thanh toán bằng thẻ T-money.' },
+      { speaker: 'Hành khách', role: 'USER', text: '기사님, 명동 롯데호텔로 가 주세요.', translation: 'Bác tài ơi, chở cháu đến khách sạn Lotte Myeongdong nhé ạ.' },
+      { speaker: 'Bác tài xế', role: 'AI', text: '네, 알겠습니다. 지금 퇴근 시간이라 조금 막힐 수 있어요.', translation: 'Vâng, được rồi. Giờ tan tầm nên đường hơi đông một chút nhé.' },
+      { speaker: 'Hành khách', role: 'USER', text: '네 괜찮습니다. 도착하면 티머니 카드로 결제할게요.', translation: 'Vâng không sao ạ. Đến nơi cháu sẽ quẹt thanh toán bằng thẻ T-money.' },
+      { speaker: 'Bác tài xế', role: 'AI', text: '네, 카드 단말기에 태그하시면 됩니다. 편안히 쉬세요.', translation: 'Được chứ, cháu chỉ cần quẹt vào máy đọc thẻ là xong. Cứ ngồi nghỉ ngơi thoải mái nhé.' },
+      { speaker: 'Hành khách', role: 'USER', text: '안전운전해 주셔서 감사합니다!', translation: 'Cháu cảm ơn bác tài đã lái xe an toàn ạ!' },
+      { speaker: 'Bác tài xế', role: 'AI', text: '네, 도착했습니다. 소지품 잊지 말고 잘 챙겨 내리세요!', translation: 'Tới nơi rồi nhé. Cháu kiểm tra hành lý cẩn thận đừng để quên đồ nhé!' },
     ],
   },
   {
@@ -153,9 +185,12 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '친절하게 설명해 주셔서 감사합니다!',
     ],
     sampleDialogues: [
-      { speaker: '여행객', text: '티머니 교통카드 한 장 구매하고 싶은데요.', translation: 'Tôi muốn mua một chiếc thẻ giao thông T-money ạ.' },
-      { speaker: '역무원', text: '네, 카드는 4,000원입니다. 얼마 충전해 드릴까요?', translation: 'Vâng, tiền thẻ là 4.000 won. Tôi nạp cho bạn bao nhiêu tiền ạ?' },
-      { speaker: '여행객', text: '2만 원 충전해 주세요.', translation: 'Nạp giúp tôi 20.000 won nhé ạ.' },
+      { speaker: 'Du khách', role: 'USER', text: '티머니 교통카드 한 장 구매하고 싶은데요.', translation: 'Tôi muốn mua một chiếc thẻ giao thông T-money ạ.' },
+      { speaker: 'Nhân viên quầy vé', role: 'AI', text: '네, 카드는 4,000원입니다. 얼마 충전해 드릴까요?', translation: 'Vâng, tiền phôi thẻ là 4.000 won. Tôi nạp thêm bao nhiêu tiền vào thẻ cho bạn ạ?' },
+      { speaker: 'Du khách', role: 'USER', text: '현금으로 2만 원 충전해 주세요.', translation: 'Nạp giúp tôi 20.000 won bằng tiền mặt nhé ạ.' },
+      { speaker: 'Nhân viên quầy vé', role: 'AI', text: '네, 2만 원 충전 완료되었습니다. 영수증 챙겨 드릴게요.', translation: 'Vâng, đã nạp xong 20.000 won. Tôi gửi kèm hóa đơn cho bạn nhé.' },
+      { speaker: 'Du khách', role: 'USER', text: '버스에서 내릴 때도 카드를 찍어야 하나요?', translation: 'Cho tôi hỏi khi xuống xe buýt có cần phải quẹt thẻ lại không ạ?' },
+      { speaker: 'Nhân viên quầy vé', role: 'AI', text: '네, 내릴 때 꼭 단말기에 찍으셔야 환승 할인이 적용됩니다.', translation: 'Đúng rồi, bạn phải quẹt thẻ lúc xuống thì mới được áp dụng giảm giá chuyển tuyến nhé.' },
     ],
   },
   {
@@ -177,6 +212,14 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '여기서 제일 유명한 맛집이 어느 쪽인가요?',
       '오른쪽으로 쭉 가면 되나요?',
       '알려주셔서 정말 감사합니다!',
+    ],
+    sampleDialogues: [
+      { speaker: 'Khách tham quan', role: 'USER', text: '이모님, 빈대떡 골목이 어디예요?', translation: 'Dì ơi, cho con hỏi con ngõ bán bánh xèo Bindaetteok ở đâu vậy ạ?' },
+      { speaker: 'Bác bán hàng rong', role: 'AI', text: '중앙 통로로 30미터만 쭉 들어가면 고소한 기름 냄새 나는 사거리가 바로 빈대떡 골목이야!', translation: 'Cháu cứ đi thẳng lối chính 30 mét nữa, đến ngã tư ngửi thấy mùi dầu thơm phức là ngõ bánh xèo đấy!' },
+      { speaker: 'Khách tham quan', role: 'USER', text: '거기서 마약김밥도 같이 먹을 수 있나요?', translation: 'Ở đó mình có thể gọi ăn cùng kimbap tí hon (Mayak Kimbap) luôn được không ạ?' },
+      { speaker: 'Bác bán hàng rong', role: 'AI', text: '그럼! 빈대떡이랑 마약김밥 같이 시켜서 겨자 소스에 찍어 먹으면 꿀맛이지.', translation: 'Được chứ! Gọi bánh xèo ăn chung kimbap tí hon chấm sốt mù tạt là ngon hết ý luôn cháu ạ.' },
+      { speaker: 'Khách tham quan', role: 'USER', text: '친절하게 알려주셔서 정말 감사해요 이모님!', translation: 'Con cảm ơn dì nhiều đã chỉ dẫn nhiệt tình ạ!' },
+      { speaker: 'Bác bán hàng rong', role: 'AI', text: '맛있게 많이 먹고 가요~', translation: 'Ăn ngon miệng và vui vẻ nhé cháu ơi~' },
     ],
   },
 
@@ -204,9 +247,12 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '앞으로 친하게 지내자!',
     ],
     sampleDialogues: [
-      { speaker: '동기', text: '안녕! 혹시 이번 학기 신입생이야? 만나서 반가워!', translation: 'Chào bạn! Bạn là tân sinh viên kỳ này à? Rất vui được gặp bạn!' },
-      { speaker: '신입생', text: '응 안녕! 나는 베트남에서 온 유학생이야. 만나서 반가워.', translation: 'Ừ chào bạn! Mình là du học sinh đến từ Việt Nam. Rất vui được làm quen.' },
-      { speaker: '동기', text: '한국말 정말 잘한다! 우리 앞으로 같이 밥 먹으러 가자.', translation: 'Bạn nói tiếng Hàn giỏi thế! Sau này chúng mình cùng đi ăn trưa nhé.' },
+      { speaker: 'Sinh viên mới', role: 'USER', text: '응 안녕! 나는 베트남에서 온 유학생이야. 만나서 반가워.', translation: 'Ừ chào bạn! Mình là du học sinh đến từ Việt Nam. Rất vui được làm quen với bạn.' },
+      { speaker: 'Bạn học cùng lớp', role: 'AI', text: '한국말 정말 잘한다! 전공은 뭐야?', translation: 'Bạn nói tiếng Hàn giỏi quá! Bạn học chuyên ngành gì vậy?' },
+      { speaker: 'Sinh viên mới', role: 'USER', text: '경영학을 전공하고 있어. 한국 문화에 관심이 많아.', translation: 'Mình theo học ngành Quản trị kinh doanh. Mình rất hứng thú với văn hóa Hàn Quốc.' },
+      { speaker: 'Bạn học cùng lớp', role: 'AI', text: '우와 멋지다! 나도 베트남 음식 엄청 좋아해. 우리 앞으로 같이 밥 먹으러 가자.', translation: 'Tuyệt vời thế! Mình cũng cực kỳ mê đồ ăn Việt Nam. Chúng mình sau này cùng đi ăn trưa nhé.' },
+      { speaker: 'Sinh viên mới', role: 'USER', text: '좋아! 앞으로 친하게 지내자.', translation: 'Nhất trí luôn! Chúng mình giữ liên lạc và thân thiết với nhau nhé.' },
+      { speaker: 'Bạn học cùng lớp', role: 'AI', text: '그래, 수업 끝나고 연락처 교환하자!', translation: 'Được chứ, tan học chúng mình đổi số điện thoại kết bạn nha!' },
     ],
   },
   {
@@ -229,6 +275,14 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '팀에 보탬이 되도록 최선을 다하겠습니다.',
       '앞으로 잘 부탁드립니다!',
     ],
+    sampleDialogues: [
+      { speaker: 'Nhân viên mới', role: 'USER', text: '안녕하십니까! 오늘부터 마케팅팀에서 일하게 된 신입사원입니다.', translation: 'Kính chào anh/chị! Tôi là nhân viên mới gia nhập đội ngũ phòng Marketing từ hôm nay ạ.' },
+      { speaker: 'Trưởng nhóm', role: 'AI', text: '환영해요! 우리 팀 분위기 좋으니까 긴장하지 말고 편하게 적응해요.', translation: 'Chào mừng em! Không khí đội ngũ mình rất hòa đồng nên em đừng căng thẳng, cứ thoải mái làm quen nhé.' },
+      { speaker: 'Nhân viên mới', role: 'USER', text: '아직 부족한 점이 많지만 선배님들께 열심히 배우겠습니다.', translation: 'Em còn nhiều điều bỡ ngỡ nhưng sẽ nỗ lực học hỏi từ các anh chị tiền bối ạ.' },
+      { speaker: 'Trưởng nhóm', role: 'AI', text: '좋은 자세예요. 모르는 게 있으면 언제든 팀원들에게 편하게 질문하세요.', translation: 'Tinh thần rất tốt. Có bất kỳ thắc mắc nào em cứ chủ động hỏi mọi người trong nhóm nhé.' },
+      { speaker: 'Nhân viên mới', role: 'USER', text: '팀에 보탬이 되도록 최선을 다하겠습니다. 잘 부탁드립니다!', translation: 'Em sẽ cố gắng hết mình đóng góp cho phòng ban. Rất mong được các anh chị chỉ bảo ạ!' },
+      { speaker: 'Trưởng nhóm', role: 'AI', text: '네, 앞으로 함께 멋진 성과 만들어 봅시다. 파이팅!', translation: 'Vâng, chúng ta cùng cố gắng tạo ra những thành quả tuyệt vời nhé. Cố lên!' },
+    ],
   },
   {
     id: 203,
@@ -249,6 +303,14 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '주말에는 보통 집에서 한국 드라마를 봐요.',
       '한국 음식 중에 매콤한 떡볶이를 제일 좋아해요.',
       '당신은 어떤 취미가 있으신가요?',
+    ],
+    sampleDialogues: [
+      { speaker: 'Người học tiếng Hàn', role: 'USER', text: '저는 K-POP 음악 듣는 것과 맛집 탐방을 좋아해요.', translation: 'Mình rất thích nghe nhạc K-Pop và khám phá các quán ăn ngon.' },
+      { speaker: 'Bạn giao lưu', role: 'AI', text: '오, 저도 음악 좋아해요! K-POP 아이돌 중에 누구를 제일 좋아하세요?', translation: 'Ồ, mình cũng mê âm nhạc lắm! Trong các nhóm nhạc K-Pop bạn thích thần tượng nào nhất?' },
+      { speaker: 'Người học tiếng Hàn', role: 'USER', text: 'BTS랑 뉴진스 노래를 매일 들어요. 그리고 주말에는 한국 드라마를 봐요.', translation: 'Mình nghe nhạc của BTS và NewJeans mỗi ngày. Còn cuối tuần thì hay cày phim Hàn.' },
+      { speaker: 'Bạn giao lưu', role: 'AI', text: '저랑 취향이 정말 비슷하시네요! 다음 주말에 홍대 K-Pop 카페 같이 가실래요?', translation: 'Sở thích của bạn giống hệt mình luôn! Cuối tuần sau bạn có muốn cùng đi cafe K-Pop ở Hongdae không?' },
+      { speaker: 'Người học tiếng Hàn', role: 'USER', text: '정말 좋아요! 꼭 같이 가요.', translation: 'Thích quá! Nhất định chúng mình cùng đi nhé.' },
+      { speaker: 'Bạn giao lưu', role: 'AI', text: '네, 약속 잡아서 재미있게 놀아요!', translation: 'Được rồi, chúng mình hẹn nhau rồi đi chơi thật vui nhé!' },
     ],
   },
   {
@@ -272,8 +334,12 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '손님들께 늘 친절한 미소로 최선을 다하겠습니다!',
     ],
     sampleDialogues: [
-      { speaker: '점장님', text: '한국어 소통에는 문제없으신가요?', translation: 'Bạn giao tiếp tiếng Hàn có gặp khó khăn gì không?' },
-      { speaker: '지원자', text: '네! 일상 회화와 주문 받기는 자신 있습니다. 부족한 점은 열심히 배우겠습니다.', translation: 'Vâng! Hội thoại hàng ngày và nhận order em rất tự tin ạ. Điểm nào còn thiếu sót em sẽ chăm chỉ học hỏi.' },
+      { speaker: 'Người ứng tuyển', role: 'USER', text: '안녕하십니까! 베트남에서 온 유학생이며, 카페 바리스타 경력이 1년 있습니다.', translation: 'Kính chào anh/chị! Em là du học sinh Việt Nam, đã có 1 năm kinh nghiệm làm barista quán cafe ạ.' },
+      { speaker: 'Chủ quán Cafe', role: 'AI', text: '한국어로 손님 주문 받고 응대하는 데에는 문제없으신가요?', translation: 'Nhận order và giao tiếp chào đón khách bằng tiếng Hàn thì em có tự tin không?' },
+      { speaker: 'Người ứng tuyển', role: 'USER', text: '네! 일상 회화와 주문 받기는 자신 있습니다. 부족한 점은 열심히 배우겠습니다.', translation: 'Dạ có ạ! Hội thoại hàng ngày và nhận order em rất tự tin, có gì cần cải thiện em sẽ học hỏi nhanh ạ.' },
+      { speaker: 'Chủ quán Cafe', role: 'AI', text: '근무 가능한 요일과 시간대는 어떻게 되나요?', translation: 'Các ngày trong tuần và khung giờ em có thể làm việc là khi nào?' },
+      { speaker: 'Người ứng tuyển', role: 'USER', text: '평일 오후 시간대와 주말에는 언제든 근무 가능합니다.', translation: 'Các buổi chiều trong tuần và toàn bộ cuối tuần em đều có thể nhận ca làm việc được ạ.' },
+      { speaker: 'Chủ quán Cafe', role: 'AI', text: '성실해 보여서 아주 마음에 듭니다. 다음 주 월요일부터 교육 시작할까요?', translation: 'Trông em rất nhanh nhẹn và đáng tin cậy. Vậy thứ 2 tuần sau bắt đầu đào tạo nhận việc nhé?' },
     ],
   },
   {
@@ -296,6 +362,14 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '베트남 쌀국수랑 연유 커피는 꼭 마셔봐야 해.',
       '나중에 베트남 오면 내가 맛집 많이 데려가 줄게!',
     ],
+    sampleDialogues: [
+      { speaker: 'Bạn người Việt', role: 'USER', text: '베트남은 날씨가 따뜻하고 사람들이 아주 친절해!', translation: 'Việt Nam khí hậu ấm áp quanh năm và con người thì vô cùng thân thiện mến khách!' },
+      { speaker: 'Bạn người Hàn', role: 'AI', text: '우와! 베트남 가면 어떤 음식을 꼭 먹어봐야 해?', translation: 'Tuyệt quá! Sang Việt Nam thì nhất định phải thưởng thức những món ăn nào vậy?' },
+      { speaker: 'Bạn người Việt', role: 'USER', text: '따끈한 소고기 쌀국수랑 바삭한 반미, 달콤한 연유 커피는 필수야.', translation: 'Phở bò nóng hổi, bánh mì giòn rụm và cà phê sữa đá ngọt béo là những món bắt buộc phải thử đó.' },
+      { speaker: 'Bạn người Hàn', role: 'AI', text: '벌써부터 너무 기대된다! 여행지는 어디가 제일 좋아?', translation: 'Mới nghe thôi mà mình đã háo hức quá! Thế địa điểm du lịch ở đâu là đẹp nhất?' },
+      { speaker: 'Bạn người Việt', role: 'USER', text: '아름다운 바다가 있는 다낭이랑 고풍스러운 하노이를 강력 추천해!', translation: 'Mình đặc biệt khuyên bạn nên đi ngắm biển Đà Nẵng và dạo phố cổ Hà Nội cổ kính!' },
+      { speaker: 'Bạn người Hàn', role: 'AI', text: '고마워! 너 덕분에 완벽한 여행 계획을 세울 수 있겠다.', translation: 'Cảm ơn bạn nhé! Nhờ bạn mà mình lên được một lịch trình du lịch quá hoàn hảo rồi.' },
+    ],
   },
   {
     id: 206,
@@ -316,6 +390,14 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '컴퓨터공학을 전공하고 있고 한국 문화를 좋아해요.',
       '한국 생활에 잘 적응하고 싶어서 멘토링 프로그램에 참여했어요.',
       '한 학기 동안 잘 부탁드립니다 선배님!',
+    ],
+    sampleDialogues: [
+      { speaker: 'Du học sinh', role: 'USER', text: '안녕하세요 선배님! 저는 베트남에서 온 유학생입니다.', translation: 'Chào tiền bối ạ! Em là du học sinh đến từ Việt Nam.' },
+      { speaker: 'Tiền bối hỗ trợ', role: 'AI', text: '반가워요! 이번 학기에 어떤 전공 수업들을 듣게 되나요?', translation: 'Chào em! Kỳ này em sẽ theo học những môn chuyên ngành nào thế?' },
+      { speaker: 'Du học sinh', role: 'USER', text: '컴퓨터공학과 한국어 심화 과정을 전공하고 있어요.', translation: 'Em học Khoa Khoa học máy tính và các khóa tiếng Hàn nâng cao ạ.' },
+      { speaker: 'Tiền bối hỗ trợ', role: 'AI', text: '학교 도서관이나 학생식당 이용할 때 궁금한 거 있으면 언제든 편하게 물어봐요.', translation: 'Khi dùng thư viện hay nhà ăn trường nếu có chỗ nào chưa rõ em cứ thoải mái hỏi anh/chị nhé.' },
+      { speaker: 'Du học sinh', role: 'USER', text: '한국 생활에 잘 적응하도록 열심히 하겠습니다. 잘 부탁드립니다!', translation: 'Em sẽ cố gắng để hòa nhập thật tốt với cuộc sống tại Hàn. Nhờ tiền bối giúp đỡ ạ!' },
+      { speaker: 'Tiền bối hỗ trợ', role: 'AI', text: '그래요, 즐겁고 알찬 유학 생활이 되길 응원할게요!', translation: 'Được rồi, chúc em có một quãng đời du học thật nhiều niềm vui và ý nghĩa!' },
     ],
   },
 
@@ -342,6 +424,14 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '물 좀 한 병 더 주세요.',
       '계산은 카드로 할게요. 영수증 주세요!',
     ],
+    sampleDialogues: [
+      { speaker: 'Khách hàng', role: 'USER', text: '저기요! 김치찌개 1인분하고 공깃밥 하나 주세요.', translation: 'Em ơi! Cho anh/chị một phần canh kim chi với một bát cơm trắng nhé.' },
+      { speaker: 'Nhân viên phục vụ', role: 'AI', text: '네 손님, 찌개는 라면사리 추가해 드릴까요?', translation: 'Dạ được ạ, nồi canh kim chi anh/chị có muốn thêm mì tôm (Ramyeon) vào không ạ?' },
+      { speaker: 'Khách hàng', role: 'USER', text: '네 라면사리도 하나 넣어 주시고, 반찬도 좀 넉넉히 주세요.', translation: 'Có, cho một vắt mì tôm luôn nhé, và cho thêm ít món ăn kèm (panchan) nữa nhé.' },
+      { speaker: 'Nhân viên phục vụ', role: 'AI', text: '네, 알겠습니다. 반찬은 셀프바에서 무한 리필 가능합니다!', translation: 'Dạ vâng, các món banchan anh/chị có thể tự lấy thêm thoải mái ở quầy tự phục vụ ạ!' },
+      { speaker: 'Khách hàng', role: 'USER', text: '계산은 카드로 할게요. 정말 맛있게 잘 먹었습니다!', translation: 'Anh/chị thanh toán bằng thẻ nhé. Bữa ăn ngon lắm, cảm ơn em!' },
+      { speaker: 'Nhân viên phục vụ', role: 'AI', text: '감사합니다! 다음에 또 찾아주세요.', translation: 'Dạ cảm ơn anh/chị nhiều! Lần sau lại ghé quán em ủng hộ nhé.' },
+    ],
   },
   {
     id: 302,
@@ -362,6 +452,14 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '불판이 좀 탔는데 갈아주시겠어요?',
       '상추랑 마늘 좀 더 주세요.',
       '정말 맛있게 잘 먹었습니다!',
+    ],
+    sampleDialogues: [
+      { speaker: 'Khách ăn tối', role: 'USER', text: '삼겹살 2인분하고 된장찌개 하나 주세요.', translation: 'Cho bàn mình 2 phần thịt ba chỉ heo nướng và một bát canh tương đậu nhé.' },
+      { speaker: 'Nhân viên quán nướng', role: 'AI', text: '네, 주문 확인했습니다. 숯불 올려드릴 테니 잠시만 기다려 주세요.', translation: 'Dạ vâng, em ghi order rồi ạ. Em lên bếp than ngay, anh/chị đợi một lát nhé.' },
+      { speaker: 'Khách ăn tối', role: 'USER', text: '저기요, 불판이 좀 탔는데 새 걸로 갈아주시겠어요?', translation: 'Em ơi, vỉ nướng hơi bị cháy rồi, đổi giúp anh/chị vỉ mới với nhé?' },
+      { speaker: 'Nhân viên quán nướng', role: 'AI', text: '네, 바로 깨끗한 불판으로 교체해 드리겠습니다. 상추도 더 드릴까요?', translation: 'Dạ vâng, em thay vỉ nướng mới tinh cho anh/chị ngay ạ. Rau xà lách có cần thêm không ạ?' },
+      { speaker: 'Khách ăn tối', role: 'USER', text: '네, 상추랑 마늘, 쌈장도 조금 더 부탁드려요.', translation: 'Cho anh/chị thêm chút xà lách, tỏi và sốt chấm ssamjang luôn nhé.' },
+      { speaker: 'Nhân viên quán nướng', role: 'AI', text: '네, 맛있게 구워 드세요!', translation: 'Dạ có ngay ạ, chúc anh/chị nướng thịt ăn ngon miệng!' },
     ],
   },
   {
@@ -384,6 +482,14 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '덜 달게 해 주실 수 있나요?',
       '영수증은 버려주셔도 돼요.',
     ],
+    sampleDialogues: [
+      { speaker: 'Khách hàng', role: 'USER', text: '아이스 아메리카노 한 잔이랑 바스크 치즈케이크 하나 주세요.', translation: 'Cho mình một ly Americano đá và một miếng bánh phô mai nướng nhé.' },
+      { speaker: 'Barista', role: 'AI', text: '네, 매장에서 드시고 가시나요, 아니면 테이크아웃이신가요?', translation: 'Dạ vâng, bạn dùng tại quán hay mang đi (take-away) ạ?' },
+      { speaker: 'Khách hàng', role: 'USER', text: '테이크아웃으로 포장해 주세요. 샷은 하나만 연하게 넣어주세요.', translation: 'Đóng gói mang đi giúp mình nhé. Pha nhạt một shot espresso thôi nhé.' },
+      { speaker: 'Barista', role: 'AI', text: '네, 연한 아메리카노 테이크아웃 한 잔과 치즈케이크 포장해 드릴게요. 총 9,500원입니다.', translation: 'Vâng, một ly Americano đá pha nhạt mang đi và bánh phô mai. Tổng cộng là 9.500 won ạ.' },
+      { speaker: 'Khách hàng', role: 'USER', text: '카드로 결제할게요. 영수증은 버려주셔도 괜찮아요.', translation: 'Mình quẹt thẻ nhé. Hóa đơn bạn cứ bỏ giúp mình không cần in đâu.' },
+      { speaker: 'Barista', role: 'AI', text: '네 결제되셨습니다. 진동벨 울리면 픽업대에서 찾아가세요!', translation: 'Dạ đã thanh toán xong. Khi nào chuông báo rung mời bạn ra quầy nhận đồ nhé!' },
+    ],
   },
   {
     id: 304,
@@ -404,6 +510,14 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '치킨무랑 콜라 큰 걸로 추가해 주세요.',
       '주소는 강남대로 123번지 302호예요.',
       '배달 시간은 얼마나 걸리나요?',
+    ],
+    sampleDialogues: [
+      { speaker: 'Người gọi món', role: 'USER', text: '안녕하세요! 후라이드 반, 양념 반으로 배달 주문할게요.', translation: 'Alo xin chào! Cho em đặt giao một phần gà nửa chiên giòn, nửa sốt cay (banban) nhé.' },
+      { speaker: 'Nhân viên quán gà', role: 'AI', text: '네 반반치킨 한 마리요. 음료나 사이드 메뉴 추가하시겠어요?', translation: 'Dạ một phần gà nửa nọ nửa kia. Bạn có muốn thêm đồ uống hay món phụ nào không ạ?' },
+      { speaker: 'Người gọi món', role: 'USER', text: '콜라 1.25리터 하나 추가해 주시고, 치킨무도 하나 더 주세요.', translation: 'Cho thêm một chai Coca lớn 1.25L và thêm một hộp củ cải muối trắng nhé.' },
+      { speaker: 'Nhân viên quán gà', role: 'AI', text: '네 확인했습니다. 배달 받으실 주소 알려주시겠어요?', translation: 'Dạ em ghi nhận rồi ạ. Anh/chị cho em xin địa chỉ nhận hàng với ạ?' },
+      { speaker: 'Người gọi món', role: 'USER', text: '강남대로 123번지 드림오피스텔 502호입니다.', translation: 'Địa chỉ là số 123 đường Gangnam-daero, tòa Dream Officetel phòng 502 nhé.' },
+      { speaker: 'Nhân viên quán gà', role: 'AI', text: '네, 35분 내로 따뜻하게 배달해 드리겠습니다. 감사합니다!', translation: 'Dạ, trong vòng 35 phút gà nóng hổi sẽ được giao tới tận cửa ạ. Cảm ơn anh/chị!' },
     ],
   },
   {
@@ -427,8 +541,12 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '계좌이체나 현금으로 계산할게요!',
     ],
     sampleDialogues: [
-      { speaker: '이모님', text: '떡볶이 맵지 않게 해 줄까?', translation: 'Dì làm bánh gạo cay vừa cho con nhé?' },
-      { speaker: '손님', text: '네! 매운 걸 잘 못 먹어서 덜 맵게 해 주세요.', translation: 'Vâng ạ! Con ăn cay hơi kém nên dì cho bớt cay giúp con nhé.' },
+      { speaker: 'Khách ăn vặt đêm', role: 'USER', text: '이모님! 떡볶이 1인분하고 튀김 섞어서 주세요.', translation: 'Dì ơi! Cho con một phần bánh gạo cay Tteokbokki và một đĩa đồ chiên thập cẩm nhé.' },
+      { speaker: 'Dì chủ quán vỉa hè', role: 'AI', text: '떡볶이 맵지 않게 해 줄까? 튀김은 떡볶이 국물에 묻혀 줄까?', translation: 'Bánh gạo dì làm ít cay cho nhé? Đồ chiên có rưới nước sốt bánh gạo lên luôn không con?' },
+      { speaker: 'Khách ăn vặt đêm', role: 'USER', text: '네! 덜 맵게 해 주시고 튀김에 국물 듬뿍 묻혀 주세요.', translation: 'Dạ! Cho bớt cay giúp con và rưới đẫm nước sốt lên đồ chiên giòn nha dì.' },
+      { speaker: 'Dì chủ quán vỉa hè', role: 'AI', text: '그래 알았어. 추운데 어묵 국물 저기 종이컵에 마음껏 떠 마셔~', translation: 'Được rồi. Trời lạnh thế này con cứ lấy cốc giấy tự múc nước súp chả cá nóng hổi uống thoải mái nhé~' },
+      { speaker: 'Khách ăn vặt đêm', role: 'USER', text: '국물이 정말 시원하고 맛있어요! 계좌이체로 계산할게요.', translation: 'Nước súp ngọt thanh ấm bụng quá dì ơi! Con xin số tài khoản chuyển khoản nhé.' },
+      { speaker: 'Dì chủ quán vỉa hè', role: 'AI', text: '그래 맛있게 먹어줘서 고마워, 조심히 들어가요!', translation: 'Ừ cảm ơn con đã ăn ngon miệng, về nhà cẩn thận nhé!' },
     ],
   },
   {
@@ -450,6 +568,14 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '탕수육 소(小)짜 하나 추가해 주시는데 소스는 따로 주세요 (찍먹이에요).',
       '단무지랑 양파 좀 넉넉하게 리필해 주세요.',
       '정말 맛있게 잘 먹었습니다!',
+    ],
+    sampleDialogues: [
+      { speaker: 'Khách ăn trưa', role: 'USER', text: '짜장면 곱빼기 하나랑 얼큰한 짬뽕 한 그릇 주세요.', translation: 'Cho bàn mình một tô mì tương đen phần lớn (gopbaegi) và một tô mì hải sản cay nhé.' },
+      { speaker: 'Nhân viên quán', role: 'AI', text: '네 손님, 탕수육 세트로 묶어드릴까요? 세트로 하시면 더 저렴해요.', translation: 'Dạ, anh/chị có muốn dùng combo kèm thịt heo chiên giòn Tangsuyuk không ạ? Combo sẽ tiết kiệm hơn đấy ạ.' },
+      { speaker: 'Khách ăn trưa', role: 'USER', text: '네 탕수육 세트로 해 주시고, 소스는 따로 담아주세요 (찍먹이에요).', translation: 'Vậy cho set Tangsuyuk luôn nhé, và nhớ để sốt chua ngọt ra bát riêng để chấm nha (đội chấm sốt giòn).' },
+      { speaker: 'Nhân viên quán', role: 'AI', text: '네 찍먹으로 소스 분리해서 바삭하게 튀겨드릴게요! 단무지도 넉넉히 가져다 드립니다.', translation: 'Dạ vâng, em tách riêng sốt và chiên thịt thật giòn rụm ạ! Em mang thêm đĩa củ cải vàng muối ra luôn nhé.' },
+      { speaker: 'Khách ăn trưa', role: 'USER', text: '감사합니다, 배고팠는데 기대되네요!', translation: 'Cảm ơn em nhiều, đang đói bụng thế này háo hức quá!' },
+      { speaker: 'Nhân viên quán', role: 'AI', text: '주문하신 음식 금방 준비해 드리겠습니다. 편안히 기다려 주세요!', translation: 'Đồ ăn sẽ ra trong ít phút nữa ạ. Anh/chị ngồi nghỉ ngơi nhé!' },
     ],
   },
   {
@@ -473,8 +599,12 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '신용카드로 결제할게요!',
     ],
     sampleDialogues: [
-      { speaker: '손님', text: '삼각김밥은 전자레인지에 몇 초 돌리면 돼요?', translation: 'Cơm nắm tam giác quay lò vi sóng mấy giây vậy bạn?' },
-      { speaker: '알바생', text: '매장용 전자레인지로 15초만 돌리시면 따뜻하고 맛있어요.', translation: 'Lò vi sóng ở cửa hàng thì bạn quay 15 giây là ấm ngon vừa tới ạ.' },
+      { speaker: 'Khách mua đồ ăn nhanh', role: 'USER', text: '삼각김밥은 전자레인지에 몇 초 돌리면 돼요?', translation: 'Cơm nắm tam giác quay lò vi sóng mấy giây vậy bạn ơi?' },
+      { speaker: 'Nhân viên thu ngân', role: 'AI', text: '매장용 전자레인지로 15초만 돌리시면 김이 바삭하고 따뜻해서 제일 맛있어요.', translation: 'Lò vi sóng ở cửa hàng thì bạn bấm 15 giây là rong biển giòn và cơm ấm ngon nhất nhé.' },
+      { speaker: 'Khách mua đồ ăn nhanh', role: 'USER', text: '그리고 쓰레기봉투 10리터짜리 한 장 같이 계산해 주세요.', translation: 'Với lại tính tiền thêm cho mình một chiếc túi rác sinh hoạt loại 10 lít nữa nha.' },
+      { speaker: 'Nhân viên thu ngân', role: 'AI', text: '네, 봉투 포함해서 총 4,800원입니다. 나무젓가락 챙겨드릴까요?', translation: 'Vâng, cả túi rác là 4.800 won ạ. Mình lấy thêm đũa gỗ dùng một lần cho bạn nhé?' },
+      { speaker: 'Khách mua đồ ăn nhanh', role: 'USER', text: '네 젓가락 하나 챙겨주세요. 카드로 결제할게요.', translation: 'Cho mình xin một đôi đũa nhé. Mình quẹt thẻ thanh toán luôn.' },
+      { speaker: 'Nhân viên thu ngân', role: 'AI', text: '결제 완료되었습니다. 따뜻하게 드시고 좋은 하루 보내세요!', translation: 'Đã thanh toán xong. Chúc bạn ăn ngon miệng và một ngày vui vẻ ạ!' },
     ],
   },
   {
@@ -496,6 +626,14 @@ export const KOREAN_SCENARIOS: EnhancedScenario[] = [
       '생일 케이크용 큰 초 2개랑 작은 초 5개 챙겨주세요.',
       '선물용으로 예쁘게 포장해 주실 수 있나요?',
       '포인트 적립하고 카드로 결제할게요.',
+    ],
+    sampleDialogues: [
+      { speaker: 'Khách mua bánh', role: 'USER', text: '방금 나온 따뜻한 소금빵 2개랑 딸기 생크림 케이크 하나 주세요.', translation: 'Cho em 2 chiếc bánh mì muối nóng vừa ra lò và một chiếc bánh kem dâu tây nhé.' },
+      { speaker: 'Nhân viên tiệm bánh', role: 'AI', text: '네, 케이크 축하용 초는 큰 초와 작은 초 몇 개씩 필요하신가요?', translation: 'Vâng, bánh sinh nhật thì anh/chị cần bao nhiêu que nến lớn và que nến nhỏ ạ?' },
+      { speaker: 'Khách mua bánh', role: 'USER', text: '큰 초 2개랑 작은 초 5개 챙겨주시고 성냥도 같이 넣어주세요.', translation: 'Cho em 2 nến lớn và 5 nến nhỏ nhé (25 tuổi), cho kèm cả bao diêm nữa nha.' },
+      { speaker: 'Nhân viên tiệm bánh', role: 'AI', text: '네, 선물용 리본으로 예쁘게 상자 포장해 드릴게요. 이동 시간은 얼마나 걸리세요?', translation: 'Dạ, em thắt nơ hộp quà thật xinh xắn ạ. Quãng đường mang bánh đi mất khoảng bao lâu thế ạ?' },
+      { speaker: 'Khách mua bánh', role: 'USER', text: '걸어서 15분 정도 걸려요. 아이스팩 하나 넣어주실 수 있나요?', translation: 'Đi bộ khoảng 15 phút thôi. Cho em xin một túi đá khô giữ nhiệt kèm theo được không ạ?' },
+      { speaker: 'Nhân viên tiệm bánh', role: 'AI', text: '물론이죠! 신선하게 보관되도록 아이스팩 동봉해 드렸습니다. 행복한 생일 파티 되세요!', translation: 'Chắc chắn rồi ạ! Em đã lót sẵn túi giữ lạnh. Chúc anh/chị có một bữa tiệc sinh nhật thật vui vẻ và hạnh phúc!' },
     ],
   },
 
