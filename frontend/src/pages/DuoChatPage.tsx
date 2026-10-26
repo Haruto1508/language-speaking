@@ -437,31 +437,11 @@ Respond ONLY with a JSON object:
           <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <button
               className="duo-btn-outline"
-              onClick={openApiKeyModal}
-              style={{ padding: '8px 14px', borderColor: apiKey ? '#58CC02' : '#FFC800' }}
-            >
-              <Key size={15} color={apiKey ? '#58CC02' : '#FFC800'} />
-              <span style={{ color: apiKey ? '#58CC02' : '#FFC800' }}>
-                {apiKey ? 'AI Key (Đã bật)' : 'Điền AI Key'}
-              </span>
-            </button>
-
-            <button
-              className="duo-btn-outline"
               onClick={openImportModal}
-              style={{ padding: '8px 14px' }}
+              style={{ padding: '8px 16px', fontSize: 13 }}
             >
-              <Upload size={15} color="#1CB0F6" />
-              <span>Nạp JSON</span>
-            </button>
-
-            <button
-              className="duo-btn-outline"
-              onClick={toggleTheme}
-              style={{ padding: '8px 12px' }}
-              title={themeMode === 'dark' ? 'Giao diện Sáng ☀️' : 'Giao diện Tối 🌙'}
-            >
-              {themeMode === 'dark' ? <Sun size={15} color="#FFC800" /> : <Moon size={15} color="#6366F1" />}
+              <Upload size={16} color="#1CB0F6" />
+              <span>Nạp thêm JSON</span>
             </button>
           </div>
         </div>
@@ -638,19 +618,22 @@ Respond ONLY with a JSON object:
   // =========================================================================
   return (
     <div
+      className="duo-card"
       style={{
         display: 'flex',
         flexDirection: 'column',
-        height: 'calc(100vh - 64px)',
-        background: 'var(--duo-bg)',
+        height: 'calc(100vh - 120px)',
+        borderRadius: 24,
+        overflow: 'hidden',
+        border: '2px solid var(--duo-border)',
+        background: 'var(--duo-card-bg)',
       }}
     >
       {/* Top Header in Chat Room */}
       <div
         style={{
-          padding: '12px 24px',
-          background: 'var(--duo-header-bg)',
-          backdropFilter: 'blur(16px)',
+          padding: '12px 20px',
+          background: 'var(--duo-card-hover)',
           borderBottom: '2px solid var(--duo-border)',
           display: 'flex',
           justifyContent: 'space-between',
@@ -702,26 +685,6 @@ Respond ONLY with a JSON object:
 
         {/* Header Right Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button
-            className="duo-btn-outline"
-            onClick={openApiKeyModal}
-            style={{ padding: '8px 14px', borderColor: apiKey ? '#58CC02' : '#FFC800' }}
-          >
-            <Key size={15} color={apiKey ? '#58CC02' : '#FFC800'} />
-            <span style={{ color: apiKey ? '#58CC02' : '#FFC800' }}>
-              {apiKey ? 'AI Key (Bật)' : 'Điền Key'}
-            </span>
-          </button>
-
-          <button
-            className="duo-btn-outline"
-            onClick={toggleTheme}
-            style={{ padding: '8px 12px' }}
-            title={themeMode === 'dark' ? 'Giao diện Sáng ☀️' : 'Giao diện Tối 🌙'}
-          >
-            {themeMode === 'dark' ? <Sun size={15} color="#FFC800" /> : <Moon size={15} color="#6366F1" />}
-          </button>
-
           <button
             className="duo-btn-green"
             onClick={handleFinish}

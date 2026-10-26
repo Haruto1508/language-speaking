@@ -49,13 +49,13 @@ export const App: React.FC = () => {
           {/* Dedicated Fullscreen Duolingo Style Pages */}
           <Route path="/learn" element={<DuoLessonPage />} />
           <Route path="/learn/:id" element={<DuoLessonPage />} />
-          <Route path="/chat" element={<DuoChatPage />} />
 
           {/* Core App Shell */}
           <Route element={<MainLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/topics" element={<TopicsPage />} />
             <Route path="/lesson/:id" element={<DuoLessonPage />} />
+            <Route path="/chat" element={<DuoChatPage />} />
             <Route path="/conversation" element={<DuoChatPage />} />
             <Route path="/review" element={<ReviewPage />} />
             <Route path="/vocabulary" element={<VocabularyPage />} />
